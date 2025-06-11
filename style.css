@@ -110,6 +110,21 @@ section p {
   transition: transform 0.2s;
 }
 
+
+.back-button {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 10px 20px;
+  background: #0077ff;
+  color: #fff;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.back-button:hover {
+  background: #005ce0;
+}
 .card:hover {
   transform: translateY(-5px);
 }
