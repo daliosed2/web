@@ -69,6 +69,7 @@ h1 {
 section p {
   text-align: left;
   line-height: 1.6;
+  margin-bottom: 1em; /* Corrección de espaciado */
 }
 
 .socials a {
