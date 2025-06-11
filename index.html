@@ -1,12 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>David Martínez</title>
   <link rel="stylesheet" href="style.css" />
+  <script defer src="script.js"></script>
+  <script src="https://kit.fontawesome.com/a2e0c6c35e.js" crossorigin="anonymous"></script>
 </head>
 <body>
+  <button id="toggle-mode">🌓</button>
   <main class="container">
     <img src="https://via.placeholder.com/100" alt="David Martínez" class="avatar" />
     <h1>David Martínez</h1>
@@ -21,9 +24,9 @@
     <section>
       <h2 class="label">/socials</h2>
       <div class="socials">
-        <a href="https://twitter.com" target="_blank">Twitter</a>
-        <a href="https://github.com" target="_blank">GitHub</a>
-        <a href="https://linkedin.com" target="_blank">LinkedIn</a>
+        <a href="https://x.com/todovaaestarbien" target="_blank"><i class="fab fa-x-twitter"></i></a>
+        <a href="https://www.youtube.com/@todovaaestarbien" target="_blank"><i class="fab fa-youtube"></i></a>
+        <a href="https://linkedin.com/in/davidmartinezec" target="_blank"><i class="fab fa-linkedin"></i></a>
       </div>
     </section>
 
@@ -35,6 +38,15 @@
         <a href="#" class="card">Curso Pan de Jamón</a>
         <a href="#" class="card">App para emprendedores</a>
       </div>
+    </section>
+
+    <section>
+      <h2 class="label">/newsletter</h2>
+      <form action="https://formspree.io/f/mwkglrwz" method="POST" class="newsletter">
+        <p>Suscríbete para recibir tips semanales sobre IA y emprendimiento directamente en tu correo.</p>
+        <input type="email" name="email" placeholder="Tu correo electrónico" required />
+        <button type="submit">Suscribirme</button>
+      </form>
     </section>
   </main>
 </body>
