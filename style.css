@@ -125,6 +125,12 @@ section p {
 .back-button:hover {
   background: #005ce0;
 }
+
+@media (max-width: 600px) {
+  .cards {
+    grid-template-columns: 1fr;
+  }
+}
 .card:hover {
   transform: translateY(-5px);
 }
