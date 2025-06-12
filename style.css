@@ -126,6 +126,21 @@ section p {
   background: #005ce0;
 }
 
+.contact-button {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 10px 20px;
+  background: #28a745;
+  color: #fff;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.contact-button:hover {
+  background: #1e7e34;
+}
+
 @media (max-width: 600px) {
   .cards {
     grid-template-columns: 1fr;
