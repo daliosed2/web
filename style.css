@@ -141,6 +141,21 @@ section p {
   background: #1e7e34;
 }
 
+.boton-descarga {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 10px 20px;
+  background: #ff5722;
+  color: #fff;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.boton-descarga:hover {
+  background: #e64a19;
+}
+
 @media (max-width: 600px) {
   .cards {
     grid-template-columns: 1fr;
