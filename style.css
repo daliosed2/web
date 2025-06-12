@@ -131,6 +131,52 @@ section p {
     grid-template-columns: 1fr;
   }
 }
+
+.gpt-category {
+  text-align: left;
+  margin-top: 20px;
+}
+
+.toggle-btn {
+  width: 100%;
+  background: var(--card-bg);
+  color: var(--text-color);
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.gpt-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 10px;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
+}
+
+.gpt-list.open {
+  max-height: 500px;
+  opacity: 1;
+  padding: 10px;
+}
+
+.gpt-list li a {
+  display: block;
+  padding: 8px;
+  margin: 4px 0;
+  border-radius: 6px;
+  background: var(--card-bg);
+  color: var(--text-color);
+  text-decoration: none;
+}
 .card:hover {
   transform: translateY(-5px);
 }

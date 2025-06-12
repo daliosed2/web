@@ -6,6 +6,15 @@ function applyMode(dark) {
   if (dark) {
     document.body.classList.add('dark');
     toggleButton.textContent = '☀️';
+
+document.querySelectorAll('.toggle-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const list = btn.nextElementSibling;
+    if (list) {
+      list.classList.toggle('open');
+    }
+  });
+});
     toggleButton.setAttribute('aria-label', 'Activar modo claro');
   } else {
     document.body.classList.remove('dark');
