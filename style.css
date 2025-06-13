@@ -112,18 +112,24 @@ section p {
 
 
 .back-button {
-  display: inline-block;
-  margin-top: 20px;
-  padding: 10px 20px;
-  background: #0077ff;
-  color: #fff;
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: var(--card-bg);
+  color: var(--text-color);
   border-radius: 8px;
   text-decoration: none;
-  transition: background 0.2s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: background 0.2s, transform 0.2s;
 }
 
 .back-button:hover {
-  background: #005ce0;
+  background: rgba(0,0,0,0.05);
+  transform: scale(1.05);
 }
 
 .contact-button {
