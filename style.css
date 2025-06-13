@@ -8,7 +8,11 @@
 html {
   scroll-behavior: smooth;
 }
-
+:root {
+  --bg-color: #f6f6f6;
+  --text-color: #333;
+  --card-bg: #fff;
+}
 body.dark {
   --bg-color: #121212;
   --text-color: #fff;
