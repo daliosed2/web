@@ -4,14 +4,30 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>David Martínez</title>
+
+  <!-- Meta Open Graph -->
+  <meta property="og:url" content="https://daliosed2.github.io" />
+  <meta property="og:title" content="David Martínez - Emprendedor + IA & Datos" />
+  <meta property="og:description" content="Soluciones con IA y tecnología para emprendedores y profesionales." />
+  <meta property="og:image" content="David-9.jpg" />
+
+  <!-- Meta Twitter -->
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:url" content="https://daliosed2.github.io" />
+  <meta property="twitter:title" content="David Martínez - Emprendedor + IA & Datos" />
+  <meta property="twitter:description" content="Soluciones con IA y tecnología para emprendedores y profesionales." />
+  <meta property="twitter:image" content="David-9.jpg" />
+
   <link rel="stylesheet" href="style.css" />
   <script defer src="script.js"></script>
-  <script src="https://kit.fontawesome.com/a2e0c6c35e.js" crossorigin="anonymous"></script>
+  <script src="https://kit.fontawesome.com/b7816ec245.js" crossorigin="anonymous"></script>
 </head>
+
 <body>
-  <button id="toggle-mode">🌓</button>
-  <main class="container">
-    <img src="https://via.placeholder.com/100" alt="David Martínez" class="avatar" />
+  <button id="toggle-mode" aria-label="Activar modo oscuro">🌓</button>
+
+  <main class="container" id="inicio">
+    <img src="David-9.jpg" alt="David Martínez" class="avatar" />
     <h1>David Martínez</h1>
     <p class="role">Emprendedor + IA & Datos</p>
 
@@ -24,19 +40,20 @@
     <section>
       <h2 class="label">/socials</h2>
       <div class="socials">
+        <a href="mailto:davidfernandomartinezmontes@gmail.com" class="contact-button">Contáctame</a>
         <a href="https://x.com/todovaaestarbien" target="_blank"><i class="fab fa-x-twitter"></i></a>
-        <a href="https://www.youtube.com/@todovaaestarbien" target="_blank"><i class="fab fa-youtube"></i></a>
-        <a href="https://linkedin.com/in/davidmartinezec" target="_blank"><i class="fab fa-linkedin"></i></a>
+        <a href="https://www.youtube.com/channel/UCj7otWSXYo-abuG9rDjkl0g" target="_blank"><i class="fab fa-youtube"></i></a>
+        <a href="https://www.linkedin.com/in/david-martinez-53168a8b" target="_blank"><i class="fab fa-linkedin"></i></a>
       </div>
     </section>
 
     <section>
       <h2 class="label">/projects</h2>
       <div class="cards">
-        <a href="#" class="card">Ecuametrics</a>
-        <a href="#" class="card">Todovaaestarbien</a>
-        <a href="#" class="card">Curso Pan de Jamón</a>
-        <a href="#" class="card">App para emprendedores</a>
+        <a href="proyectos.html" class="card">Proyectos</a>
+        <a href="gpts.html" class="card">GPT Personalizados</a>
+        <a href="benchmark.html" class="card">Benchmark</a>
+        <a href="multimedia.html" class="card">Blog</a>
       </div>
     </section>
 
@@ -44,10 +61,13 @@
       <h2 class="label">/newsletter</h2>
       <form action="https://formspree.io/f/mwkglrwz" method="POST" class="newsletter">
         <p>Suscríbete para recibir tips semanales sobre IA y emprendimiento directamente en tu correo.</p>
-        <input type="email" name="email" placeholder="Tu correo electrónico" required />
+        <label for="email-input" class="sr-only">Tu correo electrónico</label>
+        <input id="email-input" type="email" name="email" placeholder="Tu correo electrónico" required />
         <button type="submit">Suscribirme</button>
       </form>
     </section>
+
+    <a href="#inicio" class="back-button">🏠 Volver al inicio</a>
   </main>
 </body>
 </html>
