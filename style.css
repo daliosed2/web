@@ -6,6 +6,10 @@
   padding: 0;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -26,6 +30,11 @@ body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   color: var(--text-color);
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
 .btn {
   border: none;
   transition: background 0.2s ease, transform 0.2s ease;
@@ -35,14 +44,29 @@ body {
 .btn-dark {
   background: #333;
   color: #fff;
+}
+
 .btn-dark:hover {
   background: #444;
 }
 
 .socials a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   margin: 5px 10px;
-  --text-color: #eee;
-  --card-bg: #2a2a2a;
+  padding: 8px 16px;
+  background: var(--card-bg);
+  border-radius: 10px;
+  text-decoration: none;
+  color: var(--text-color);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: all 0.2s ease-in-out;
+}
+
+.socials a:hover {
+  transform: scale(1.05);
+  background-color: rgba(0,0,0,0.05);
 }
 
 .container {
@@ -77,26 +101,7 @@ h1 {
 section p {
   text-align: left;
   line-height: 1.6;
-  margin-bottom: 1em; /* Corrección de espaciado */
-}
-
-.socials a {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin: 5px 10px;
-  padding: 8px 16px;
-  background: var(--card-bg);
-  border-radius: 10px;
-  text-decoration: none;
-  color: var(--text-color);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  transition: all 0.2s ease-in-out;
-}
-
-.socials a:hover {
-  transform: scale(1.05);
-  background-color: rgba(0,0,0,0.05);
+  margin-bottom: 1em;
 }
 
 .cards {
@@ -118,13 +123,30 @@ section p {
   transition: transform 0.2s;
 }
 
+.card:hover {
+  transform: translateY(-5px);
+}
 
 .back-button {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  padding: 8px 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: var(--card-bg);
+  color: var(--text-color);
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 500;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: all 0.2s ease-in-out;
+  border: none;
+  margin: 30px auto;
+}
+
+.back-button:hover {
+  transform: scale(1.05);
+  background-color: rgba(0,0,0,0.05);
 }
 
 .contact-button {
@@ -207,9 +229,6 @@ section p {
   background: var(--card-bg);
   color: var(--text-color);
   text-decoration: none;
-}
-.card:hover {
-  transform: translateY(-5px);
 }
 
 .newsletter {
