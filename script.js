@@ -7,14 +7,15 @@ function applyMode(dark) {
     document.body.classList.add('dark');
     toggleButton.textContent = '☀️';
 
-document.querySelectorAll('.toggle-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const list = btn.nextElementSibling;
-    if (list) {
-      list.classList.toggle('open');
-    }
-  });
-});
+    document.querySelectorAll('.toggle-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const list = btn.nextElementSibling;
+        if (list) {
+          list.classList.toggle('open');
+        }
+      });
+    });
+
     toggleButton.setAttribute('aria-label', 'Activar modo claro');
   } else {
     document.body.classList.remove('dark');
@@ -35,3 +36,10 @@ if (toggleButton) {
     applyMode(useDark);
   });
 }
+
+// 🔁 Agregar script de MailerLite al final
+(function(w,d,e,u,f,l,n){w[f]=w[f]||function(){(w[f].q=w[f].q||[])
+.push(arguments);},l=d.createElement(e),l.async=1,l.src=u,
+n=d.getElementsByTagName(e)[0],n.parentNode.insertBefore(l,n);})
+(window,document,'script','https://assets.mailerlite.com/js/universal.js','ml');
+ml('account', '1493483');
