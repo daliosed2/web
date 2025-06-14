@@ -148,19 +148,22 @@ section p {
   background: rgba(0,0,0,0.05);
 }
 
+/* ✅ BOTÓN DESCARGA ADAPTADO */
 .boton-descarga {
   display: inline-block;
   margin-top: 10px;
   padding: 10px 20px;
-  background: #ff5722;
-  color: #fff;
+  background: var(--card-bg);
+  color: var(--text-color);
+  border: 2px solid var(--text-color);
   border-radius: 8px;
   text-decoration: none;
-  transition: background 0.2s;
+  transition: background 0.2s ease, color 0.2s ease, border 0.2s ease;
+  font-weight: 500;
 }
 
 .boton-descarga:hover {
-  background: #e64a19;
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
 .newsletter {
