@@ -46,7 +46,8 @@ body {
 
 h1 {
   font-size: 2rem;
-  margin: 0;
+  margin-bottom: 30px; /* <- Este valor crea el espacio debajo del título */
+  text-align: center;
 }
 
 .role {
@@ -121,7 +122,7 @@ section p {
   border-radius: 10px;
   text-decoration: none;
   font-weight: 500;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   transition: all 0.2s ease-in-out;
   border: none;
   margin: 30px auto;
