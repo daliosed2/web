@@ -89,9 +89,9 @@ section p {
 
 .cards {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 40px;
-  margin-top: 20px;
+  margin-top: 40px;
 }
 
 .card {
