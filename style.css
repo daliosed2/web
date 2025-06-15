@@ -278,7 +278,7 @@ section p {
 }
 
 .icon-circle {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.08);
   width: 50px;
   height: 50px;
   border-radius: 50%;
@@ -307,6 +307,7 @@ section p {
   padding: 8px 16px;
   border-radius: 8px;
   transition: all 0.2s ease;
+  font-weight: 500;
 }
 
 .new-card a:hover {
