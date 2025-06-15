@@ -270,6 +270,12 @@ section p {
   text-align: center;
   max-width: 350px;
   margin: auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 40px; /* controla el espacio entre las cartas */
+  margin-top: 40px;
+  padding: 0 10px; /* espacio lateral opcional */
 }
 
 .new-card:hover {
