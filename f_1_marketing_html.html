@@ -9,18 +9,33 @@
   <link rel="stylesheet" href="style.css" />
 
   <!-- Ajustes “blog”: ancho cómodo y texto alineado a la izquierda -->
-  <style>
-    .article{
-      max-width:780px;      /* ancho de lectura cómodo */
-      margin:0 auto;        /* centrado en la pantalla */
-      text-align:left;      /* alineación de párrafos */
-    }
-    .article h1{margin-bottom:.5rem;}
-    .article h2{color:var(--text-color);margin-top:2rem;}
-    .article img{max-width:100%;border-radius:8px;margin:1.2rem 0;}
-    .article ul{padding-left:1.4rem;list-style:disc;}
-    .article time{color:#aaa;font-size:.85rem;}
-  </style>
+ <style>
+  /* layout tipo blog */
+  .article{max-width:780px;margin:0 auto;text-align:left;}
+
+  /* tipografía general que ya usabas */
+  .article h1{margin-bottom:.5rem;}
+  .article h2{margin-top:2rem;}
+
+  /* ① FECHA – centrada y gris tenue */
+  .article time{
+    display:block;
+    text-align:center;
+    margin-bottom:1rem;
+    color:#9a9a9a;        /* gris suave */
+    font-size:.85rem;
+  }
+
+  /* ② TÍTULOS: gris suave en vez de blanco */
+  .article h2.label{
+    color:#b5b5b5;        /* ajusta el tono si lo quieres más claro u oscuro */
+    font-weight:600;
+  }
+
+  /* imágenes y listas igual que antes */
+  .article img{max-width:100%;border-radius:8px;margin:1.2rem 0;}
+  .article ul{padding-left:1.4rem;list-style:disc;}
+</style>
 
   <script defer src="script.js"></script>
 </head>
@@ -34,13 +49,13 @@
     <!-- 1. Era Ecclestone -->
     <h2 class="label">/era Ecclestone</h2>
     <p>Durante décadas, la Fórmula&nbsp;1 estuvo liderada por Bernie Ecclestone. Su enfoque era tradicional y elitista, basado en contratos televisivos, patrocinios de lujo y un público adinerado. Ecclestone no consideraba relevantes a los fans jóvenes ni las redes sociales, lo que desconectó al deporte de las nuevas generaciones.</p>
-    <img src="https://github.com/daliosed2/web/blob/codex/crear-página-web-personal/62bdbc1c64450__600x390.webp" alt="Bernie Ecclestone">
+    <img src="62bdbc1c64450__600x390.webp" alt="Bernie Ecclestone">
     <p>El resultado fue una <strong>caída del 40&nbsp;%</strong> de aficionados entre 2008 y 2016, dejando a la F1 rezagada en el panorama digital.</p>
 
     <!-- 2. Liberty Media -->
     <h2 class="label">/liberty media (2017)</h2>
     <p>La compra de la F1 por Liberty Media en 2017 marcó un giro radical. Se desplazó a Ecclestone y se introdujo una filosofía centrada en el aficionado, los datos, el entretenimiento y el marketing digital; se creó la primera división de marketing en la historia del deporte.</p>
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/Chase_Carey_2017.jpg/800px-Chase_Carey_2017.jpg" alt="Chase Carey">
+    <img src="f1-spanish-gp-2018-greg-maffei.jpg" alt="Chase Carey">
     <p>El CEO Greg Maffei subrayó el enorme potencial desaprovechado, especialmente en Estados Unidos.</p>
 
     <!-- 3. Transformación digital -->
