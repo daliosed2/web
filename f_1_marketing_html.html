@@ -31,18 +31,19 @@
     color:#b5b5b5;        /* ajusta el tono si lo quieres más claro u oscuro */
     font-weight:600;
   }
-
-  /* imágenes y listas igual que antes */
-/*  ───────── Imágenes uniformes ───────── */
+/* ─── Imágenes: tamaño moderado, sin recortes ─── */
 .article img{
   display:block;
-  width:100%;          /* que ocupen el ancho del contenedor (780 px) */
-  height:300px;        /* ⬅︎ altura uniforme: ajusta 260-320 px al gusto */
-  object-fit:cover;    /* recorta para llenar sin deformar */
-  object-position:center;
-  border-radius:12px;  /* mismo radio que tus tarjetas */
-  margin:1.2rem 0;
-  box-shadow:0 2px 6px rgba(0,0,0,0.08); /* sutil, opcional */
+  max-width:100%;     /* nunca pasa del ancho del texto */
+  height:auto;        /* mantiene la proporción original */
+  max-height:220px;   /* ⬅︎ ajusta este número si las ves aún grandes (200-240) */
+  margin:1rem auto;   /* centra y deja aire arriba/abajo */
+  border-radius:10px;
+  box-shadow:0 2px 5px rgba(0,0,0,.08);
+  object-fit:contain; /* NO recorta; “letterbox” si hace falta */
+  background:var(--card-bg); /* relleno detrás si sobra espacio */
+}
+
 }
 </style>
 
@@ -82,7 +83,7 @@
     <!-- 5. F1 TV y Esports -->
     <h2 class="label">/f1 tv + esports</h2>
     <p>Se lanzó la plataforma F1 TV con contenido exclusivo y carreras en directo. En 2017 nació la F1 Esports Series para captar a los gamers, y los Fan Festivals llevaron la F1 a ciudades clave.</p>
-    <img src="" alt="F1 Fan Festival Londres">
+    <img src="images.png" alt="F1 Fan Festival Londres">
 
     <!-- 6. Expansión USA -->
     <h2 class="label">/expansión EE.UU.</h2>
