@@ -338,20 +338,28 @@ section p {
   margin: 24px 0 12px;
 }
 
-.legal__text {
-  background: var(--card-bg);
-  color: #9aa0a6;
-  border: 1px solid rgba(0, 0, 0, 0.10);
-  border-radius: 14px;
-  padding: 14px 16px;
+/* Aviso legal sutil con divisores a los lados */
+.legal-note{
+  max-width: 720px;
+  margin: 16px auto 28px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: center;
+  color: var(--text-color);
+  opacity: .8;
+  font-size: .9rem;
   text-align: center;
-  font-size: 0.95rem;
-  line-height: 1.5;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
 }
-
-/* Ajuste de borde/tono en modo oscuro */
-body.dark .legal__text {
-  border-color: rgba(255, 255, 255, 0.10);
-  color: #bdbdbd;
+.legal-note::before,
+.legal-note::after{
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: currentColor;
+  opacity: .15;               /* líneas muy sutiles */
+}
+.legal-note span{ padding: 0 .5rem; }
+@media (max-width: 480px){
+  .legal-note{ font-size: .85rem; gap: 8px; }
 }
