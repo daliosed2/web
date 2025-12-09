@@ -1,107 +1,161 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Guía Técnica Nano Banana Pro – David Martínez</title>
-
-  <!-- Hoja global -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Guía Técnica Nano Banana Pro — David Martínez</title>
+  <meta name="description" content="Guía Técnica: Nano Banana Pro — tácticas de prompting, rendering de texto en imágenes, data grounding y workflows profesionales. Gratis." />
   <link rel="stylesheet" href="/style.css" />
 
-  <!-- Ajustes “blog” (solo afectan a .article) - los mismos que usas en tu ejemplo -->
+  <!-- Google Analytics (si ya lo tienes en el sitio, este snippet puede quedar duplicado; lo dejo por seguridad) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TPRYYR8VJP"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TPRYYR8VJP', { 'send_page_view': true });
+  </script>
+
+  <!-- Estilos específicos del post (mantienen la coherencia con tu style.css) -->
   <style>
-    .article{max-width:780px;margin:0 auto;text-align:left;padding:24px;}
-    .article h1{margin-bottom:.5rem;}
-    .article h2{color:#b5b5b5;margin-top:2rem;font-weight:600;}
-    .article h3{margin-top:1.2rem;}
-    .article ul{padding-left:1.4rem;list-style:disc;}
-    .article time{display:block;text-align:center;margin-bottom:1rem;color:#9a9a9a;font-size:.85rem;}
-    .callout{
-      background:var(--card-bg);
-      border-left:4px solid #ffb703;
-      padding:12px 14px;
-      border-radius:10px;
-      box-shadow:0 2px 6px rgba(0,0,0,.06);
-      margin:1rem 0;
-      font-size:.95rem;
+    :root{
+      --accent:#0b63c6;
+      --bg-card:#ffffff;
+      --text:#111827;
+      --muted:#6b7280;
+      --radius:12px;
+      --maxw:780px;
     }
-    .sources ul{list-style:none;padding-left:0}
-    .sources li{margin:.3rem 0}
-    .sources a{word-break:break-word}
-    .btn {
-      display:inline-block;padding:10px 14px;border-radius:8px;background:#0b63c6;color:#fff;text-decoration:none;font-weight:600;
+    :root.dark{
+      --bg-card:#0f1724;
+      --text:#e6eef8;
+      --muted:#9aa4b2;
+      --accent:#4ea1ff;
     }
-    .btn-outline {background:transparent;border:2px solid #0b63c6;color:#0b63c6;padding:8px 12px;border-radius:8px}
-    .center{text-align:center;margin:18px 0}
-    .note{background:#fff9e6;border-left:4px solid #ffb703;padding:12px;border-radius:8px;margin:14px 0}
-    .small{font-size:.9rem;color:#777}
-    .back-button{display:inline-block;margin-top:18px;text-decoration:none;color:#0b63c6}
+    html,body{background:transparent;color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial;margin:0;padding:0;}
+    .container{padding:22px;}
+    .article{max-width:var(--maxw);margin:32px auto;padding:24px;background:var(--bg-card);border-radius:var(--radius);box-shadow:0 10px 30px rgba(2,6,23,0.06);}
+    .article h1{font-size:1.9rem;margin:0 0 .25rem}
+    .meta-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px;color:var(--muted)}
+    .tag{display:inline-block;background:#f1f5f9;color:var(--muted);padding:6px 10px;border-radius:999px;font-size:12px}
+    time{font-size:.9rem;color:var(--muted)}
+    .lead{font-weight:600;margin-top:8px;margin-bottom:8px}
+    .callout{background:linear-gradient(180deg, rgba(0,0,0,0.01), transparent);border-left:4px solid #ffb703;padding:12px;border-radius:10px;margin:12px 0;color:var(--text)}
+    .pdf-actions{display:flex;gap:12px;align-items:center;margin:14px 0}
+    .btn{display:inline-block;padding:10px 14px;border-radius:10px;background:var(--accent);color:#fff;text-decoration:none;font-weight:600;border:0;box-shadow:0 8px 18px rgba(11,99,198,.12)}
+    .btn.secondary{background:transparent;color:var(--accent);border:2px solid var(--accent);padding:8px 12px}
+    .pdf-preview{margin-top:16px;border-radius:10px;overflow:hidden;border:1px solid rgba(0,0,0,0.06);background:linear-gradient(180deg, rgba(0,0,0,0.02), rgba(0,0,0,0.01));display:none}
+    .pdf-preview iframe{width:100%;height:640px;border:0;display:block}
+    @media(max-width:800px){ .pdf-preview iframe{height:420px} }
+    .small{font-size:.9rem;color:var(--muted)}
+    .center{text-align:center}
+    .back{display:inline-block;margin-top:18px;color:var(--accent);text-decoration:none}
+    code{background:#f5f7fb;padding:2px 6px;border-radius:6px;color:var(--accent)}
+    /* ensure the global toggle button looks same as index */
+    #toggle-mode{position:fixed;right:18px;top:18px;background:transparent;border:0;font-size:18px;cursor:pointer}
   </style>
-
-  <!-- No incluyo gtag config aquí (asumo tu layout lo carga). El evento JS usa try/catch -->
 </head>
-
 <body>
+  <!-- Reuso del toggle global -->
   <button id="toggle-mode" aria-label="Cambiar modo oscuro">🌓</button>
 
-  <main class="container article">
-    <h1>Guía Técnica: Nano Banana Pro — Estrategias de Nivel Avanzado</h1>
-    <time datetime="2025-12-06">Publicado: 6 dic 2025</time>
+  <main class="container">
+    <article class="article" role="main" aria-labelledby="post-title">
+      <div class="meta-row">
+        <div class="tag">Tecnología</div>
+        <div class="tag">IA</div>
+        <time datetime="2025-12-06">Publicado: 6 dic 2025</time>
+      </div>
 
-    <p class="lead"><strong>Introducción</strong></p>
-    <p>Descarga la Guía Técnica completa de <em>Nano Banana Pro</em>: workflows, ejemplos de prompting profesional, control de texto en imágenes y técnicas para outputs de alta resolución. El PDF está disponible para ver o descargar.</p>
+      <h1 id="post-title">Guía Técnica: Nano Banana Pro — Estrategias de Nivel Avanzado</h1>
 
-    <div class="callout">
-      <strong>Qué encontrarás:</strong>
-      <ul>
-        <li>Principios de prompting y edición conversacional.</li>
-        <li>Renderizado de texto legible dentro de imágenes.</li>
-        <li>Workflows para consistencia de personajes y visualización basada en datos.</li>
-      </ul>
-    </div>
+      <p class="lead">Resumen</p>
+      <p class="small">Descarga una guía práctica y gratuita sobre Nano Banana Pro con prompts reutilizables, técnicas para texto legible en imágenes, workflows para consistencia y tips para outputs en alta resolución.</p>
 
-    <h2>/Accede al PDF</h2>
-    <p class="small">Haz clic en <em>Ver guía técnica</em> para abrir el PDF en una nueva pestaña. Se registrará un evento en Google Analytics (evento: <code>download_pdf</code>).</p>
+      <div class="callout">
+        <strong>Qué vas a aprender</strong>
+        <ul>
+          <li>Prompts profesionales y pipelines de edición.</li>
+          <li>Control de texto dentro de imágenes y localización.</li>
+          <li>Infografías basadas en datos y grounding en tiempo real.</li>
+          <li>Workflows para storyboards y consistencia visual.</li>
+        </ul>
+      </div>
 
-    <div class="center">
-      <a id="downloadBtn" class="btn" href="/GUIA_TECNICA_NANO_BANANA.pdf" target="_blank" rel="noopener" data-pdf="/GUIA_TECNICA_NANO_BANANA.pdf">Ver guía técnica (PDF)</a>
-      <a id="downloadBtnDL" class="btn-outline" href="/GUIA_TECNICA_NANO_BANANA.pdf" download="GUIA_TECNICA_NANO_BANANA.pdf" style="margin-left:12px">Descargar PDF</a>
-    </div>
+      <div class="pdf-actions" role="region" aria-label="Acciones PDF">
+        <a id="viewPdf" class="btn" href="/GUIA_TECNICA_NANO_BANANA.pdf" target="_blank" rel="noopener" data-pdf="/GUIA_TECNICA_NANO_BANANA.pdf">Ver guía (PDF)</a>
+        <a id="dlPdf" class="btn secondary" href="/GUIA_TECNICA_NANO_BANANA.pdf" download="GUIA_TECNICA_NANO_BANANA.pdf">Descargar</a>
+        <button id="togglePreview" class="btn secondary" style="margin-left:auto">Mostrar / Ocultar preview</button>
+      </div>
 
-    <h2>/Privacidad y rastreo</h2>
-    <p class="small">Google Analytics registrará el evento de descarga pero <strong>no</strong> identifica nombres ni correos. Si quieres identificar usuarios, agrego modal para captura de email (opt-in).</p>
+      <div id="pdfPreview" class="pdf-preview" aria-hidden="true"></div>
 
-    <footer style="margin-top:20px;color:#888;font-size:.9rem">
-      <div>Publicado por <strong>David F. Martínez</strong></div>
-      <div class="small">Documento fuente: Guía Técnica: Nano Banana Pro.</div>
-    </footer>
+      <p class="small">Privacidad: se registra el evento <code>download_pdf</code> en Google Analytics cuando se abre o descarga el PDF. No se captura información personal.</p>
 
-    <a href="/index.html" class="back-button">🏠 Volver al inicio</a>
+      <footer style="margin-top:20px;color:var(--muted);font-size:.9rem">
+        Publicado por <strong>David F. Martínez</strong>
+      </footer>
+
+      <div class="center">
+        <a href="/index.html" class="back">🏠 Volver al inicio</a>
+      </div>
+    </article>
   </main>
 
+  <!-- JS: dark mode, lazy preview y GA events -->
   <script>
-    // Evento GA: envía download_pdf (envuelto en try/catch)
-    document.getElementById('downloadBtn')?.addEventListener('click', function(){
-      var pdfPath = this.dataset.pdf || this.href;
-      try{
-        gtag('event', 'download_pdf', {
-          'event_category': 'Downloads',
-          'event_label': pdfPath,
-          'value': 1
-        });
-      }catch(e){console.warn('gtag no definido o falló el envío', e)}
-    });
+    (function(){
+      const pdfPath = '/GUIA_TECNICA_NANO_BANANA.pdf';
+      const toggleBtn = document.getElementById('toggle-mode');
+      const togglePreviewBtn = document.getElementById('togglePreview');
+      const preview = document.getElementById('pdfPreview');
+      const viewBtn = document.getElementById('viewPdf');
+      const dlBtn = document.getElementById('dlPdf');
+      const root = document.documentElement;
+      const THEME_KEY = 'site_theme_pref';
 
-    document.getElementById('downloadBtnDL')?.addEventListener('click', function(){
-      var pdfPath = this.href;
-      try{
-        gtag('event', 'download_pdf', {
-          'event_category': 'Downloads',
-          'event_label': pdfPath,
-          'value': 1
-        });
-      }catch(e){}
-    });
+      // Theme: init
+      function applyTheme(theme){ if(theme==='dark') root.classList.add('dark'); else root.classList.remove('dark'); }
+      const saved = localStorage.getItem(THEME_KEY);
+      if(saved) applyTheme(saved);
+      else applyTheme(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+      // Toggle
+      toggleBtn?.addEventListener('click', () => {
+        const isDark = root.classList.toggle('dark');
+        localStorage.setItem(THEME_KEY, isDark ? 'dark' : 'light');
+      });
+
+      // Lazy load preview iframe
+      let iframeLoaded = false;
+      function togglePreview(){
+        if(!iframeLoaded){
+          const iframe = document.createElement('iframe');
+          iframe.src = pdfPath + '#toolbar=0';
+          iframe.loading = 'lazy';
+          iframe.title = 'Preview PDF - Guía Nano Banana';
+          preview.appendChild(iframe);
+          iframeLoaded = true;
+        }
+        const showing = preview.style.display === 'block';
+        preview.style.display = showing ? 'none' : 'block';
+        preview.setAttribute('aria-hidden', showing ? 'true' : 'false');
+
+        // GA event for preview open
+        try{ gtag('event','preview_open',{ event_category:'PDF', event_label: pdfPath }); }catch(e){}
+      }
+      togglePreviewBtn?.addEventListener('click', togglePreview);
+
+      // GA events: view / download
+      viewBtn?.addEventListener('click', function(){
+        try{ gtag('event','download_pdf',{ event_category:'Downloads', event_label: pdfPath, value:1 }); }catch(e){}
+      });
+      dlBtn?.addEventListener('click', function(){
+        try{ gtag('event','download_pdf',{ event_category:'Downloads', event_label: pdfPath, value:1 }); }catch(e){}
+      });
+
+      // safety: if gtag not present, no-op (we used try/catch above)
+    })();
   </script>
 </body>
 </html>
