@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Guía Técnica Nano Banana Pro — David Martínez</title>
+  <meta name="description" content="Guía Técnica: Nano Banana Pro — tácticas de prompting, rendering de texto en imágenes, data grounding y workflows profesionales." />
+  <link rel="stylesheet" href="/style.css" />
+
+  <!-- Google Analytics (ya usas G-TPRYYR8VJP) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TPRYYR8VJP"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TPRYYR8VJP', { 'send_page_view': true });
+  </script>
+
+  <style>
+    .article{max-width:780px;margin:0 auto;text-align:left;padding:24px;}
+    .article h1{margin-bottom:.5rem;}
+    .lead{color:#222;margin:0.6rem 0 1.2rem}
+    .btn {display:inline-block;padding:12px 18px;border-radius:10px;background:#0b63c6;color:#fff;text-decoration:none;font-weight:600;box-shadow:0 8px 18px rgba(11,99,198,.12);}
+    .btn-outline {background:transparent;border:2px solid #0b63c6;color:#0b63c6}
+    .meta{color:#9a9a9a;font-size:.9rem;margin-bottom:12px}
+    .note{background:#fff9e6;border-left:4px solid #ffb703;padding:12px;border-radius:8px;margin:14px 0}
+    .small{font-size:.9rem;color:#777}
+    .center{text-align:center}
+  </style>
+</head>
+<body>
+  <main class="container article">
+    <h1>Guía Técnica: Nano Banana Pro — Estrategias de Nivel Avanzado</h1>
+    <div class="meta">Publicado: 2025-12-06 · Autor: David F. Martínez</div>
+
+    <p class="lead"><strong>Introducción</strong></p>
+    <p>Descarga la Guía Técnica completa de <em>Nano Banana Pro</em>: workflows, ejemplos de prompting profesional, control de texto en imágenes y técnicas para outputs de alta resolución. El PDF está disponible para ver o descargar.</p>
+
+    <div class="note">
+      <strong>Qué encontrarás:</strong>
+      <ul>
+        <li>Principios de prompting y edición conversacional.</li>
+        <li>Renderizado de texto legible dentro de imágenes.</li>
+        <li>Workflows para consistencia de personajes y visualización basada en datos.</li>
+      </ul>
+    </div>
+
+    <h2>Accede al PDF</h2>
+    <p class="small">Haz clic en <em>Ver guía técnica</em> para abrir el PDF en una nueva pestaña. Se registrará un evento en Google Analytics (evento: <code>download_pdf</code>).</p>
+
+    <div class="center" style="margin:18px 0;">
+      <!-- PDF en la raíz del repo (nombre con guiones bajos) -->
+      <a id="downloadBtn" class="btn" href="/GUIA_TECNICA_NANO_BANANA.pdf" target="_blank" rel="noopener" data-pdf="/GUIA_TECNICA_NANO_BANANA.pdf">Ver guía técnica (PDF)</a>
+      <a id="downloadBtnDL" class="btn btn-outline" href="/GUIA_TECNICA_NANO_BANANA.pdf" download="GUIA_TECNICA_NANO_BANANA.pdf" style="margin-left:10px">Descargar PDF</a>
+    </div>
+
+    <hr style="margin:18px 0">
+
+    <h2>Privacidad y rastreo</h2>
+    <p class="small">GA4 registrará el evento de descarga pero <strong>no</strong> identifica nombres ni correos. Si quieres identificar usuarios, puedo añadir un modal para pedir email antes de descargar (Formspree/Sheets).</p>
+
+    <footer style="margin-top:20px;color:#888;font-size:.9rem">
+      <div>Publicado por <strong>David F. Martínez</strong></div>
+      <div class="small">Documento fuente: Guía Técnica: Nano Banana Pro.</div>
+    </footer>
+  </main>
+
+  <script>
+    document.getElementById('downloadBtn')?.addEventListener('click', function(){
+      var pdfPath = this.getAttribute('data-pdf') || this.href;
+      try{ gtag('event', 'download_pdf', { 'event_category':'Downloads', 'event_label': pdfPath, 'value':1 }); }
+      catch(err){console.warn('GA event failed', err)}
+    });
+
+    document.getElementById('downloadBtnDL')?.addEventListener('click', function(){
+      var pdfPath = this.href;
+      try{ gtag('event', 'download_pdf', { 'event_category':'Downloads', 'event_label': pdfPath, 'value':1 }); }
+      catch(err){}
+    });
+  </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Guía Técnica Nano Banana Pro — David Martínez</title>
+  <meta name="description" content="Guía Técnica: Nano Banana Pro — tácticas de prompting, rendering de texto en imágenes, data grounding y workflows profesionales." />
+  <link rel="stylesheet" href="/style.css" />
+
+  <!-- Google Analytics (ya usas G-TPRYYR8VJP) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TPRYYR8VJP"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TPRYYR8VJP', { 'send_page_view': true });
+  </script>
+
+  <style>
+    .article{max-width:780px;margin:0 auto;text-align:left;padding:24px;}
+    .article h1{margin-bottom:.5rem;}
+    .lead{color:#222;margin:0.6rem 0 1.2rem}
+    .btn {display:inline-block;padding:12px 18px;border-radius:10px;background:#0b63c6;color:#fff;text-decoration:none;font-weight:600;box-shadow:0 8px 18px rgba(11,99,198,.12);}
+    .btn-outline {background:transparent;border:2px solid #0b63c6;color:#0b63c6}
+    .meta{color:#9a9a9a;font-size:.9rem;margin-bottom:12px}
+    .note{background:#fff9e6;border-left:4px solid #ffb703;padding:12px;border-radius:8px;margin:14px 0}
+    .small{font-size:.9rem;color:#777}
+    .center{text-align:center}
+  </style>
+</head>
+<body>
+  <main class="container article">
+    <h1>Guía Técnica: Nano Banana Pro — Estrategias de Nivel Avanzado</h1>
+    <div class="meta">Publicado: 2025-12-06 · Autor: David F. Martínez</div>
+
+    <p class="lead"><strong>Introducción</strong></p>
+    <p>Descarga la Guía Técnica completa de <em>Nano Banana Pro</em>: workflows, ejemplos de prompting profesional, control de texto en imágenes y técnicas para outputs de alta resolución. El PDF está disponible para ver o descargar.</p>
+
+    <div class="note">
+      <strong>Qué encontrarás:</strong>
+      <ul>
+        <li>Principios de prompting y edición conversacional.</li>
+        <li>Renderizado de texto legible dentro de imágenes.</li>
+        <li>Workflows para consistencia de personajes y visualización basada en datos.</li>
+      </ul>
+    </div>
+
+    <h2>Accede al PDF</h2>
+    <p class="small">Haz clic en <em>Ver guía técnica</em> para abrir el PDF en una nueva pestaña. Se registrará un evento en Google Analytics (evento: <code>download_pdf</code>).</p>
+
+    <div class="center" style="margin:18px 0;">
+      <!-- PDF en la raíz del repo (nombre con guiones bajos) -->
+      <a id="downloadBtn" class="btn" href="/GUIA_TECNICA_NANO_BANANA.pdf" target="_blank" rel="noopener" data-pdf="/GUIA_TECNICA_NANO_BANANA.pdf">Ver guía técnica (PDF)</a>
+      <a id="downloadBtnDL" class="btn btn-outline" href="/GUIA_TECNICA_NANO_BANANA.pdf" download="GUIA_TECNICA_NANO_BANANA.pdf" style="margin-left:10px">Descargar PDF</a>
+    </div>
+
+    <hr style="margin:18px 0">
+
+    <h2>Privacidad y rastreo</h2>
+    <p class="small">GA4 registrará el evento de descarga pero <strong>no</strong> identifica nombres ni correos. Si quieres identificar usuarios, puedo añadir un modal para pedir email antes de descargar (Formspree/Sheets).</p>
+
+    <footer style="margin-top:20px;color:#888;font-size:.9rem">
+      <div>Publicado por <strong>David F. Martínez</strong></div>
+      <div class="small">Documento fuente: Guía Técnica: Nano Banana Pro.</div>
+    </footer>
+  </main>
+
+  <script>
+    document.getElementById('downloadBtn')?.addEventListener('click', function(){
+      var pdfPath = this.getAttribute('data-pdf') || this.href;
+      try{ gtag('event', 'download_pdf', { 'event_category':'Downloads', 'event_label': pdfPath, 'value':1 }); }
+      catch(err){console.warn('GA event failed', err)}
+    });
+
+    document.getElementById('downloadBtnDL')?.addEventListener('click', function(){
+      var pdfPath = this.href;
+      try{ gtag('event', 'download_pdf', { 'event_category':'Downloads', 'event_label': pdfPath, 'value':1 }); }
+      catch(err){}
+    });
+  </script>
+</body>
+</html>
