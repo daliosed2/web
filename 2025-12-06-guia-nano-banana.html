@@ -7,9 +7,18 @@
   <meta name="description" content="Guía Técnica: Nano Banana Pro — prompts, texto en imágenes, workflows y tips para outputs en alta resolución. Gratis." />
   <link rel="stylesheet" href="/style.css" />
 
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TPRYYR8VJP"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TPRYYR8VJP', { 'send_page_view': true });
+  </script>
+
   <style>
-    /* Mantén esto mínimo: usa tu style.css para el look principal */
-    .article{max-width:780px;margin:0 auto;padding:24px;}
+    /* Estilos mínimos específicos para que el post se integre con tu site */
+    .article{max-width:780px;margin:28px auto;padding:24px;}
     .article h1{margin-bottom:.5rem;}
     .meta{color:#9a9a9a;font-size:.9rem;margin-bottom:12px}
     .callout{background:var(--card-bg, #fff);border-left:4px solid #ffb703;padding:12px;border-radius:10px;margin:12px 0}
@@ -17,14 +26,14 @@
     .btn{display:inline-block;padding:10px 14px;border-radius:8px;background:#0b63c6;color:#fff;text-decoration:none;font-weight:600}
     .btn-outline{display:inline-block;padding:8px 12px;border-radius:8px;background:transparent;border:2px solid #0b63c6;color:#0b63c6;text-decoration:none}
     .small{font-size:.9rem;color:#777;margin-top:14px}
+    .center{text-align:center}
     #toggle-mode{position:fixed;right:18px;top:18px;background:transparent;border:0;font-size:18px;cursor:pointer}
   </style>
 </head>
 <body>
-  <!-- toggle reuse -->
   <button id="toggle-mode" aria-label="Cambiar modo oscuro">🌓</button>
 
-  <main class="container article">
+  <main class="container article" role="main">
     <h1>Guía Técnica: Nano Banana Pro — Estrategias de Nivel Avanzado</h1>
     <div class="meta">Publicado: 6 dic 2025 · Autor: David F. Martínez</div>
 
@@ -56,13 +65,14 @@
   </main>
 
   <script>
-    // Dark mode toggle (simple: guarda preferencia)
+    // Dark mode toggle (simple, guarda preferencia)
     (function(){
       const btn = document.getElementById('toggle-mode');
       const root = document.documentElement;
       const KEY = 'site_theme_pref';
       const saved = localStorage.getItem(KEY);
       if(saved === 'dark') root.classList.add('dark');
+      else if(saved === 'light') root.classList.remove('dark');
 
       btn?.addEventListener('click', () => {
         const isDark = root.classList.toggle('dark');
@@ -70,7 +80,7 @@
       });
     })();
 
-    // GA events: view / download (no duplicamos gtag snippet)
+    // GA events: view / download
     (function(){
       const pdfPath = '/GUIA_TECNICA_NANO_BANANA.pdf';
       const view = document.getElementById('viewPdf');
