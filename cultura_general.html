@@ -1,1349 +1,1105 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
-  <title>Trivia Rush — Cultura General</title>
-  <style>
-    :root{
-      --bg1:#0b1220;
-      --bg2:#0a2a3a;
-      --card:#0f1b2e;
-      --card2:#0e2236;
-      --text:#e8f0ff;
-      --muted:#9fb2d3;
-      --accent:#7c5cff;
-      --ok:#2fe37a;
-      --bad:#ff5b6e;
-      --warn:#ffcc66;
-      --shadow: 0 20px 60px rgba(0,0,0,.35);
-      --radius: 18px;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Trivia Rush - Neon Edition</title>
+    <style>
+        /* --- CORE VARIABLES & RESET --- */
+        :root {
+            --bg-dark: #0f172a;
+            --bg-gradient: radial-gradient(circle at 50% 0%, #1e293b, #0f172a);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --primary: #3b82f6;
+            --secondary: #8b5cf6;
+            --accent: #f43f5e;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --neon-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
 
-    *{ box-sizing:border-box; }
-    body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      color:var(--text);
-      background: radial-gradient(1200px 800px at 20% 10%, rgba(124,92,255,.22), transparent 55%),
-                  radial-gradient(1200px 800px at 80% 20%, rgba(47,227,122,.14), transparent 55%),
-                  linear-gradient(180deg, var(--bg1), var(--bg2));
-      min-height:100vh;
-      overflow-x:hidden;
-    }
+        * { box-sizing: border-box; touch-action: manipulation; }
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg-dark);
+            background-image: var(--bg-gradient);
+            color: var(--text-main);
+            font-family: var(--font-main);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            -webkit-font-smoothing: antialiased;
+        }
 
-    .wrap{
-      width:min(980px, 92vw);
-      margin: 28px auto 40px;
-      display:grid;
-      gap:18px;
-    }
+        /* --- GLASSMORPHISM UTILS --- */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        }
 
-    .top{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:14px;
-    }
+        .container {
+            width: 100%;
+            max-width: 500px;
+            height: 100%;
+            max-height: 900px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
 
-    .brand{
-      display:flex;align-items:center;gap:12px;
-      user-select:none;
-    }
-    .logo{
-      width:44px;height:44px;border-radius:14px;
-      background: conic-gradient(from 210deg, var(--accent), #2dd4bf, #60a5fa, var(--accent));
-      box-shadow: var(--shadow);
-      position:relative;
-      overflow:hidden;
-    }
-    .logo::after{
-      content:"";
-      position:absolute; inset:-30%;
-      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.25), transparent 55%);
-      transform: rotate(15deg);
-    }
-    .brand h1{
-      margin:0; font-size:18px; letter-spacing:.2px;
-    }
-    .brand p{
-      margin:0; color:var(--muted); font-size:12px;
-    }
+        /* --- SCREENS --- */
+        .screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 10;
+        }
+        .screen.active {
+            opacity: 1;
+            pointer-events: all;
+            z-index: 20;
+        }
 
-    .pill{
-      padding:10px 12px;
-      border-radius:999px;
-      background: rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.10);
-      box-shadow: 0 10px 24px rgba(0,0,0,.18);
-      display:flex; gap:10px; align-items:center;
-      flex-wrap:wrap;
-    }
-    .pill .stat{
-      display:flex; gap:8px; align-items:baseline;
-      padding:6px 10px;
-      border-radius:999px;
-      background: rgba(0,0,0,.22);
-      border:1px solid rgba(255,255,255,.08);
-    }
-    .stat b{ font-size:13px; }
-    .stat span{ font-size:12px; color:var(--muted); }
+        /* --- MENU SCREEN --- */
+        .logo-area {
+            text-align: center;
+            margin-top: 40px;
+            margin-bottom: 40px;
+        }
+        .logo-title {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+            margin: 0;
+        }
+        .logo-subtitle {
+            color: var(--text-muted);
+            margin-top: 5px;
+            letter-spacing: 2px;
+            font-size: 0.9rem;
+        }
 
-    .grid{
-      display:grid;
-      grid-template-columns: 1.2fr .8fr;
-      gap:18px;
-    }
+        .menu-grid {
+            display: grid;
+            gap: 15px;
+            width: 100%;
+        }
 
-    @media (max-width: 920px){
-      .grid{ grid-template-columns: 1fr; }
-    }
+        .btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--glass-border);
+            color: white;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .btn:hover { background: rgba(255, 255, 255, 0.15); transform: translateY(-2px); }
+        .btn:active { transform: scale(0.98); }
+        .btn-primary { background: var(--primary); border-color: var(--primary); box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
+        .btn-primary:hover { background: #2563eb; }
 
-    .card{
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      border:1px solid rgba(255,255,255,.10);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow:hidden;
-      position:relative;
-    }
-    .card .inner{ padding:18px; }
+        /* --- GAME SCREEN --- */
+        .hud {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+        .score-box span { color: var(--success); text-shadow: 0 0 10px rgba(16, 185, 129, 0.4); font-size: 1.2rem; }
+        
+        .timer-bar-bg {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .timer-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            width: 100%;
+            transition: width 0.1s linear;
+        }
+        .timer-bar-fill.frozen { background: #38bdf8; box-shadow: 0 0 10px #38bdf8; }
+        .timer-bar-fill.danger { background: #ef4444; }
 
-    .screen{ display:none; }
-    .screen.active{ display:block; }
+        .question-card {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .boss-indicator {
+            position: absolute;
+            top: -20px;
+            background: var(--accent);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            box-shadow: 0 0 15px var(--accent);
+            animation: pulse 1s infinite;
+            display: none;
+        }
 
-    .hero{
-      padding:18px;
-      display:grid;
-      gap:12px;
-    }
-    .hero h2{
-      margin:0;
-      font-size:22px;
-      line-height:1.15;
-      letter-spacing:.2px;
-    }
-    .hero p{
-      margin:0;
-      color:var(--muted);
-      line-height:1.45;
-      font-size:14px;
-    }
+        .category-tag {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .diff-badge {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
 
-    .modes{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:12px;
-    }
-    @media (max-width:560px){
-      .modes{ grid-template-columns: 1fr; }
-    }
+        .question-text {
+            font-size: 1.3rem;
+            line-height: 1.4;
+            font-weight: 500;
+        }
 
-    .mode{
-      padding:14px;
-      border-radius:16px;
-      background: rgba(0,0,0,.18);
-      border: 1px solid rgba(255,255,255,.10);
-      cursor:pointer;
-      transition: transform .12s ease, border-color .12s ease, background .12s ease;
-      position:relative;
-      overflow:hidden;
-    }
-    .mode:hover{
-      transform: translateY(-1px);
-      border-color: rgba(124,92,255,.45);
-      background: rgba(124,92,255,.10);
-    }
-    .mode h3{ margin:0 0 6px; font-size:15px; }
-    .mode p{ margin:0; font-size:13px; color:var(--muted); }
-    .tag{
-      display:inline-flex; align-items:center; gap:8px;
-      margin-top:10px;
-      padding:6px 10px;
-      border-radius:999px;
-      background: rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.10);
-      font-size:12px;
-      color:var(--muted);
-    }
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .option-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            color: var(--text-main);
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .option-btn:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(255,255,255,0.3); }
+        .option-btn.correct { background: rgba(16, 185, 129, 0.2); border-color: var(--success); color: var(--success); }
+        .option-btn.wrong { background: rgba(244, 63, 94, 0.2); border-color: var(--accent); color: var(--accent); }
+        .option-btn.disabled { opacity: 0.5; pointer-events: none; }
+        
+        /* Powers */
+        .powers-dock {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: auto;
+        }
+        .power-btn {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 10px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+            position: relative;
+            min-width: 80px;
+        }
+        .power-btn .icon { font-size: 1.4rem; margin-bottom: 4px; }
+        .power-btn .key-hint { 
+            position: absolute; top: 2px; right: 4px; 
+            font-size: 0.6rem; color: rgba(255,255,255,0.4); 
+        }
+        .power-btn .count-badge {
+            position: absolute; top: -5px; right: -5px;
+            background: var(--primary);
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            font-size: 0.7rem;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .power-btn:active { transform: scale(0.95); }
+        .power-btn.disabled { opacity: 0.3; pointer-events: none; filter: grayscale(1); }
+        .power-btn.active-state { border-color: var(--warning); box-shadow: 0 0 10px var(--warning) inset; }
 
-    .btn{
-      appearance:none;
-      border:none;
-      cursor:pointer;
-      padding:12px 14px;
-      border-radius: 14px;
-      font-weight:700;
-      color:var(--text);
-      background: linear-gradient(180deg, rgba(124,92,255,.9), rgba(124,92,255,.72));
-      box-shadow: 0 18px 40px rgba(124,92,255,.22);
-      transition: transform .12s ease, filter .12s ease, opacity .12s ease;
-    }
-    .btn:hover{ transform: translateY(-1px); filter:brightness(1.03); }
-    .btn:active{ transform: translateY(0px); filter:brightness(.98); }
-    .btn.secondary{
-      background: rgba(255,255,255,.08);
-      box-shadow:none;
-      border:1px solid rgba(255,255,255,.12);
-      font-weight:650;
-    }
-    .btn.ghost{
-      background: transparent;
-      border:1px solid rgba(255,255,255,.14);
-      font-weight:650;
-      box-shadow:none;
-    }
-    .btn:disabled{ opacity:.5; cursor:not-allowed; transform:none; }
+        /* --- EXPLANATION OVERLAY --- */
+        .explanation-overlay {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-top: 1px solid var(--glass-border);
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 50;
+            text-align: center;
+        }
+        .explanation-overlay.show { transform: translateY(0); }
+        .exp-title { font-weight: bold; margin-bottom: 10px; display: block; font-size: 1.2rem; }
+        .exp-text { font-size: 0.95rem; color: #cbd5e1; line-height: 1.4; margin-bottom: 15px; }
+        
+        .auto-next-bar {
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            width: 100%;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        .auto-next-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 2.5s linear;
+        }
+        .explanation-overlay.show .auto-next-fill {
+            width: 100%;
+        }
 
-    .aside .inner{
-      display:grid;
-      gap:12px;
-    }
-    .panel{
-      padding:14px;
-      border-radius:16px;
-      background: rgba(0,0,0,.18);
-      border:1px solid rgba(255,255,255,.10);
-    }
-    .panel h4{ margin:0 0 8px; font-size:13px; color:var(--muted); font-weight:700; letter-spacing:.2px; }
-    .panel .row{ display:flex; justify-content:space-between; gap:10px; margin:6px 0; font-size:13px; }
-    .kbd{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      padding:2px 6px; border-radius:8px;
-      background: rgba(255,255,255,.08);
-      border:1px solid rgba(255,255,255,.10);
-      font-size:12px;
-      color:var(--muted);
-    }
+        /* --- ANIMATIONS --- */
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        @keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-5px); } 100% { transform: translateX(0); } }
+        .shake { animation: shake 0.4s ease-in-out; }
+        
+        .floating-score {
+            position: absolute;
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--warning);
+            pointer-events: none;
+            animation: floatUp 1s forwards;
+            z-index: 100;
+        }
+        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-50px) scale(1.5); } }
 
-    /* Game UI */
-    .hud{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-      padding:14px 18px;
-      background: rgba(0,0,0,.24);
-      border-bottom:1px solid rgba(255,255,255,.08);
-    }
-    .hud-left{
-      display:flex; align-items:center; gap:10px; flex-wrap:wrap;
-    }
-    .badge{
-      display:inline-flex; align-items:center; gap:8px;
-      padding:7px 10px;
-      border-radius:999px;
-      background: rgba(255,255,255,.07);
-      border:1px solid rgba(255,255,255,.10);
-      font-size:12px;
-      color:var(--muted);
-    }
-    .badge b{ color:var(--text); font-size:12px; }
-    .hearts{
-      display:inline-flex; gap:6px; align-items:center;
-      padding:7px 10px;
-      border-radius:999px;
-      background: rgba(255,255,255,.07);
-      border:1px solid rgba(255,255,255,.10);
-    }
-    .heart{
-      width:10px;height:10px;border-radius:3px;
-      background: rgba(255,255,255,.18);
-      transform: rotate(45deg);
-      position:relative;
-    }
-    .heart::before, .heart::after{
-      content:""; position:absolute; width:10px;height:10px; border-radius:50%;
-      background: inherit;
-    }
-    .heart::before{ left:-5px; top:0; }
-    .heart::after{ left:0; top:-5px; }
-    .heart.on{ background: rgba(255,91,110,.95); }
-
-    .timer{
-      min-width: 150px;
-      display:flex; align-items:center; gap:10px; justify-content:flex-end;
-    }
-    .bar{
-      width:110px; height:10px; border-radius:999px;
-      background: rgba(255,255,255,.10);
-      border:1px solid rgba(255,255,255,.10);
-      overflow:hidden;
-      box-shadow: inset 0 0 0 1px rgba(0,0,0,.18);
-    }
-    .bar > i{
-      display:block; height:100%;
-      width:100%;
-      background: linear-gradient(90deg, var(--ok), var(--warn), var(--bad));
-      transform-origin:left center;
-      transform: scaleX(1);
-      transition: transform .18s linear;
-    }
-    .timer .t{
-      font-weight:800;
-      font-size:14px;
-      color:var(--text);
-      width:36px; text-align:right;
-    }
-
-    .qwrap{ padding:18px; display:grid; gap:12px; }
-    .qhead{
-      display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
-    }
-    .category{
-      font-size:12px;
-      color:var(--muted);
-      display:inline-flex; align-items:center; gap:8px;
-      padding:7px 10px;
-      border-radius:999px;
-      background: rgba(124,92,255,.12);
-      border:1px solid rgba(124,92,255,.25);
-    }
-    .boss{
-      background: rgba(255,204,102,.12);
-      border-color: rgba(255,204,102,.28);
-    }
-    .qnum{
-      font-size:12px; color:var(--muted);
-      padding:7px 10px; border-radius:999px;
-      background: rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.10);
-      white-space:nowrap;
-    }
-    .question{
-      font-size:18px;
-      line-height:1.28;
-      margin:0;
-      letter-spacing:.1px;
-    }
-
-    .answers{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:10px;
-    }
-    @media (max-width:620px){
-      .answers{ grid-template-columns: 1fr; }
-    }
-
-    .ans{
-      padding:12px 12px;
-      border-radius:16px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.20);
-      cursor:pointer;
-      text-align:left;
-      color:var(--text);
-      display:flex; align-items:center; gap:10px;
-      transition: transform .12s ease, border-color .12s ease, background .12s ease;
-      position:relative;
-      overflow:hidden;
-      min-height: 52px;
-    }
-    .ans:hover{
-      transform: translateY(-1px);
-      border-color: rgba(124,92,255,.45);
-      background: rgba(124,92,255,.12);
-    }
-    .ans:disabled{ cursor:not-allowed; opacity:.82; transform:none; }
-    .chip{
-      width:30px;height:30px;border-radius:12px;
-      display:flex; align-items:center; justify-content:center;
-      font-weight:900; font-size:12px;
-      background: rgba(255,255,255,.08);
-      border:1px solid rgba(255,255,255,.10);
-      color:var(--muted);
-      flex: 0 0 auto;
-    }
-    .ans.correct{
-      border-color: rgba(47,227,122,.55);
-      background: rgba(47,227,122,.14);
-    }
-    .ans.wrong{
-      border-color: rgba(255,91,110,.55);
-      background: rgba(255,91,110,.12);
-    }
-    .ans.dim{
-      opacity:.55;
-      filter:saturate(.85);
-    }
-
-    .powers{
-      display:flex; flex-wrap:wrap; gap:10px;
-      padding: 0 18px 18px;
-    }
-    .power{
-      padding:10px 12px;
-      border-radius:14px;
-      background: rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.12);
-      color:var(--text);
-      cursor:pointer;
-      display:inline-flex; align-items:center; gap:10px;
-      font-weight:750;
-      transition: transform .12s ease, border-color .12s ease, background .12s ease, opacity .12s ease;
-      user-select:none;
-    }
-    .power:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.22); background: rgba(255,255,255,.08); }
-    .power:disabled{ opacity:.45; cursor:not-allowed; transform:none; }
-    .power small{ color:var(--muted); font-weight:700; }
-
-    .toast{
-      margin: 0 18px 18px;
-      padding:12px 14px;
-      border-radius:16px;
-      background: rgba(0,0,0,.22);
-      border:1px solid rgba(255,255,255,.10);
-      color:var(--muted);
-      display:none;
-    }
-    .toast.show{ display:block; }
-    .toast b{ color:var(--text); }
-
-    .footer-actions{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      justify-content:flex-end;
-      padding: 0 18px 18px;
-    }
-
-    /* Confetti */
-    .confetti{
-      position:fixed;
-      inset:0;
-      pointer-events:none;
-      overflow:hidden;
-      display:none;
-      z-index:999;
-    }
-    .confetti.show{ display:block; }
-    .confetti i{
-      position:absolute;
-      top:-10vh;
-      width:10px;height:16px;
-      border-radius:4px;
-      opacity:.9;
-      animation: fall 1200ms linear forwards;
-      filter: drop-shadow(0 10px 12px rgba(0,0,0,.25));
-    }
-    @keyframes fall{
-      to{ transform: translate(var(--dx), 120vh) rotate(360deg); }
-    }
-
-    .tiny{
-      font-size:12px;color:var(--muted); line-height:1.35;
-    }
-    .divider{
-      height:1px;background:rgba(255,255,255,.08);
-      margin:12px 0;
-    }
-    .mono{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    }
-  </style>
+        /* --- CONFETTI CANVAS --- */
+        #confetti-canvas {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 90;
+        }
+    </style>
 </head>
-
 <body>
-  <div class="confetti" id="confetti"></div>
 
-  <div class="wrap">
-    <div class="top">
-      <div class="brand">
-        <div class="logo" aria-hidden="true"></div>
-        <div>
-          <h1>Trivia Rush</h1>
-          <p>Cultura general con rachas, poderes y jefes 🔥</p>
+<div class="container glass-panel">
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- MENU SCREEN -->
+    <div id="menu-screen" class="screen active">
+        <div class="logo-area">
+            <h1 class="logo-title">TRIVIA RUSH</h1>
+            <div class="logo-subtitle">WORLD EDITION</div>
         </div>
-      </div>
+        
+        <div class="menu-grid">
+            <button class="btn btn-primary" onclick="Game.start('classic')">
+                <span>🎮 Clásico</span>
+                <small>12 Preguntas</small>
+            </button>
+            <button class="btn" onclick="Game.start('daily')">
+                <span>📅 Reto Diario</span>
+                <small id="daily-score-prev">-</small>
+            </button>
+            <button class="btn" onclick="Game.start('practice')">
+                <span>🎓 Práctica</span>
+                <small>Sin estrés</small>
+            </button>
+        </div>
 
-      <div class="pill" aria-label="Resumen">
-        <div class="stat"><b id="bestScore">0</b><span>Mejor puntaje</span></div>
-        <div class="stat"><b id="bestStreak">0</b><span>Mejor racha</span></div>
-        <div class="stat"><b id="bestDaily">0</b><span>Récord diario</span></div>
-      </div>
+        <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid var(--glass-border);">
+            <div class="hud">
+                <span>🏆 Record: <span id="best-score">0</span></span>
+                <span>🔥 Racha Max: <span id="best-streak">0</span></span>
+            </div>
+            <div style="text-align: center; font-size: 0.8rem; color: var(--text-muted);">
+                Teclado: Enter, F
+            </div>
+        </div>
     </div>
 
-    <div class="grid">
-      <!-- Main -->
-      <div class="card">
-        <!-- START SCREEN -->
-        <div class="screen active" id="screenStart">
-          <div class="hero">
-            <h2>Responde rápido, encadena rachas y usa poderes. Cada 5 aciertos: <span style="color:var(--warn);font-weight:900">Jefe</span>.</h2>
-            <p>Mi opinión: esto se siente como un “arcade” de preguntas, no como la trivia aburrida de siempre. Ideal para viciarte 5 minutos.</p>
-
-            <div class="modes">
-              <button class="mode" id="btnClassic" type="button">
-                <h3>Modo Clásico</h3>
-                <p>12 preguntas · 3 vidas · timer por pregunta</p>
-                <div class="tag">🎯 Mejor para empezar</div>
-              </button>
-
-              <button class="mode" id="btnTimeAttack" type="button">
-                <h3>Contrarreloj</h3>
-                <p>60 segundos · sin parar · racha manda</p>
-                <div class="tag">⚡ Puro estrés rico</div>
-              </button>
-
-              <button class="mode" id="btnDaily" type="button">
-                <h3>Reto Diario</h3>
-                <p>Mismas preguntas para todos hoy</p>
-                <div class="tag">📅 Perfecto para competir</div>
-              </button>
-
-              <button class="mode" id="btnPractice" type="button">
-                <h3>Práctica</h3>
-                <p>Sin vidas · sin presión · aprende con datos</p>
-                <div class="tag">🧠 Modo estudio</div>
-              </button>
-            </div>
-
-            <div class="divider"></div>
-            <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end">
-              <button class="btn secondary" id="btnResetStats" type="button">Reset récords</button>
-              <button class="btn" id="btnStartDefault" type="button">Jugar ya</button>
-            </div>
-
-            <p class="tiny">Tip: Usa teclado <span class="kbd">1</span> <span class="kbd">2</span> <span class="kbd">3</span> <span class="kbd">4</span> para responder rápido. Poderes: <span class="kbd">F</span> 50/50 · <span class="kbd">S</span> Saltar · <span class="kbd">C</span> Congelar</p>
-          </div>
+    <!-- GAME SCREEN -->
+    <div id="game-screen" class="screen">
+        <div class="hud">
+            <div><span id="lives-display">❤️❤️❤️</span></div>
+            <div>🔥 <span id="streak-display">0</span>x</div>
+            <div class="score-box">💎 <span id="score-display">0</span></div>
         </div>
 
-        <!-- GAME SCREEN -->
-        <div class="screen" id="screenGame">
-          <div class="hud">
-            <div class="hud-left">
-              <div class="badge">Puntaje: <b id="score">0</b></div>
-              <div class="badge">Racha: <b id="streak">0</b> <span id="multText" style="color:var(--muted);font-weight:700;margin-left:6px">x1</span></div>
-              <div class="hearts" title="Vidas">
-                <span class="heart on" id="h1"></span>
-                <span class="heart on" id="h2"></span>
-                <span class="heart on" id="h3"></span>
-              </div>
-            </div>
-
-            <div class="timer" aria-label="Tiempo">
-              <div class="bar" aria-hidden="true"><i id="barFill"></i></div>
-              <div class="t"><span id="time">15</span>s</div>
-            </div>
-          </div>
-
-          <div class="qwrap">
-            <div class="qhead">
-              <div class="category" id="category">📚 Cultura</div>
-              <div class="qnum" id="qnum">1/12</div>
-            </div>
-
-            <p class="question" id="question">Pregunta…</p>
-
-            <div class="answers" id="answers"></div>
-          </div>
-
-          <div class="powers">
-            <button class="power" id="p5050" type="button" title="Elimina 2 opciones incorrectas">
-              🎲 50/50 <small>(<span id="c5050">1</span>)</small>
-            </button>
-            <button class="power" id="pSkip" type="button" title="Salta la pregunta sin perder vida">
-              ⏭️ Saltar <small>(<span id="cSkip">1</span>)</small>
-            </button>
-            <button class="power" id="pFreeze" type="button" title="Congela el tiempo 5s">
-              🧊 Congelar <small>(<span id="cFreeze">1</span>)</small>
-            </button>
-            <button class="power" id="pDouble" type="button" title="Duplica puntos del próximo acierto">
-              ✨ Doble <small>(<span id="cDouble">0</span>)</small>
-            </button>
-          </div>
-
-          <div class="toast" id="toast"></div>
-
-          <div class="footer-actions">
-            <button class="btn ghost" id="btnQuit" type="button">Salir</button>
-            <button class="btn secondary" id="btnNext" type="button" disabled>Siguiente</button>
-          </div>
+        <div class="timer-bar-bg">
+            <div id="timer-bar" class="timer-bar-fill"></div>
         </div>
 
-        <!-- END SCREEN -->
-        <div class="screen" id="screenEnd">
-          <div class="hero">
-            <h2 id="endTitle">¡Fin!</h2>
-            <p id="endDesc">Resumen…</p>
-
-            <div class="panel">
-              <div class="row"><span>Modo</span><b id="endMode">—</b></div>
-              <div class="row"><span>Puntaje</span><b id="endScore">0</b></div>
-              <div class="row"><span>Racha máx.</span><b id="endMaxStreak">0</b></div>
-              <div class="row"><span>Aciertos</span><b id="endCorrect">0</b></div>
-              <div class="row"><span>Errores</span><b id="endWrong">0</b></div>
+        <div class="question-card" id="question-card">
+            <div class="boss-indicator" id="boss-badge">⚠️ BOSS BATTLE ⚠️</div>
+            <div class="category-tag">
+                <span id="q-category">CIENCIA</span>
+                <span class="diff-badge" id="q-diff">EASY</span>
             </div>
+            <div class="question-text" id="q-text">¿Cargando pregunta...?</div>
+        </div>
 
-            <div class="divider"></div>
+        <div class="options-grid" id="options-container">
+            <!-- Buttons generated by JS -->
+        </div>
 
-            <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end">
-              <button class="btn secondary" id="btnCopy" type="button">Copiar resultado</button>
-              <button class="btn" id="btnReplay" type="button">Jugar otra vez</button>
+        <div class="powers-dock">
+            <div class="power-btn" id="btn-5050" onclick="PowerUps.use('5050')">
+                <span class="count-badge" id="count-5050">1</span>
+                <span class="key-hint">F</span>
+                <span class="icon">🎲</span>
+                <span>50/50</span>
             </div>
-
-            <p class="tiny">Pro tip: si quieres más preguntas, abajo en el JS hay un array <span class="mono">QUESTION_BANK</span>. Solo agrega más.</p>
-          </div>
         </div>
-      </div>
-
-      <!-- Aside -->
-      <div class="card aside">
-        <div class="inner">
-          <div class="panel">
-            <h4>¿Cómo ganas?</h4>
-            <div class="row"><span>✅ Acierto</span><span>+ puntos + tiempo</span></div>
-            <div class="row"><span>🔥 Racha</span><span>multiplicador</span></div>
-            <div class="row"><span>👑 Jefe</span><span>vale más puntos</span></div>
-          </div>
-
-          <div class="panel">
-            <h4>Poderes</h4>
-            <div class="row"><span>🎲 50/50</span><span class="kbd">F</span></div>
-            <div class="row"><span>⏭️ Saltar</span><span class="kbd">S</span></div>
-            <div class="row"><span>🧊 Congelar</span><span class="kbd">C</span></div>
-            <div class="row"><span>✨ Doble</span><span>se gana</span></div>
-          </div>
-
-          <div class="panel">
-            <h4>Reglas rápidas</h4>
-            <p class="tiny" style="margin:0">
-              • Tienes 3 vidas (excepto Práctica).<br/>
-              • Cada 5 aciertos seguidos aparece un <b style="color:var(--warn)">Jefe</b> (pregunta difícil).<br/>
-              • Si respondes muy rápido, te premia con más puntos.<br/>
-              • En el Reto Diario, el set se genera igual para el día de hoy.
-            </p>
-          </div>
-
-          <div class="panel">
-            <h4>Atajos</h4>
-            <div class="row"><span>Responder</span><span><span class="kbd">1</span> <span class="kbd">2</span> <span class="kbd">3</span> <span class="kbd">4</span></span></div>
-            <div class="row"><span>Siguiente</span><span class="kbd">Enter</span></div>
-            <div class="row"><span>Salir</span><span class="kbd">Esc</span></div>
-          </div>
-
-          <div class="panel">
-            <h4>Mini idea para hacerlo MÁS adictivo</h4>
-            <p class="tiny" style="margin:0">
-              Si te gusta, el siguiente upgrade sería: “liga semanal” (ranking en localStorage),
-              y cartas de “eventos” (p.ej. “Solo ciencia por 3 preguntas”).
-            </p>
-          </div>
+        
+        <!-- Explanation Slide-up -->
+        <div class="explanation-overlay" id="explanation-panel">
+            <span class="exp-title" id="exp-result-text">¡Correcto!</span>
+            <p class="exp-text" id="exp-detail">Detalle de la respuesta.</p>
+            <div class="auto-next-bar"><div class="auto-next-fill"></div></div>
+            <div style="margin-top: 5px; font-size: 0.7rem; color: var(--text-muted);">Siguiente pregunta...</div>
         </div>
-      </div>
     </div>
-  </div>
+
+    <!-- RESULT SCREEN -->
+    <div id="result-screen" class="screen" style="justify-content: center; text-align: center;">
+        <h2 id="result-title" style="font-size: 2rem; margin-bottom: 10px;">¡Juego Terminado!</h2>
+        <div style="font-size: 4rem; font-weight: bold; color: var(--primary); margin-bottom: 20px;" id="final-score">0</div>
+        
+        <div class="menu-grid">
+            <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px;">
+                <div style="font-size: 0.9rem; color: var(--text-muted);">Aciertos</div>
+                <div style="font-size: 1.5rem; font-weight: bold;" id="final-correct">0/12</div>
+            </div>
+            <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px;">
+                <div style="font-size: 0.9rem; color: var(--text-muted);">Mejor Racha</div>
+                <div style="font-size: 1.5rem; font-weight: bold;" id="final-streak">0</div>
+            </div>
+        </div>
+
+        <button class="btn btn-primary" style="margin-top: 30px; justify-content: center;" onclick="UI.showScreen('menu-screen')">
+            🏠 Volver al Menú
+        </button>
+    </div>
+</div>
 
 <script>
-/* =========================
-   TRIVIA RUSH — PURE JS
-   ========================= */
+/**
+ * TRIVIA RUSH - WORLD EDITION (200 GLOBAL QUESTIONS)
+ */
 
-const $ = (sel) => document.querySelector(sel);
-const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+const QUESTIONS_DB = [
+    // FÁCIL (Diff: 1) - Approx 80 questions
+    { cat: "Ciencia", q: "¿Cuál es el símbolo químico del Oro?", a: ["Au", "Ag", "Fe", "Or"], correct: 0, explain: "Del latín 'Aurum'.", diff: 1 },
+    { cat: "Tecnología", q: "¿Qué significan las siglas HTML?", a: ["Lenguaje de Marcado", "Lenguaje de Programación", "Base de Datos", "Protocolo de Red"], correct: 0, explain: "HyperText Markup Language.", diff: 1 },
+    { cat: "Historia", q: "¿Quién pintó la Mona Lisa?", a: ["Leonardo da Vinci", "Miguel Ángel", "Raphael", "Donatello"], correct: 0, explain: "Renacimiento italiano.", diff: 1 },
+    { cat: "Deportes", q: "¿Cuántos jugadores tiene un equipo de fútbol en la cancha?", a: ["11", "10", "12", "9"], correct: 0, explain: "Por equipo.", diff: 1 },
+    { cat: "Ciencia", q: "¿Cuál es el planeta más grande del Sistema Solar?", a: ["Júpiter", "Saturno", "Neptuno", "Tierra"], correct: 0, explain: "Gigante gaseoso.", diff: 1 },
+    { cat: "Tecnología", q: "¿Quién fue el cofundador principal de Apple?", a: ["Steve Jobs", "Bill Gates", "Elon Musk", "Mark Zuckerberg"], correct: 0, explain: "Lanzó el iPhone en 2007.", diff: 1 },
+    { cat: "Biología", q: "¿Cuál es la unidad básica de la vida?", a: ["Célula", "Átomo", "Molécula", "Tejido"], correct: 0, explain: "Fundamental para la vida.", diff: 1 },
+    { cat: "Música", q: "¿A quién se le conoce como el Rey del Pop?", a: ["Michael Jackson", "Elvis Presley", "Prince", "Freddie Mercury"], correct: 0, explain: "Thriller es el álbum más vendido.", diff: 1 },
+    { cat: "Geografía", q: "¿En qué continente se encuentra Egipto?", a: ["África", "Asia", "Europa", "América"], correct: 0, explain: "En el noreste de África.", diff: 1 },
+    { cat: "Gaming", q: "¿Cómo se llama el hermano de Mario Bros?", a: ["Luigi", "Wario", "Toad", "Yoshi"], correct: 0, explain: "Viste de verde.", diff: 1 },
+    { cat: "Matemáticas", q: "¿Cuánto es la raíz cuadrada de 144?", a: ["12", "14", "10", "16"], correct: 0, explain: "12 x 12 = 144.", diff: 1 },
+    { cat: "Química", q: "¿Cuál es la fórmula química del agua?", a: ["H2O", "HO2", "H2O2", "OH"], correct: 0, explain: "Dos Hidrógenos, uno Oxígeno.", diff: 1 },
+    { cat: "Tecnología", q: "¿Qué componente es considerado el cerebro del PC?", a: ["CPU", "RAM", "GPU", "SSD"], correct: 0, explain: "Unidad Central de Procesamiento.", diff: 1 },
+    { cat: "Anime", q: "¿Quién es el protagonista de Dragon Ball?", a: ["Goku", "Vegeta", "Gohan", "Piccolo"], correct: 0, explain: "Su nombre saiyajin es Kakarotto.", diff: 1 },
+    { cat: "Historia", q: "¿Quién descubrió América en 1492?", a: ["Cristóbal Colón", "Américo Vespucio", "Magallanes", "Hernán Cortés"], correct: 0, explain: "Llegó al nuevo mundo.", diff: 1 },
+    { cat: "Música", q: "¿De qué banda fue vocalista Freddie Mercury?", a: ["Queen", "The Beatles", "Rolling Stones", "AC/DC"], correct: 0, explain: "Británicos legendarios.", diff: 1 },
+    { cat: "Espacio", q: "¿Qué planeta es conocido como el Planeta Rojo?", a: ["Marte", "Júpiter", "Venus", "Saturno"], correct: 0, explain: "Por el óxido de hierro.", diff: 1 },
+    { cat: "Geografía", q: "¿Cuál es la capital de Francia?", a: ["París", "Lyon", "Marsella", "Niza"], correct: 0, explain: "La ciudad de la luz.", diff: 1 },
+    { cat: "Comics", q: "¿Cuál es la identidad secreta de Batman?", a: ["Bruce Wayne", "Clark Kent", "Peter Parker", "Tony Stark"], correct: 0, explain: "Multimillonario de Gótica.", diff: 1 },
+    { cat: "Química", q: "¿Qué gas necesitamos principalmente para respirar?", a: ["Oxígeno", "Helio", "Nitrógeno", "Carbono"], correct: 0, explain: "Vital para la vida.", diff: 1 },
+    { cat: "Tecnología", q: "¿Cómo se llama ahora la red social del pájaro azul?", a: ["X", "Facebook", "Instagram", "Snapchat"], correct: 0, explain: "Antes Twitter.", diff: 1 },
+    { cat: "Cine", q: "¿Quién es el padre de Luke Skywalker?", a: ["Darth Vader", "Joker", "Thanos", "Voldemort"], correct: 0, explain: "Anakin Skywalker.", diff: 1 },
+    { cat: "Biología", q: "¿Cómo se llaman los animales que ponen huevos?", a: ["Ovíparos", "Vivíparos", "Mamíferos", "Marsupiales"], correct: 0, explain: "Como las aves y reptiles.", diff: 1 },
+    { cat: "Música", q: "¿Qué instrumento musical tiene 88 teclas?", a: ["Piano", "Guitarra", "Violín", "Flauta"], correct: 0, explain: "Teclas blancas y negras.", diff: 1 },
+    { cat: "Tecnología", q: "¿Quién es el fundador principal de Microsoft?", a: ["Bill Gates", "Steve Jobs", "Elon Musk", "Mark Zuckerberg"], correct: 0, explain: "Pionero del software.", diff: 1 },
+    { cat: "Literatura", q: "¿Quién escribió 'Romeo y Julieta'?", a: ["Shakespeare", "Cervantes", "Dante", "Homero"], correct: 0, explain: "Dramaturgo inglés.", diff: 1 },
+    { cat: "Cuerpo", q: "¿Qué órgano bombea la sangre al cuerpo?", a: ["Corazón", "Pulmón", "Hígado", "Cerebro"], correct: 0, explain: "El motor del cuerpo.", diff: 1 },
+    { cat: "Física", q: "¿Qué fuerza nos mantiene pegados al suelo?", a: ["Gravedad", "Magnetismo", "Fricción", "Inercia"], correct: 0, explain: "Descrita por Newton.", diff: 1 },
+    { cat: "Gaming", q: "¿Cuál es el juego de bloques más vendido?", a: ["Minecraft", "Tetris", "Roblox", "Lego"], correct: 0, explain: "Mundo abierto pixelado.", diff: 1 },
+    { cat: "Cine", q: "¿En qué película los juguetes cobran vida?", a: ["Toy Story", "Cars", "Up", "Coco"], correct: 0, explain: "Un clásico de Pixar.", diff: 1 },
+    { cat: "Ciencia", q: "¿Cómo se llama el agua en estado sólido?", a: ["Hielo", "Vapor", "Plasma", "Niebla"], correct: 0, explain: "Congelada a 0°C.", diff: 1 },
+    { cat: "Tecnología", q: "¿Qué sistema operativo móvil desarrolla Google?", a: ["Android", "iOS", "Windows", "Linux"], correct: 0, explain: "El más usado en el mundo.", diff: 1 },
+    { cat: "Deportes", q: "¿Cuánto dura un partido de fútbol profesional?", a: ["90 min", "60 min", "100 min", "45 min"], correct: 0, explain: "Dos tiempos de 45 minutos.", diff: 1 },
+    { cat: "Mitología", q: "¿Quién es el dios del trueno en la mitología nórdica?", a: ["Thor", "Odín", "Loki", "Zeus"], correct: 0, explain: "Porta el martillo Mjolnir.", diff: 1 },
+    { cat: "Química", q: "¿Qué elemento representa la letra 'O'?", a: ["Oxígeno", "Oro", "Osmio", "Oliva"], correct: 0, explain: "Vital para la respiración.", diff: 1 },
+    { cat: "Cine", q: "¿Cómo se llama el ogro verde de Dreamworks?", a: ["Shrek", "Hulk", "Yoda", "Grinch"], correct: 0, explain: "Vive en un pantano.", diff: 1 },
+    { cat: "Literatura", q: "¿Contra qué peleaba Don Quijote?", a: ["Molinos de viento", "Dragones", "Gigantes reales", "Castillos"], correct: 0, explain: "Creía que eran gigantes.", diff: 1 },
+    { cat: "Espacio", q: "¿Cuál es la estrella más cercana a la Tierra?", a: ["El Sol", "Sirio", "Alpha Centauri", "Polar"], correct: 0, explain: "Nos da luz y calor.", diff: 1 },
+    { cat: "Geografía", q: "¿Cuál es la capital de Japón?", a: ["Tokio", "Kioto", "Osaka", "Seúl"], correct: 0, explain: "Una de las mayores metrópolis.", diff: 1 },
+    { cat: "Cine", q: "¿Qué tipo de animal es Simba?", a: ["León", "Tigre", "Gato", "Leopardo"], correct: 0, explain: "El Rey León.", diff: 1 },
+    { cat: "Música", q: "¿Quién es conocido como el Rey del Rock?", a: ["Elvis Presley", "Michael Jackson", "Mick Jagger", "John Lennon"], correct: 0, explain: "Ícono de los 50s.", diff: 1 },
+    { cat: "Animales", q: "¿De qué color es la piel del oso polar (bajo el pelo)?", a: ["Negra", "Blanca", "Rosa", "Gris"], correct: 0, explain: "Para absorber calor. Su pelo es transparente.", diff: 1 },
+    { cat: "Comida", q: "¿Cuál es el ingrediente base del Sushi?", a: ["Arroz", "Pescado", "Alga", "Soya"], correct: 0, explain: "Arroz aderezado con vinagre.", diff: 1 },
+    { cat: "Historia", q: "¿Qué famoso barco se hundió en 1912?", a: ["Titanic", "Lusitania", "Bismarck", "Santa María"], correct: 0, explain: "Tras chocar con un iceberg.", diff: 1 },
+    { cat: "Idiomas", q: "¿Cómo se dice 'Hello' en español?", a: ["Hola", "Adiós", "Gracias", "Bien"], correct: 0, explain: "Saludo básico.", diff: 1 },
+    { cat: "Cuerpo", q: "¿Qué hueso protege el cerebro?", a: ["Cráneo", "Costilla", "Pelvis", "Fémur"], correct: 0, explain: "Estructura ósea de la cabeza.", diff: 1 },
+    { cat: "Geografía", q: "¿Qué país tiene forma de bota?", a: ["Italia", "España", "Grecia", "Francia"], correct: 0, explain: "En el sur de Europa.", diff: 1 },
+    { cat: "Tecnología", q: "¿Qué significa 'Cloud' en informática?", a: ["Nube", "Cielo", "Red", "Web"], correct: 0, explain: "Almacenamiento en internet.", diff: 1 },
+    { cat: "Cine", q: "¿Cuál es el código del agente James Bond?", a: ["007", "001", "777", "911"], correct: 0, explain: "Licencia para matar.", diff: 1 },
+    { cat: "Historia", q: "¿Qué gran muralla es visible desde el espacio (mito)?", a: ["Muralla China", "Muro de Berlín", "Muro de los Lamentos", "Muro de Adriano"], correct: 0, explain: "Construida para defensa.", diff: 1 },
+    { cat: "Literatura", q: "¿Quién es el niño que no quería crecer?", a: ["Peter Pan", "Pinocho", "Bambi", "Dumbo"], correct: 0, explain: "Vive en Nunca Jamás.", diff: 1 },
+    { cat: "Biología", q: "¿Qué líquido rojo transporta oxígeno en el cuerpo?", a: ["Sangre", "Agua", "Linfa", "Bilis"], correct: 0, explain: "Circula por venas y arterias.", diff: 1 },
+    { cat: "Geografía", q: "¿Cuál es la capital de España?", a: ["Madrid", "Barcelona", "Sevilla", "Valencia"], correct: 0, explain: "En el centro de la península.", diff: 1 },
+    { cat: "Deportes", q: "¿En qué deporte se usa un balón naranja?", a: ["Baloncesto", "Fútbol", "Vóley", "Tenis"], correct: 0, explain: "Se juega con las manos y canastas.", diff: 1 },
+    { cat: "Tecnología", q: "¿A qué empresa pertenece YouTube?", a: ["Google", "Facebook", "Amazon", "Apple"], correct: 0, explain: "Adquirida en 2006.", diff: 1 },
+    { cat: "Animales", q: "¿Quién es conocido como el Rey de la Selva?", a: ["León", "Tigre", "Elefante", "Gorila"], correct: 0, explain: "Gran felino con melena.", diff: 1 },
+    { cat: "Geografía", q: "¿Cuál es el océano más grande?", a: ["Pacífico", "Atlántico", "Índico", "Ártico"], correct: 0, explain: "Cubre gran parte del planeta.", diff: 1 },
+    { cat: "Cultura", q: "¿Qué se celebra el 25 de diciembre?", a: ["Navidad", "Año Nuevo", "Pascua", "Reyes"], correct: 0, explain: "Festividad cristiana.", diff: 1 },
+    { cat: "Música", q: "¿Cuántas cuerdas tiene una guitarra estándar?", a: ["6", "4", "5", "7"], correct: 0, explain: "Instrumento popular.", diff: 1 },
+    { cat: "Ciencia", q: "¿Qué animal produce miel?", a: ["Abeja", "Avispa", "Hormiga", "Mariposa"], correct: 0, explain: "En colmenas.", diff: 1 },
+    { cat: "Idiomas", q: "¿Cuál es el idioma más hablado del mundo?", a: ["Inglés", "Español", "Chino Mandarín", "Hindú"], correct: 0, explain: "Por número total de hablantes.", diff: 1 },
+    { cat: "Comics", q: "¿De qué planeta es Superman?", a: ["Krypton", "Marte", "Tierra", "Júpiter"], correct: 0, explain: "Se destruyó al nacer él.", diff: 1 },
+    { cat: "Geografía", q: "¿Dónde está la Torre Eiffel?", a: ["París", "Londres", "Roma", "Berlín"], correct: 0, explain: "Símbolo de Francia.", diff: 1 },
+    { cat: "Cine", q: "¿Qué busca Nemo?", a: ["A su padre", "Un tesoro", "A su madre", "El océano"], correct: 0, explain: "En realidad su padre lo busca a él.", diff: 1 },
+    { cat: "Animales", q: "¿Cuál es el animal más alto?", a: ["Jirafa", "Elefante", "Avestruz", "Oso"], correct: 0, explain: "Tiene un cuello muy largo.", diff: 1 },
+    { cat: "Tecnología", q: "¿Qué usas para escribir en el PC?", a: ["Teclado", "Ratón", "Pantalla", "Impresora"], correct: 0, explain: "Dispositivo de entrada.", diff: 1 },
+    { cat: "Arte", q: "¿Cuántos colores tiene el arcoíris (tradicionalmente)?", a: ["7", "6", "5", "8"], correct: 0, explain: "ROYGBIV.", diff: 1 },
+    { cat: "Geografía", q: "¿Cuál es el país más poblado?", a: ["India", "China", "EEUU", "Indonesia"], correct: 0, explain: "Superó a China recientemente.", diff: 1 },
+    { cat: "Ciencia", q: "¿Qué respiran los peces?", a: ["Oxígeno del agua", "Aire", "Hidrógeno", "Nada"], correct: 0, explain: "A través de branquias.", diff: 1 },
+    { cat: "Historia", q: "¿Quién fue Napoleón?", a: ["Emperador francés", "Rey inglés", "Zar ruso", "Presidente USA"], correct: 0, explain: "Gran estratega militar.", diff: 1 },
+    { cat: "Deportes", q: "¿Qué usas para jugar tenis?", a: ["Raqueta", "Bate", "Palo", "Guante"], correct: 0, explain: "Y una pelota amarilla.", diff: 1 },
 
-/* ---- Question Bank (editable) ----
-   Cada pregunta:
-   {
-     cat: "Geografía",
-     q: "¿Pregunta?",
-     a: ["op1","op2","op3","op4"],
-     correct: 1, // índice
-     explain: "Dato corto/curioso."
-     diff: 1..3  (1 fácil, 2 medio, 3 difícil)
-   }
-*/
-const QUESTION_BANK = [
-  // Ecuador / LatAm
-  {cat:"Ecuador", q:"¿Cuál es la capital de Ecuador?", a:["Guayaquil","Quito","Cuenca","Manta"], correct:1, explain:"Quito es la capital y está a ~2.850 m de altitud.", diff:1},
-  {cat:"Ecuador", q:"¿Qué archipiélago ecuatoriano es Patrimonio Natural de la Humanidad por la UNESCO?", a:["Galápagos","Juan Fernández","Malvinas","Chiloé"], correct:0, explain:"Las Galápagos fueron uno de los primeros sitios UNESCO (1978).", diff:1},
-  {cat:"Ecuador", q:"¿Qué volcán se ve muy cerca de Quito y suele ‘vigilar’ el valle?", a:["Cotopaxi","Chimborazo","Cayambe","Pichincha"], correct:3, explain:"El Pichincha está justo al oeste de Quito.", diff:1},
-  {cat:"Ecuador", q:"¿Cuál es el punto más alto de Ecuador?", a:["Cotopaxi","Chimborazo","Cayambe","Antisana"], correct:1, explain:"El Chimborazo es el más alto del país (y el punto más ‘lejano’ del centro por abultamiento terrestre).", diff:2},
+    // MEDIA (Diff: 2) - Approx 80 questions
+    { cat: "Geografía", q: "¿Cuál es el río más largo del mundo?", a: ["Amazonas", "Nilo", "Yangtsé", "Misisipi"], correct: 0, explain: "Atraviesa Sudamérica.", diff: 2 },
+    { cat: "Arte", q: "¿Qué pintor se cortó su propia oreja?", a: ["Van Gogh", "Picasso", "Dalí", "Monet"], correct: 0, explain: "Durante una crisis en Arles.", diff: 2 },
+    { cat: "Historia", q: "¿En qué año cayó el Muro de Berlín?", a: ["1989", "1991", "1985", "1990"], correct: 0, explain: "Símbolo del fin de la Guerra Fría.", diff: 2 },
+    { cat: "Física", q: "¿Cuál es la velocidad aproximada de la luz?", a: ["300.000 km/s", "150.000 km/s", "1.000 km/s", "340 m/s"], correct: 0, explain: "En el vacío.", diff: 2 },
+    { cat: "Literatura", q: "¿Quién escribió 'Cien años de soledad'?", a: ["Gabriel García Márquez", "Mario Vargas Llosa", "Julio Cortázar", "Jorge Luis Borges"], correct: 0, explain: "Nobel colombiano.", diff: 2 },
+    { cat: "Animales", q: "¿Cuál es el animal terrestre más rápido?", a: ["Guepardo", "León", "Águila", "Caballo"], correct: 0, explain: "Alcanza más de 100 km/h.", diff: 2 },
+    { cat: "Cine", q: "¿Quién dirigió la película 'Titanic'?", a: ["James Cameron", "Steven Spielberg", "Quentin Tarantino", "Christopher Nolan"], correct: 0, explain: "También dirigió Avatar.", diff: 2 },
+    { cat: "Cuerpo", q: "¿Cuál es el hueso más largo del cuerpo humano?", a: ["Fémur", "Tibia", "Húmero", "Radio"], correct: 0, explain: "Ubicado en el muslo.", diff: 2 },
+    { cat: "Historia", q: "¿Quién fue el primer hombre en pisar la Luna?", a: ["Neil Armstrong", "Buzz Aldrin", "Yuri Gagarin", "Michael Collins"], correct: 0, explain: "En la misión Apolo 11.", diff: 2 },
+    { cat: "Arte", q: "¿Quién pintó el famoso cuadro 'Guernica'?", a: ["Pablo Picasso", "Salvador Dalí", "Joan Miró", "Francisco de Goya"], correct: 0, explain: "Representa el bombardeo de Guernica.", diff: 2 },
+    { cat: "Deportes", q: "¿De qué país es originario el Judo?", a: ["Japón", "China", "Corea", "Tailandia"], correct: 0, explain: "Es un arte marcial moderno.", diff: 2 },
+    { cat: "Geografía", q: "¿Cuál es el desierto cálido más grande del mundo?", a: ["Sahara", "Gobi", "Atacama", "Kalahari"], correct: 0, explain: "Ubicado en el norte de África.", diff: 2 },
+    { cat: "Animales", q: "¿Cuál es el único mamífero capaz de volar realmente?", a: ["Murciélago", "Ardilla voladora", "Pingüino", "Avestruz"], correct: 0, explain: "Tiene alas membranosas.", diff: 2 },
+    { cat: "Música", q: "¿Qué cantante interpreta el éxito 'Hello'?", a: ["Adele", "Beyoncé", "Rihanna", "Sia"], correct: 0, explain: "Cantante británica.", diff: 2 },
+    { cat: "Geografía", q: "¿Qué canal artificial une el Atlántico y el Pacífico?", a: ["Canal de Panamá", "Canal de Suez", "Canal de Corinto", "Canal de Nicaragua"], correct: 0, explain: "Clave para el comercio mundial.", diff: 2 },
+    { cat: "Tecnología", q: "¿Qué significan las siglas Wi-Fi (comúnmente)?", a: ["Wireless Fidelity", "Wire Fire", "World Find", "Wide Fiber"], correct: 0, explain: "Conexión inalámbrica.", diff: 2 },
+    { cat: "Biología", q: "¿A qué reino pertenecen los hongos?", a: ["Fungi", "Plantae", "Animalia", "Protista"], correct: 0, explain: "No son plantas ni animales.", diff: 2 },
+    { cat: "Matemáticas", q: "¿Cómo se llama el triángulo de 3 lados iguales?", a: ["Equilátero", "Isósceles", "Escaleno", "Rectángulo"], correct: 0, explain: "Sus ángulos también son iguales.", diff: 2 },
+    { cat: "Deportes", q: "¿A qué deporte pertenece el torneo Grand Slam?", a: ["Tenis", "Golf", "Béisbol", "Fútbol"], correct: 0, explain: "Son los 4 torneos mayores.", diff: 2 },
+    { cat: "Historia", q: "¿Quién fue la última reina de Egipto?", a: ["Cleopatra", "Nefertiti", "Hatshepsut", "Isis"], correct: 0, explain: "Famosa por su relación con Roma.", diff: 2 },
+    { cat: "Cuerpo", q: "¿Cuántos dientes de leche tiene un niño?", a: ["20", "32", "10", "28"], correct: 0, explain: "Son los dientes temporales.", diff: 2 },
+    { cat: "Arte", q: "¿Qué pintor es famoso por sus relojes blandos?", a: ["Salvador Dalí", "Pablo Picasso", "Joan Miró", "Henri Matisse"], correct: 0, explain: "Obra 'La persistencia de la memoria'.", diff: 2 },
+    { cat: "Tecnología", q: "¿A quién se le atribuye la invención de la bombilla?", a: ["Thomas Edison", "Nikola Tesla", "Graham Bell", "Henry Ford"], correct: 0, explain: "Aunque hubo precursores.", diff: 2 },
+    { cat: "Ciencia", q: "¿Qué fuerza se opone al movimiento de los objetos?", a: ["Fricción", "Gravedad", "Empuje", "Tensión"], correct: 0, explain: "También llamada rozamiento.", diff: 2 },
+    { cat: "Música", q: "¿Quién fue el líder de la banda Nirvana?", a: ["Kurt Cobain", "Dave Grohl", "Eddie Vedder", "Axl Rose"], correct: 0, explain: "Ícono del Grunge.", diff: 2 },
+    { cat: "Arte", q: "¿Quién esculpió el David?", a: ["Miguel Ángel", "Donatello", "Bernini", "Rodin"], correct: 0, explain: "Obra maestra del Renacimiento.", diff: 2 },
+    { cat: "Deportes", q: "¿Cuántos anillos hay en la bandera olímpica?", a: ["5", "6", "4", "7"], correct: 0, explain: "Representan los continentes habitados.", diff: 2 },
+    { cat: "Ciencia", q: "¿Qué ciencia estudia los fósiles?", a: ["Paleontología", "Arqueología", "Geología", "Biología"], correct: 0, explain: "Clave para entender la evolución.", diff: 2 },
+    { cat: "Geografía", q: "¿Qué país es considerado el más largo del mundo?", a: ["Chile", "Brasil", "EEUU", "China"], correct: 0, explain: "Por su extensión de norte a sur.", diff: 2 },
+    { cat: "Historia", q: "¿Cuánto duró la Guerra de los 100 Años?", a: ["116 años", "100 años", "99 años", "101 años"], correct: 0, explain: "Entre Francia e Inglaterra.", diff: 2 },
+    { cat: "Cine", q: "¿Quién dirigió la película 'Psicosis'?", a: ["Alfred Hitchcock", "Stanley Kubrick", "Steven Spielberg", "Coppola"], correct: 0, explain: "El maestro del suspenso.", diff: 2 },
+    { cat: "Química", q: "¿Cuál es el valor del pH neutro?", a: ["7", "0", "14", "5"], correct: 0, explain: "Como el del agua pura.", diff: 2 },
+    { cat: "Literatura", q: "¿Quién escribió 'El Principito'?", a: ["Antoine de Saint-Exupéry", "Julio Verne", "Victor Hugo", "Sartre"], correct: 0, explain: "Autor francés.", diff: 2 },
+    { cat: "Geografía", q: "¿Cuál es la montaña más alta del mundo?", a: ["Everest", "K2", "Aconcagua", "Kilimanjaro"], correct: 0, explain: "En el Himalaya.", diff: 2 },
+    { cat: "Historia", q: "¿En qué país nació Adolf Hitler?", a: ["Austria", "Alemania", "Polonia", "Hungría"], correct: 0, explain: "Aunque lideró Alemania.", diff: 2 },
+    { cat: "Ciencia", q: "¿Qué gas es fundamental para la fotosíntesis?", a: ["Dióxido de Carbono", "Oxígeno", "Nitrógeno", "Metano"], correct: 0, explain: "Las plantas lo absorben.", diff: 2 },
+    { cat: "Arte", q: "¿Dónde está la Capilla Sixtina?", a: ["Vaticano", "Roma", "Florencia", "Venecia"], correct: 0, explain: "Pintada por Miguel Ángel.", diff: 2 },
+    { cat: "Música", q: "¿Quién es la Reina del Pop?", a: ["Madonna", "Britney Spears", "Lady Gaga", "Cher"], correct: 0, explain: "Título honorífico.", diff: 2 },
+    { cat: "Tecnología", q: "¿Qué empresa creó Windows?", a: ["Microsoft", "Apple", "IBM", "Dell"], correct: 0, explain: "Bill Gates.", diff: 2 },
+    { cat: "Deportes", q: "¿Dónde fueron los JJOO 2016?", a: ["Río de Janeiro", "Londres", "Tokio", "Pekín"], correct: 0, explain: "En Brasil.", diff: 2 },
+    { cat: "Geografía", q: "¿Capital de Alemania?", a: ["Berlín", "Múnich", "Frankfurt", "Hamburgo"], correct: 0, explain: "Reunificada en 1990.", diff: 2 },
+    { cat: "Cine", q: "¿Qué actor interpreta a Iron Man?", a: ["Robert Downey Jr.", "Chris Evans", "Chris Hemsworth", "Mark Ruffalo"], correct: 0, explain: "Tony Stark.", diff: 2 },
+    { cat: "Biología", q: "¿Cuál es el órgano más grande del cuerpo?", a: ["Piel", "Hígado", "Intestino", "Cerebro"], correct: 0, explain: "Cubre todo el cuerpo.", diff: 2 },
+    { cat: "Historia", q: "¿Quién liberó a India pacíficamente?", a: ["Gandhi", "Nehru", "Mandela", "Luther King"], correct: 0, explain: "Mahatma.", diff: 2 },
+    { cat: "Química", q: "¿Símbolo del Hierro?", a: ["Fe", "Hi", "Ir", "F"], correct: 0, explain: "Del latín Ferrum.", diff: 2 },
+    { cat: "Literatura", q: "¿Quién escribió 'Harry Potter'?", a: ["J.K. Rowling", "Tolkien", "George R.R. Martin", "Stephen King"], correct: 0, explain: "Autora británica.", diff: 2 },
+    { cat: "Geografía", q: "¿Qué país tiene más islas?", a: ["Suecia", "Filipinas", "Indonesia", "Japón"], correct: 0, explain: "Más de 200.000.", diff: 2 },
+    { cat: "Ciencia", q: "¿Planeta con anillos visibles?", a: ["Saturno", "Júpiter", "Urano", "Neptuno"], correct: 0, explain: "Los más famosos.", diff: 2 },
+    { cat: "Deportes", q: "¿Cuánto dura un round de boxeo profesional?", a: ["3 minutos", "2 minutos", "5 minutos", "1 minuto"], correct: 0, explain: "Estándar masculino.", diff: 2 },
+    { cat: "Arte", q: "¿Estilo de la Catedral de Notre Dame?", a: ["Gótico", "Románico", "Barroco", "Renacentista"], correct: 0, explain: "En París.", diff: 2 },
+    { cat: "Música", q: "¿Quién compuso 'Las Cuatro Estaciones'?", a: ["Vivaldi", "Bach", "Mozart", "Chopin"], correct: 0, explain: "Compositor italiano.", diff: 2 },
+    { cat: "Historia", q: "¿Moneda de España antes del Euro?", a: ["Peseta", "Franco", "Lira", "Escudo"], correct: 0, explain: "Hasta 2002.", diff: 2 },
+    { cat: "Tecnología", q: "¿Quién es el CEO de Tesla?", a: ["Elon Musk", "Jeff Bezos", "Tim Cook", "Bill Gates"], correct: 0, explain: "Visionario.", diff: 2 },
+    { cat: "Cine", q: "¿Quién dirigió 'E.T.'?", a: ["Steven Spielberg", "George Lucas", "Ridley Scott", "Cameron"], correct: 0, explain: "El extraterrestre.", diff: 2 },
+    { cat: "Animales", q: "¿Cuántos corazones tiene un pulpo?", a: ["3", "1", "2", "4"], correct: 0, explain: "Dos branquiales y uno sistémico.", diff: 2 },
+    { cat: "Geografía", q: "¿Capital de Canadá?", a: ["Ottawa", "Toronto", "Montreal", "Vancouver"], correct: 0, explain: "No es la más grande.", diff: 2 },
+    { cat: "Química", q: "¿Gas de la risa?", a: ["Óxido Nitroso", "Helio", "Metano", "Ozono"], correct: 0, explain: "Usado en dentistas.", diff: 2 },
+    { cat: "Literatura", q: "¿Quién escribió 'El Código Da Vinci'?", a: ["Dan Brown", "Stephen King", "Ken Follett", "Grisham"], correct: 0, explain: "Best seller.", diff: 2 },
+    { cat: "Ciencia", q: "¿Temperatura de ebullición del agua?", a: ["100°C", "90°C", "110°C", "0°C"], correct: 0, explain: "A nivel del mar.", diff: 2 },
+    { cat: "Historia", q: "¿Civilización de las pirámides?", a: ["Egipcia", "Maya", "Azteca", "Romana"], correct: 0, explain: "Giza.", diff: 2 },
+    { cat: "Arte", q: "¿Color complementario del rojo?", a: ["Verde", "Azul", "Amarillo", "Naranja"], correct: 0, explain: "Opuesto en el círculo.", diff: 2 },
+    { cat: "Deportes", q: "¿Deporte de Michael Jordan?", a: ["Baloncesto", "Béisbol", "Golf", "Fútbol"], correct: 0, explain: "Leyenda de los Bulls.", diff: 2 },
+    { cat: "Música", q: "¿Vocalista de U2?", a: ["Bono", "Sting", "Edge", "Prince"], correct: 0, explain: "Banda irlandesa.", diff: 2 },
+    { cat: "Tecnología", q: "¿Qué es un PDF?", a: ["Formato de documento", "Imagen", "Video", "Audio"], correct: 0, explain: "Portable Document Format.", diff: 2 },
+    { cat: "Geografía", q: "¿Mar entre Europa y África?", a: ["Mediterráneo", "Rojo", "Muerto", "Negro"], correct: 0, explain: "Cuna de civilizaciones.", diff: 2 },
+    { cat: "Cine", q: "¿Premio máximo del cine?", a: ["Óscar", "Globo de Oro", "Goya", "Palma de Oro"], correct: 0, explain: "Academia de Hollywood.", diff: 2 },
+    { cat: "Biología", q: "¿Qué comen los pandas?", a: ["Bambú", "Carne", "Frutas", "Insectos"], correct: 0, explain: "Casi exclusivamente.", diff: 2 },
+    { cat: "Historia", q: "¿Quién descubrió la penicilina?", a: ["Fleming", "Pasteur", "Curie", "Darwin"], correct: 0, explain: "Por accidente.", diff: 2 },
 
-  // Ciencia
-  {cat:"Ciencia", q:"¿Qué planeta es conocido por sus anillos más visibles?", a:["Marte","Saturno","Urano","Neptuno"], correct:1, explain:"Saturno tiene un sistema de anillos muy brillante y extenso.", diff:1},
-  {cat:"Ciencia", q:"¿Cuál es la unidad básica de la vida?", a:["Molécula","Átomo","Célula","Órgano"], correct:2, explain:"La célula es la unidad estructural y funcional de los seres vivos.", diff:1},
-  {cat:"Ciencia", q:"¿Qué gas es más abundante en la atmósfera terrestre?", a:["Oxígeno","Nitrógeno","CO₂","Argón"], correct:1, explain:"El nitrógeno es ~78% del aire.", diff:2},
-  {cat:"Ciencia", q:"¿Qué partícula tiene carga negativa?", a:["Protón","Neutrón","Electrón","Positrón"], correct:2, explain:"El electrón tiene carga negativa.", diff:1},
-
-  // Historia
-  {cat:"Historia", q:"¿En qué continente surgió el Antiguo Egipto?", a:["Asia","Europa","África","Oceanía"], correct:2, explain:"Egipto se desarrolló en el noreste de África, alrededor del Nilo.", diff:1},
-  {cat:"Historia", q:"¿Qué imperio construyó Machu Picchu?", a:["Azteca","Inca","Maya","Romano"], correct:1, explain:"Machu Picchu fue construido por los incas en el siglo XV.", diff:1},
-  {cat:"Historia", q:"¿Qué invento se asocia a Gutenberg?", a:["La brújula","La pólvora","La imprenta de tipos móviles","El telescopio"], correct:2, explain:"La imprenta aceleró la difusión del conocimiento en Europa.", diff:2},
-
-  // Geografía
-  {cat:"Geografía", q:"¿Cuál es el río más largo del mundo (según muchas mediciones modernas)?", a:["Nilo","Amazonas","Yangtsé","Misisipi"], correct:1, explain:"Dependiendo del método, Amazonía y Nilo compiten, pero hoy muchas fuentes dan ventaja al Amazonas.", diff:3},
-  {cat:"Geografía", q:"¿Cuál es el país más grande del mundo por superficie?", a:["China","Estados Unidos","Canadá","Rusia"], correct:3, explain:"Rusia es el país más grande por área total.", diff:1},
-  {cat:"Geografía", q:"¿En qué país está la ciudad de Petra?", a:["Egipto","Jordania","Israel","Marruecos"], correct:1, explain:"Petra está en Jordania y fue un gran centro nabateo.", diff:2},
-
-  // Arte / Cultura
-  {cat:"Arte", q:"¿Quién pintó la Mona Lisa?", a:["Van Gogh","Da Vinci","Picasso","Miguel Ángel"], correct:1, explain:"Leonardo da Vinci la pintó en el Renacimiento.", diff:1},
-  {cat:"Cultura", q:"¿Qué idioma tiene más hablantes nativos?", a:["Inglés","Español","Mandarín","Hindi"], correct:2, explain:"El mandarín lidera en hablantes nativos.", diff:2},
-  {cat:"Cultura", q:"¿Qué instrumento tiene teclas y cuerdas y se toca con martillos internos?", a:["Violín","Piano","Arpa","Flauta"], correct:1, explain:"En el piano, martillos golpean cuerdas al presionar teclas.", diff:2},
-
-  // Deportes
-  {cat:"Deportes", q:"¿Cuántos jugadores por equipo hay en cancha en fútbol (sin contar suplentes)?", a:["9","10","11","12"], correct:2, explain:"Son 11 por equipo en el campo.", diff:1},
-  {cat:"Deportes", q:"¿En tenis, cómo se llama el marcador 40-40?", a:["Break","Deuce","Tie-break","Love"], correct:1, explain:"Deuce = iguales en 40.", diff:2},
-  {cat:"Deportes", q:"¿Qué país ganó el Mundial de fútbol 2002?", a:["Brasil","Alemania","Francia","Italia"], correct:0, explain:"Brasil ganó en 2002 (su quinto título).", diff:2},
-
-  // Tecnología
-  {cat:"Tecnología", q:"¿Qué significa ‘CPU’?", a:["Central Processing Unit","Computer Personal Unit","Control Process Utility","Core Power Usage"], correct:0, explain:"Es la Unidad Central de Procesamiento.", diff:1},
-  {cat:"Tecnología", q:"¿Qué lenguaje se ejecuta directamente en el navegador (sin compilar) para la mayoría de sitios web?", a:["Python","Java","JavaScript","C#"], correct:2, explain:"JavaScript es el estándar del navegador.", diff:1},
-  {cat:"Tecnología", q:"¿Qué es ‘HTTPS’ principalmente?", a:["Un antivirus","Un protocolo seguro de comunicación web","Un tipo de Wi-Fi","Un sistema operativo"], correct:1, explain:"HTTPS cifra la comunicación entre navegador y servidor (TLS).", diff:2},
-
-  // “Boss” candidates (difícil)
-  {cat:"Jefe", q:"¿Cuál de estos elementos NO es un gas noble?", a:["Neón","Kriptón","Cloro","Argón"], correct:2, explain:"Cloro es un halógeno; los gases nobles incluyen Ne, Ar, Kr…", diff:3},
-  {cat:"Jefe", q:"¿Qué obra literaria comienza con ‘En un lugar de la Mancha…’?", a:["La Celestina","Don Quijote","Cien años de soledad","El Lazarillo"], correct:1, explain:"Es el inicio de Don Quijote de la Mancha.", diff:2},
-  {cat:"Jefe", q:"¿Qué océano es el más grande?", a:["Atlántico","Índico","Pacífico","Ártico"], correct:2, explain:"El Pacífico es el océano más grande.", diff:2},
-  {cat:"Jefe", q:"¿En qué año llegó el hombre a la Luna (Apolo 11)?", a:["1965","1969","1972","1977"], correct:1, explain:"Fue en 1969.", diff:2},
+    // DIFÍCIL (Diff: 3) - Approx 40 questions
+    { cat: "Cine", q: "¿Qué película ganó el Óscar a Mejor Película en 2020?", a: ["Parasite", "1917", "Joker", "El Irlandés"], correct: 0, explain: "Primera película de habla no inglesa en ganar.", diff: 3 },
+    { cat: "Arte", q: "¿Qué famosa estatua griega no tiene brazos?", a: ["Venus de Milo", "David", "El Pensador", "La Piedad"], correct: 0, explain: "Se encuentra en el Louvre.", diff: 3 },
+    { cat: "Historia", q: "¿En qué año cayó el Imperio Romano de Occidente?", a: ["476 d.C.", "1492", "1000", "0"], correct: 0, explain: "Marca el fin de la Edad Antigua.", diff: 3 },
+    { cat: "Historia", q: "¿En qué año comenzó la Revolución Francesa?", a: ["1789", "1800", "1776", "1492"], correct: 0, explain: "Libertad, igualdad, fraternidad.", diff: 3 },
+    { cat: "Ciencia", q: "¿Cuántos huesos tiene el cuerpo humano adulto?", a: ["206", "210", "198", "300"], correct: 0, explain: "Al nacer tenemos más.", diff: 3 },
+    { cat: "Literatura", q: "¿Quién escribió la novela 'Ulises'?", a: ["James Joyce", "Hemingway", "Orwell", "Virginia Woolf"], correct: 0, explain: "Escritor irlandés.", diff: 3 },
+    { cat: "Geografía", q: "¿Cuál es la capital de Australia?", a: ["Canberra", "Sídney", "Melbourne", "Perth"], correct: 0, explain: "Sídney es la más famosa, pero no la capital.", diff: 3 },
+    { cat: "Música", q: "¿De quién es la Sinfonía Inconclusa?", a: ["Schubert", "Mozart", "Beethoven", "Bach"], correct: 0, explain: "Su octava sinfonía.", diff: 3 },
+    { cat: "Tecnología", q: "¿En qué año se envió el primer correo electrónico?", a: ["1971", "1980", "1990", "1965"], correct: 0, explain: "Enviado por Ray Tomlinson.", diff: 3 },
+    { cat: "Física", q: "¿Qué partícula es conocida como la 'Partícula de Dios'?", a: ["Bosón de Higgs", "Quark", "Neutrino", "Fotón"], correct: 0, explain: "Otorga masa a la materia.", diff: 3 },
+    { cat: "Arte", q: "¿Quién pintó 'El Grito'?", a: ["Edvard Munch", "Gustav Klimt", "Claude Monet", "Van Gogh"], correct: 0, explain: "Obra expresionista.", diff: 3 },
+    { cat: "Deportes", q: "¿Qué ocurrió en el Maracanazo de 1950?", a: ["Uruguay venció a Brasil", "Pelé debutó", "Alemania ganó", "Argentina ganó"], correct: 0, explain: "En la final del mundial.", diff: 3 },
+    { cat: "Cine", q: "¿Cuál es la película más taquillera de la historia?", a: ["Avatar", "Titanic", "Endgame", "Star Wars"], correct: 0, explain: "Dirigida por James Cameron.", diff: 3 },
+    { cat: "Filosofía", q: "¿Quién dijo 'Pienso, luego existo'?", a: ["René Descartes", "Platón", "Sócrates", "Aristóteles"], correct: 0, explain: "Cogito ergo sum.", diff: 3 },
+    { cat: "Química", q: "¿Qué metal es líquido a temperatura ambiente?", a: ["Mercurio", "Galio", "Bromo", "Plomo"], correct: 0, explain: "Es tóxico.", diff: 3 },
+    { cat: "Astronomía", q: "¿Cuántas lunas tiene Marte?", a: ["2", "1", "4", "0"], correct: 0, explain: "Se llaman Fobos y Deimos.", diff: 3 },
+    { cat: "Biología", q: "¿Qué base nitrogenada es exclusiva del ADN?", a: ["Timina", "Uracilo", "Adenina", "Guanina"], correct: 0, explain: "En el ARN se reemplaza por Uracilo.", diff: 3 },
+    { cat: "Historia", q: "¿Quiénes se enfrentaron en la Guerra de las Rosas?", a: ["York y Lancaster", "Francia e Inglaterra", "España y Portugal", "Católicos y Protestantes"], correct: 0, explain: "Guerra civil inglesa.", diff: 3 },
+    { cat: "Matemáticas", q: "¿Cuáles son los primeros decimales de Pi?", a: ["3.14", "3.15", "3.16", "3.12"], correct: 0, explain: "Es un número irracional.", diff: 3 },
+    { cat: "Geografía", q: "¿Capital de Turquía?", a: ["Ankara", "Estambul", "Izmir", "Bursa"], correct: 0, explain: "Estambul es más grande.", diff: 3 },
+    { cat: "Historia", q: "¿Tratado que puso fin a la I Guerra Mundial?", a: ["Versalles", "Tordesillas", "Viena", "Utrecht"], correct: 0, explain: "Firmado en 1919.", diff: 3 },
+    { cat: "Literatura", q: "¿Autor de 'La Divina Comedia'?", a: ["Dante Alighieri", "Boccaccio", "Petrarca", "Maquiavelo"], correct: 0, explain: "Obra maestra italiana.", diff: 3 },
+    { cat: "Ciencia", q: "¿Qué mide la escala de Scoville?", a: ["Picante", "Dureza", "Viento", "Terremotos"], correct: 0, explain: "Capsaicina en chiles.", diff: 3 },
+    { cat: "Música", q: "¿Ópera 'La Flauta Mágica'?", a: ["Mozart", "Verdi", "Wagner", "Puccini"], correct: 0, explain: "Singspiel alemán.", diff: 3 },
+    { cat: "Arte", q: "¿Estilo de Frida Kahlo?", a: ["Surrealismo", "Cubismo", "Impresionismo", "Pop Art"], correct: 0, explain: "Aunque ella lo negaba.", diff: 3 },
+    { cat: "Deportes", q: "¿Sede JJOO 1992?", a: ["Barcelona", "Seúl", "Atlanta", "Sídney"], correct: 0, explain: "España.", diff: 3 },
+    { cat: "Tecnología", q: "¿Lenguaje de programación más antiguo aún en uso?", a: ["Fortran", "C", "Java", "Python"], correct: 0, explain: "Desde los 50s.", diff: 3 },
+    { cat: "Cine", q: "¿Director de 'El Padrino'?", a: ["Coppola", "Scorsese", "De Palma", "Leone"], correct: 0, explain: "Francis Ford.", diff: 3 },
+    { cat: "Geografía", q: "¿Río que pasa por Londres?", a: ["Támesis", "Sena", "Danubio", "Rin"], correct: 0, explain: "Thames.", diff: 3 },
+    { cat: "Historia", q: "¿Año llegada hombre a la Luna?", a: ["1969", "1960", "1970", "1959"], correct: 0, explain: "Apolo 11.", diff: 3 },
+    { cat: "Biología", q: "¿Cromosomas en humano?", a: ["46", "23", "48", "44"], correct: 0, explain: "23 pares.", diff: 3 },
+    { cat: "Química", q: "¿Elemento más abundante universo?", a: ["Hidrógeno", "Helio", "Oxígeno", "Carbono"], correct: 0, explain: "El más simple.", diff: 3 },
+    { cat: "Filosofía", q: "¿Autor de 'El Anticristo'?", a: ["Nietzsche", "Kant", "Hegel", "Marx"], correct: 0, explain: "Filósofo alemán.", diff: 3 },
+    { cat: "Música", q: "¿Vocalista de Led Zeppelin?", a: ["Robert Plant", "Ozzy", "Mercury", "Jagger"], correct: 0, explain: "Banda de rock.", diff: 3 },
+    { cat: "Arte", q: "¿Museo del Prado está en?", a: ["Madrid", "Barcelona", "Bilbao", "Valencia"], correct: 0, explain: "Pinacoteca principal.", diff: 3 },
+    { cat: "Deportes", q: "¿Ganador Tour Francia 7 veces (anulado)?", a: ["Lance Armstrong", "Indurain", "Merckx", "Contador"], correct: 0, explain: "Por dopaje.", diff: 3 },
+    { cat: "Literatura", q: "¿Quién escribió 'Moby Dick'?", a: ["Melville", "Hemingway", "Poe", "Twain"], correct: 0, explain: "La ballena blanca.", diff: 3 },
+    { cat: "Cine", q: "¿Película muda de 2011 ganadora Óscar?", a: ["The Artist", "Hugo", "Midnight in Paris", "War Horse"], correct: 0, explain: "Francesa.", diff: 3 },
+    { cat: "Historia", q: "¿Zar asesinado en 1918?", a: ["Nicolás II", "Alejandro II", "Pedro I", "Iván IV"], correct: 0, explain: "Fin de los Romanov.", diff: 3 }
 ];
 
-// Más preguntas rápidas para variedad
-const EXTRA_QUESTIONS = [
-  {cat:"Ciencia", q:"¿Cuál es el metal líquido a temperatura ambiente más conocido?", a:["Hierro","Mercurio","Aluminio","Cobre"], correct:1, explain:"El mercurio es líquido a temperatura ambiente.", diff:2},
-  {cat:"Geografía", q:"¿Cuál es la montaña más alta del mundo sobre el nivel del mar?", a:["K2","Everest","Aconcagua","Denali"], correct:1, explain:"El Everest es el más alto sobre el nivel del mar.", diff:1},
-  {cat:"Historia", q:"¿La ‘Guerra Fría’ fue principalmente entre…?", a:["EE.UU. y URSS","China y Japón","España y Francia","Brasil y Argentina"], correct:0, explain:"EE.UU. y la URSS lideraron el bloque occidental y soviético.", diff:2},
-  {cat:"Cultura", q:"¿Qué continente tiene más países?", a:["Europa","África","Asia","América"], correct:1, explain:"África tiene la mayor cantidad de países (más de 50).", diff:3},
-  {cat:"Deportes", q:"¿Cuántos puntos vale un triple en baloncesto?", a:["1","2","3","4"], correct:2, explain:"Un triple vale 3 puntos.", diff:1},
-  {cat:"Tecnología", q:"¿Qué significa ‘Wi-Fi’ en uso común?", a:["Internet por cable","Red inalámbrica","Satélite","Un navegador"], correct:1, explain:"Se usa para referirse a redes inalámbricas (IEEE 802.11).", diff:1},
-  {cat:"Arte", q:"¿Qué estilo se asocia con Claude Monet?", a:["Cubismo","Impresionismo","Surrealismo","Barroco"], correct:1, explain:"Monet es uno de los símbolos del impresionismo.", diff:2},
-  {cat:"Ecuador", q:"¿Qué moneda se usa oficialmente en Ecuador desde 2000?", a:["Sucre","Euro","Dólar estadounidense","Peso"], correct:2, explain:"Ecuador adoptó el dólar estadounidense en 2000.", diff:1},
-];
-QUESTION_BANK.push(...EXTRA_QUESTIONS);
-
-/* ======= State ======= */
-const screens = {
-  start: $("#screenStart"),
-  game: $("#screenGame"),
-  end: $("#screenEnd"),
+// --- AUDIO SYSTEM ---
+const AudioSys = {
+    ctx: null,
+    init: function() {
+        if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        if (this.ctx.state === 'suspended') this.ctx.resume();
+    },
+    playTone: function(freq, type, duration, vol = 0.1) {
+        if (!this.ctx) return;
+        if (this.ctx.state === 'suspended') this.ctx.resume();
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+        gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + duration);
+    },
+    sfx: {
+        correct: () => { AudioSys.playTone(600, 'sine', 0.1); setTimeout(() => AudioSys.playTone(900, 'sine', 0.2), 100); },
+        wrong: () => { AudioSys.playTone(150, 'sawtooth', 0.3); },
+        click: () => AudioSys.playTone(800, 'triangle', 0.05, 0.05),
+        boss: () => { AudioSys.playTone(100, 'square', 0.5); setTimeout(() => AudioSys.playTone(150, 'square', 0.5), 200); },
+        power: () => AudioSys.playTone(1200, 'sine', 0.3)
+    }
 };
 
-const state = {
-  mode: "Clásico",
-  total: 12,
-  timePerQ: 15,
-  timeLeft: 15,
-  timerId: null,
-  frozen: false,
-  freezeLeftMs: 0,
-  lives: 3,
-  score: 0,
-  streak: 0,
-  maxStreak: 0,
-  correct: 0,
-  wrong: 0,
-  qIndex: 0,
-  pool: [],
-  current: null,
-  answered: false,
-  bossNow: false,
-  doubleNext: false,
-  powers: { fifty: 1, skip: 1, freeze: 1, dbl: 0 },
-  dailySeed: null,
-};
-
-/* ======= Storage ======= */
-const LS = {
-  bestScore: "trivia_bestScore",
-  bestStreak: "trivia_bestStreak",
-  bestDaily: "trivia_bestDaily",
-};
-function loadStats(){
-  $("#bestScore").textContent = String(Number(localStorage.getItem(LS.bestScore) || 0));
-  $("#bestStreak").textContent = String(Number(localStorage.getItem(LS.bestStreak) || 0));
-  $("#bestDaily").textContent = String(Number(localStorage.getItem(LS.bestDaily) || 0));
-}
-function saveStat(key, value){
-  localStorage.setItem(key, String(value));
-  loadStats();
-}
-
-/* ======= RNG (for Daily mode) ======= */
-function xfnv1a(str){
-  let h = 2166136261 >>> 0;
-  for (let i=0; i<str.length; i++){
-    h ^= str.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
-  return h >>> 0;
-}
-function mulberry32(a){
-  return function(){
-    let t = a += 0x6D2B79F5;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  }
-}
-function shuffle(arr, rand=Math.random){
-  const a = arr.slice();
-  for (let i=a.length-1; i>0; i--){
-    const j = Math.floor(rand() * (i+1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-/* ======= UI helpers ======= */
-function showScreen(name){
-  Object.values(screens).forEach(s => s.classList.remove("active"));
-  screens[name].classList.add("active");
-}
-
-function setHearts(lives){
-  ["h1","h2","h3"].forEach((id, idx)=>{
-    const el = $("#"+id);
-    el.classList.toggle("on", idx < lives);
-  });
-}
-
-function setPowers(){
-  $("#c5050").textContent = state.powers.fifty;
-  $("#cSkip").textContent = state.powers.skip;
-  $("#cFreeze").textContent = state.powers.freeze;
-  $("#cDouble").textContent = state.powers.dbl;
-  $("#p5050").disabled = state.powers.fifty <= 0 || state.answered;
-  $("#pSkip").disabled = state.powers.skip <= 0 || state.answered;
-  $("#pFreeze").disabled = state.powers.freeze <= 0 || state.answered || state.frozen;
-  $("#pDouble").disabled = state.powers.dbl <= 0 || state.answered || state.doubleNext;
-}
-
-function updateHUD(){
-  $("#score").textContent = state.score;
-  $("#streak").textContent = state.streak;
-  state.maxStreak = Math.max(state.maxStreak, state.streak);
-  const mult = 1 + Math.floor(state.streak / 3) * 0.25; // 0-2: x1, 3-5: x1.25, 6-8: x1.5...
-  $("#multText").textContent = "x" + mult.toFixed(2).replace(".00","");
-  setHearts(state.lives);
-}
-
-function toast(html, tone="neutral"){
-  const t = $("#toast");
-  t.classList.add("show");
-  t.style.borderColor =
-    tone==="ok" ? "rgba(47,227,122,.35)" :
-    tone==="bad"? "rgba(255,91,110,.35)" :
-    tone==="warn"? "rgba(255,204,102,.35)" :
-    "rgba(255,255,255,.10)";
-  t.style.background =
-    tone==="ok" ? "rgba(47,227,122,.10)" :
-    tone==="bad"? "rgba(255,91,110,.10)" :
-    tone==="warn"? "rgba(255,204,102,.10)" :
-    "rgba(0,0,0,.22)";
-  t.innerHTML = html;
-}
-function hideToast(){
-  const t = $("#toast");
-  t.classList.remove("show");
-  t.innerHTML = "";
-}
-
-function confettiBurst(){
-  const c = $("#confetti");
-  c.innerHTML = "";
-  c.classList.add("show");
-  const colors = ["#7c5cff","#2fe37a","#60a5fa","#ffcc66","#ff5b6e","#2dd4bf"];
-  const n = 90;
-  for (let i=0; i<n; i++){
-    const el = document.createElement("i");
-    const x = Math.random() * 100;
-    const dx = (Math.random()*2-1) * 18 + "vw";
-    const dur = 900 + Math.random()*700;
-    el.style.left = x + "vw";
-    el.style.background = colors[(Math.random()*colors.length)|0];
-    el.style.setProperty("--dx", dx);
-    el.style.animationDuration = dur + "ms";
-    el.style.opacity = (0.55 + Math.random()*0.45).toFixed(2);
-    el.style.transform = `translate(0,0) rotate(${Math.random()*180}deg)`;
-    c.appendChild(el);
-  }
-  setTimeout(()=> c.classList.remove("show"), 1300);
-}
-
-/* ======= Game Flow ======= */
-function basePoints(q){
-  // diff 1..3 => 100..180
-  const diffBase = 90 + q.diff*30;
-  return diffBase;
-}
-function multiplier(){
-  return 1 + Math.floor(state.streak / 3) * 0.25;
-}
-
-function buildPool(){
-  // Selección de preguntas: mezcla general + “jefe” separado
-  const normal = QUESTION_BANK.filter(x => x.cat !== "Jefe");
-  const bosses = QUESTION_BANK.filter(x => x.cat === "Jefe");
-
-  let rand = Math.random;
-  if (state.mode === "Reto Diario"){
-    const seed = state.dailySeed;
-    rand = mulberry32(seed);
-  }
-
-  const shuffledNormal = shuffle(normal, rand);
-  const shuffledBoss = shuffle(bosses, rand);
-
-  // Insertar un boss “virtual” cuando toque (cada 5 aciertos seguidos),
-  // pero también dejamos bosses en el pool por si se necesita.
-  state.pool = {
-    normal: shuffledNormal,
-    bosses: shuffledBoss,
-    ni: 0,
-    bi: 0,
-  };
-}
-
-function nextQuestion(){
-  state.answered = false;
-  hideToast();
-  $("#btnNext").disabled = true;
-
-  // Modo Contrarreloj: termina cuando se acabe el global timer (state.timeLeft global)
-  if (state.mode !== "Contrarreloj"){
-    if (state.qIndex >= state.total){
-      endGame(true);
-      return;
-    }
-  }
-
-  // Decide si toca boss (cada 5 de racha, pero no si ya estás en boss)
-  state.bossNow = (state.streak > 0 && state.streak % 5 === 0);
-
-  // Obtener pregunta
-  let q;
-  if (state.bossNow){
-    q = state.pool.bosses[state.pool.bi++] || state.pool.normal[state.pool.ni++];
-  } else {
-    q = state.pool.normal[state.pool.ni++] || state.pool.bosses[state.pool.bi++];
-  }
-  if (!q){
-    endGame(true);
-    return;
-  }
-
-  state.current = q;
-  state.qIndex++;
-
-  // Timer per question
-  if (state.mode === "Contrarreloj"){
-    // En contrarreloj, el timeLeft es global; aquí solo refrescamos UI
-  } else {
-    state.timeLeft = state.timePerQ;
-  }
-
-  renderQuestion();
-  setPowers();
-  startTimer();
-}
-
-function renderQuestion(){
-  const q = state.current;
-  const isBoss = state.bossNow || q.cat==="Jefe";
-  $("#category").textContent = (isBoss ? "👑 JEFE" : "📚 " + q.cat);
-  $("#category").classList.toggle("boss", isBoss);
-
-  if (state.mode === "Contrarreloj"){
-    $("#qnum").textContent = "∞ / 60s";
-  } else {
-    $("#qnum").textContent = `${state.qIndex}/${state.total}`;
-  }
-
-  $("#question").textContent = q.q;
-
-  const letters = ["1","2","3","4"];
-  const answersEl = $("#answers");
-  answersEl.innerHTML = "";
-
-  q.a.forEach((txt, idx)=>{
-    const btn = document.createElement("button");
-    btn.className = "ans";
-    btn.type = "button";
-    btn.dataset.idx = String(idx);
-    btn.innerHTML = `<span class="chip">${letters[idx]}</span><span>${escapeHtml(txt)}</span>`;
-    btn.addEventListener("click", ()=> choose(idx));
-    answersEl.appendChild(btn);
-  });
-
-  updateHUD();
-}
-
-function escapeHtml(s){
-  return String(s)
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
-}
-
-/* ======= Timer ======= */
-function stopTimer(){
-  if (state.timerId) clearInterval(state.timerId);
-  state.timerId = null;
-}
-function updateTimerUI(){
-  $("#time").textContent = String(Math.max(0, Math.ceil(state.timeLeft)));
-  const max = (state.mode==="Contrarreloj") ? 60 : state.timePerQ;
-  const frac = Math.max(0, Math.min(1, state.timeLeft / max));
-  $("#barFill").style.transform = `scaleX(${frac})`;
-}
-function startTimer(){
-  stopTimer();
-  updateTimerUI();
-
-  state.timerId = setInterval(()=>{
-    if (state.frozen){
-      state.freezeLeftMs -= 100;
-      if (state.freezeLeftMs <= 0){
-        state.frozen = false;
-      }
-      return;
-    }
-
-    // Contrarreloj: timeLeft global baja siempre
-    state.timeLeft -= 0.1;
-
-    if (state.timeLeft <= 0){
-      if (state.mode === "Práctica"){
-        // En práctica, solo avanza
-        timeOutNoPenalty();
-      } else if (state.mode === "Contrarreloj"){
-        // fin de juego por tiempo
-        endGame(false);
-      } else {
-        timeOutPenalty();
-      }
-    }
-    updateTimerUI();
-  }, 100);
-}
-
-function timeOutPenalty(){
-  stopTimer();
-  if (state.answered) return;
-  state.answered = true;
-  state.wrong++;
-  state.streak = 0;
-  state.lives = Math.max(0, state.lives - 1);
-  markAnswers(null, state.current.correct);
-  toast(`<b>⏰ Se acabó el tiempo.</b> ${escapeHtml(state.current.explain || "")}`, "bad");
-  $("#btnNext").disabled = false;
-
-  if (state.lives <= 0){
-    endGame(false);
-  }
-  setPowers();
-  updateHUD();
-}
-
-function timeOutNoPenalty(){
-  stopTimer();
-  if (state.answered) return;
-  state.answered = true;
-  markAnswers(null, state.current.correct);
-  toast(`<b>⏰ Tiempo.</b> ${escapeHtml(state.current.explain || "")}`, "warn");
-  $("#btnNext").disabled = false;
-  setPowers();
-}
-
-/* ======= Answering ======= */
-function choose(idx){
-  if (state.answered) return;
-
-  state.answered = true;
-  stopTimer();
-
-  const q = state.current;
-  const correct = (idx === q.correct);
-
-  if (correct){
-    state.correct++;
-    state.streak++;
-
-    const speedBonus = (state.mode==="Contrarreloj")
-      ? 0
-      : Math.floor(Math.max(0, state.timeLeft) * 6); // más rápido = más puntos
-
-    let pts = basePoints(q);
-    if (state.bossNow || q.cat==="Jefe") pts = Math.round(pts * 1.35);
-
-    pts = Math.round((pts + speedBonus) * multiplier());
-
-    if (state.doubleNext){
-      pts *= 2;
-      state.doubleNext = false;
-      toast(`<b>✨ ¡Doble activado!</b> +${pts} puntos. ${escapeHtml(q.explain || "")}`, "ok");
-    } else {
-      toast(`<b>✅ Correcto.</b> +${pts} puntos. ${escapeHtml(q.explain || "")}`, "ok");
-    }
-
-    state.score += pts;
-
-    // Premio: cada 4 aciertos, ganas “Doble”
-    if (state.streak > 0 && state.streak % 4 === 0){
-      state.powers.dbl++;
-      toast(`${$("#toast").innerHTML}<br><span style="color:var(--muted)"><b>🎁 Bonus:</b> ganaste un poder ✨ Doble.</span>`, "ok");
-    }
-
-    // En clásico/práctica: pequeño bonus de tiempo por acierto
-    if (state.mode !== "Contrarreloj" && state.mode !== "Práctica"){
-      state.timeLeft = Math.min(state.timePerQ, state.timeLeft + 2);
-    }
-
-    // Confetti si respondes un boss
-    if (state.bossNow || q.cat==="Jefe") confettiBurst();
-  } else {
-    state.wrong++;
-    state.streak = 0;
-
-    if (state.mode !== "Práctica"){
-      state.lives = Math.max(0, state.lives - 1);
-    }
-
-    toast(`<b>❌ Incorrecto.</b> La respuesta era: <b>${escapeHtml(q.a[q.correct])}</b><br>${escapeHtml(q.explain || "")}`, "bad");
-  }
-
-  markAnswers(idx, q.correct);
-  $("#btnNext").disabled = false;
-  setPowers();
-  updateHUD();
-
-  if (state.mode !== "Práctica" && state.mode !== "Contrarreloj" && state.lives <= 0){
-    endGame(false);
-  }
-}
-
-function markAnswers(chosenIdx, correctIdx){
-  const btns = $$("#answers .ans");
-  btns.forEach((b, i)=>{
-    b.disabled = true;
-    if (i === correctIdx) b.classList.add("correct");
-    if (chosenIdx !== null && i === chosenIdx && i !== correctIdx) b.classList.add("wrong");
-    if (i !== correctIdx && i !== chosenIdx) b.classList.add("dim");
-  });
-}
-
-/* ======= Powers ======= */
-function use5050(){
-  if (state.answered || state.powers.fifty<=0) return;
-  state.powers.fifty--;
-  const q = state.current;
-  const wrongIdx = [0,1,2,3].filter(i => i !== q.correct);
-  shuffle(wrongIdx).slice(0,2).forEach(i=>{
-    const btn = $(`#answers .ans[data-idx="${i}"]`);
-    if (btn){ btn.disabled = true; btn.classList.add("dim"); btn.style.opacity = ".35"; }
-  });
-  toast(`<b>🎲 50/50</b> eliminó 2 opciones.`, "neutral");
-  setPowers();
-}
-
-function useSkip(){
-  if (state.answered || state.powers.skip<=0) return;
-  state.powers.skip--;
-  stopTimer();
-  state.answered = true;
-  toast(`<b>⏭️ Saltaste</b> sin perder vida.`, "neutral");
-  $("#btnNext").disabled = false;
-  setPowers();
-}
-
-function useFreeze(){
-  if (state.answered || state.powers.freeze<=0 || state.frozen) return;
-  state.powers.freeze--;
-  state.frozen = true;
-  state.freezeLeftMs = 5000;
-  toast(`<b>🧊 Tiempo congelado</b> por 5s.`, "neutral");
-  setPowers();
-}
-
-function useDouble(){
-  if (state.answered || state.powers.dbl<=0 || state.doubleNext) return;
-  state.powers.dbl--;
-  state.doubleNext = true;
-  toast(`<b>✨ Doble</b> activado: el próximo acierto vale x2 puntos.`, "neutral");
-  setPowers();
-}
-
-/* ======= Start / End ======= */
-function resetRun(){
-  stopTimer();
-  Object.assign(state, {
-    timeLeft: state.timePerQ,
-    lives: (state.mode==="Práctica" ? 3 : 3),
+// --- GAME STATE & CONFIG ---
+const State = {
+    mode: 'classic',
+    questions: [],
+    currentQIndex: 0,
     score: 0,
     streak: 0,
-    maxStreak: 0,
-    correct: 0,
-    wrong: 0,
-    qIndex: 0,
-    current: null,
-    answered: false,
-    bossNow: false,
-    doubleNext: false,
-    powers: { fifty: 1, skip: 1, freeze: 1, dbl: 0 },
-    frozen: false,
-    freezeLeftMs: 0,
-  });
-  hideToast();
-  setHearts(3);
-}
+    lives: 3,
+    timer: 0,
+    maxTime: 15,
+    timerInterval: null,
+    autoNextTimeout: null, // For auto-advance
+    gameOverTimeout: null,
+    isFrozen: false,
+    doublePoints: false,
+    powers: { '5050': 1 },
+    answered: false, 
+    correctCount: 0,
+    bestStreak: 0
+};
 
-function startGame(mode){
-  state.mode = mode;
+// --- CORE GAME ENGINE ---
+const Game = {
+    start: function(mode) {
+        AudioSys.init();
+        if (State.gameOverTimeout) clearTimeout(State.gameOverTimeout);
+        if (State.autoNextTimeout) clearTimeout(State.autoNextTimeout);
+        clearInterval(State.timerInterval);
 
-  // Configs por modo
-  if (mode==="Clásico"){
-    state.total = 12;
-    state.timePerQ = 15;
-    state.lives = 3;
-  } else if (mode==="Práctica"){
-    state.total = 14;
-    state.timePerQ = 9999; // sin presión real
-    state.lives = 3;
-  } else if (mode==="Contrarreloj"){
-    state.total = 999999;
-    state.timePerQ = 60; // se usa como global
-    state.lives = 3;
-  } else if (mode==="Reto Diario"){
-    state.total = 12;
-    state.timePerQ = 15;
-    state.lives = 3;
-  }
+        State.mode = mode;
+        State.score = 0;
+        State.streak = 0;
+        State.bestStreak = 0;
+        State.correctCount = 0;
+        State.answered = false;
+        State.currentQIndex = 0;
+        State.doublePoints = false;
+        State.isFrozen = false;
 
-  // Seed diario
-  if (mode==="Reto Diario"){
-    const today = new Date();
-    const key = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}-${String(today.getDate()).padStart(2,"0")}`;
-    state.dailySeed = xfnv1a("TRIVIA_RUSH_" + key);
-  } else {
-    state.dailySeed = null;
-  }
+        // Mode Config
+        if (mode === 'classic') {
+            State.lives = 3;
+            State.maxTime = 15;
+            State.powers = { '5050': 3 };
+            this.loadClassicQuestions();
+        } else if (mode === 'daily') {
+            State.lives = 1; 
+            State.maxTime = 15;
+            State.powers = { '5050': 1 };
+            this.loadDailyQuestions();
+        } else if (mode === 'practice') {
+            State.lives = 999;
+            State.maxTime = 999;
+            State.powers = { '5050': 99 };
+            this.loadPracticeQuestions();
+        }
 
-  resetRun();
-  buildPool();
+        UI.showScreen('game-screen');
+        UI.updateHUD();
+        if (mode === 'practice') UI.updateTimer(1, 1);
+        
+        this.nextQuestion(true);
+    },
 
-  // Iniciar timer global en Contrarreloj
-  if (mode==="Contrarreloj"){
-    state.timeLeft = 60;
-  } else {
-    state.timeLeft = state.timePerQ;
-  }
+    loadClassicQuestions: function() {
+        const easy = QUESTIONS_DB.filter(q => q.diff === 1);
+        const med = QUESTIONS_DB.filter(q => q.diff === 2);
+        const hard = QUESTIONS_DB.filter(q => q.diff === 3);
 
-  showScreen("game");
-  nextQuestion();
-}
+        const selected = [
+            ...this.shuffleArray(easy).slice(0, 4),
+            ...this.shuffleArray(med).slice(0, 4),
+            ...this.shuffleArray(hard).slice(0, 4)
+        ];
+        
+        State.questions = selected.map(q => this.shuffleOptions(q));
+    },
 
-function endGame(wonByQuestions){
-  stopTimer();
+    loadPracticeQuestions: function() {
+        let pool = this.shuffleArray([...QUESTIONS_DB]);
+        State.questions = pool.slice(0, 20).map(q => this.shuffleOptions(q));
+    },
 
-  // Ajusta UI final
-  showScreen("end");
-  $("#endMode").textContent = state.mode;
-  $("#endScore").textContent = state.score;
-  $("#endMaxStreak").textContent = state.maxStreak;
-  $("#endCorrect").textContent = state.correct;
-  $("#endWrong").textContent = state.wrong;
+    loadDailyQuestions: function() {
+        const dateStr = new Date().toISOString().split('T')[0];
+        let hash = 0;
+        for (let i = 0; i < dateStr.length; i++) hash = dateStr.charCodeAt(i) + ((hash << 5) - hash);
+        
+        const dailyQs = [];
+        const copy = JSON.parse(JSON.stringify(QUESTIONS_DB));
+        
+        for(let i=0; i<10; i++) {
+            if (copy.length === 0) break;
+            const index = Math.abs(hash + i) % copy.length;
+            dailyQs.push(copy[index]);
+            copy.splice(index, 1);
+        }
+        State.questions = dailyQs.map(q => this.shuffleOptions(q));
+    },
 
-  let title = "¡Fin del juego!";
-  let desc = "";
-  if (state.mode==="Contrarreloj"){
-    title = "⏱️ Se acabó el tiempo";
-    desc = `Puntaje final: <b>${state.score}</b>. Tu mejor racha fue <b>${state.maxStreak}</b>.`;
-  } else if (state.mode==="Práctica"){
-    title = "🧠 Práctica completa";
-    desc = `Te llevas <b>${state.correct}</b> aciertos. Lo importante aquí es aprender rápido con los datos curiosos.`;
-  } else {
-    if (state.lives<=0) {
-      title = "💀 Te quedaste sin vidas";
-      desc = `Puntaje: <b>${state.score}</b>. La revancha siempre arregla todo.`;
-    } else if (wonByQuestions){
-      title = "🏁 Run completado";
-      desc = `Buenísimo: <b>${state.score}</b> puntos con racha máx. <b>${state.maxStreak}</b>.`;
-      confettiBurst();
+    shuffleArray: function(array) {
+        return array.sort(() => 0.5 - Math.random());
+    },
+
+    shuffleOptions: function(q) {
+        let newQ = JSON.parse(JSON.stringify(q));
+        const originalCorrectText = newQ.a[newQ.correct];
+        let answers = newQ.a.map(ans => ({ text: ans, isCorrect: ans === originalCorrectText }));
+        answers.sort(() => Math.random() - 0.5);
+        newQ.a = answers.map(obj => obj.text);
+        newQ.correct = answers.findIndex(obj => obj.isCorrect);
+        return newQ;
+    },
+
+    nextQuestion: function(firstLoad = false) {
+        // Clear previous state
+        if (State.autoNextTimeout) clearTimeout(State.autoNextTimeout);
+        document.getElementById('explanation-panel').classList.remove('show');
+        document.getElementById('boss-badge').style.display = 'none';
+        
+        State.answered = false;
+        State.isFrozen = false;
+        document.getElementById('timer-bar').classList.remove('frozen', 'danger');
+
+        if (!firstLoad) {
+            State.currentQIndex++;
+        }
+
+        // Check End Condition
+        if (State.currentQIndex >= State.questions.length) {
+            this.endGame(true);
+            return;
+        }
+
+        const q = State.questions[State.currentQIndex];
+        
+        // BOSS LOGIC
+        const isBoss = (State.currentQIndex + 1) % 5 === 0 && State.currentQIndex > 0;
+        if (isBoss) {
+            AudioSys.sfx.boss();
+            document.getElementById('boss-badge').style.display = 'block';
+        }
+
+        UI.renderQuestion(q, isBoss);
+        UI.updatePowerUps();
+
+        if (State.mode !== 'practice') {
+            State.timer = State.maxTime;
+            this.startTimer();
+        }
+    },
+
+    startTimer: function(isGlobal = false) {
+        clearInterval(State.timerInterval);
+        
+        State.timerInterval = setInterval(() => {
+            if (State.isFrozen) return;
+
+            State.timer -= 0.1;
+            UI.updateTimer(State.timer, State.maxTime);
+
+            if (State.timer <= 0) {
+                 this.handleTimeOut();
+            }
+        }, 100);
+    },
+
+    handleTimeOut: function() {
+        clearInterval(State.timerInterval);
+        this.submitAnswer(-1); 
+    },
+
+    submitAnswer: function(selectedIndex) {
+        if (State.answered) return;
+        State.answered = true;
+        clearInterval(State.timerInterval);
+
+        const q = State.questions[State.currentQIndex];
+        const isCorrect = selectedIndex === q.correct;
+        const btn = document.querySelectorAll('.option-btn')[selectedIndex];
+        const isBoss = document.getElementById('boss-badge').style.display === 'block';
+
+        if (isCorrect) {
+            AudioSys.sfx.correct();
+            if (btn) btn.classList.add('correct');
+            this.calcScore(q.diff, isBoss);
+            State.streak++;
+            State.correctCount++;
+            if (State.streak > State.bestStreak) State.bestStreak = State.streak;
+            if (isBoss) Confetti.burst();
+
+        } else {
+            AudioSys.sfx.wrong();
+            if (btn) {
+                btn.classList.add('wrong');
+                btn.classList.add('shake');
+            }
+            const correctBtn = document.querySelectorAll('.option-btn')[q.correct];
+            if (correctBtn) correctBtn.classList.add('correct');
+            
+            State.streak = 0;
+            if (State.mode !== 'practice') {
+                State.lives--;
+            }
+        }
+
+        State.doublePoints = false;
+        UI.updateHUD();
+        UI.showExplanation(isCorrect, q.explain);
+
+        // AUTO ADVANCE LOGIC
+        if (State.lives <= 0) {
+            State.gameOverTimeout = setTimeout(() => this.endGame(false), 2500); 
+        } else {
+            State.autoNextTimeout = setTimeout(() => this.nextQuestion(), 2500);
+        }
+    },
+
+    calcScore: function(difficulty, isBoss) {
+        let points = difficulty * 100;
+        if (State.mode === 'classic') {
+            const timePercent = State.timer / State.maxTime;
+            if (timePercent > 0.5) points += 50;
+        }
+        let mult = 1 + (Math.floor(State.streak / 3) * 0.25);
+        points = points * mult;
+        if (isBoss) points += 500;
+        if (State.doublePoints) points *= 2;
+        points = Math.round(points);
+        State.score += points;
+        UI.showFloatingScore(points);
+    },
+
+    endGame: function(completed) {
+        if (State.autoNextTimeout) clearTimeout(State.autoNextTimeout);
+        clearInterval(State.timerInterval);
+        UI.showScreen('result-screen');
+        
+        document.getElementById('final-score').innerText = State.score;
+        document.getElementById('final-correct').innerText = `${State.correctCount} / ${State.questions.length}`;
+        document.getElementById('final-streak').innerText = State.bestStreak;
+        
+        const title = completed ? "¡Victoria!" : "¡Game Over!";
+        document.getElementById('result-title').innerText = title;
+        if(completed) Confetti.burst();
+
+        Persistence.save(State.score, State.bestStreak, State.mode);
     }
-  }
-  $("#endTitle").textContent = title;
-  $("#endDesc").innerHTML = desc;
+};
 
-  // Guardar récords
-  const bestScore = Number(localStorage.getItem(LS.bestScore) || 0);
-  if (state.score > bestScore) saveStat(LS.bestScore, state.score);
+// --- POWER UPS SYSTEM ---
+const PowerUps = {
+    use: function(type) {
+        if (State.answered || State.powers[type] <= 0) return;
+        // Only handling 5050 now
+        
+        State.powers[type]--;
+        AudioSys.sfx.power();
+        UI.updatePowerUps();
 
-  const bestStreak = Number(localStorage.getItem(LS.bestStreak) || 0);
-  if (state.maxStreak > bestStreak) saveStat(LS.bestStreak, state.maxStreak);
-
-  if (state.mode==="Reto Diario"){
-    const bestDaily = Number(localStorage.getItem(LS.bestDaily) || 0);
-    if (state.score > bestDaily) saveStat(LS.bestDaily, state.score);
-  }
-}
-
-/* ======= Buttons / Events ======= */
-function wire(){
-  loadStats();
-
-  $("#btnStartDefault").addEventListener("click", ()=> startGame("Clásico"));
-  $("#btnClassic").addEventListener("click", ()=> startGame("Clásico"));
-  $("#btnTimeAttack").addEventListener("click", ()=> startGame("Contrarreloj"));
-  $("#btnDaily").addEventListener("click", ()=> startGame("Reto Diario"));
-  $("#btnPractice").addEventListener("click", ()=> startGame("Práctica"));
-
-  $("#btnResetStats").addEventListener("click", ()=>{
-    localStorage.removeItem(LS.bestScore);
-    localStorage.removeItem(LS.bestStreak);
-    localStorage.removeItem(LS.bestDaily);
-    loadStats();
-    alert("Récords reiniciados ✅");
-  });
-
-  $("#btnQuit").addEventListener("click", ()=> showScreen("start"));
-  $("#btnNext").addEventListener("click", ()=>{
-    // En contrarreloj: seguir mientras haya tiempo
-    if (state.mode==="Contrarreloj"){
-      // si se saltó, no penaliza
-    } else if (state.mode !== "Práctica" && state.lives<=0){
-      endGame(false);
-      return;
+        if (type === '5050') {
+            this.effect5050();
+        }
+    },
+    effect5050: function() {
+        const q = State.questions[State.currentQIndex];
+        const buttons = document.querySelectorAll('.option-btn');
+        let removed = 0;
+        for (let i = 0; i < buttons.length; i++) {
+            if (i !== q.correct && removed < 2) {
+                buttons[i].classList.add('disabled');
+                buttons[i].innerText = ""; 
+                removed++;
+            }
+        }
     }
-    nextQuestion();
-  });
+};
 
-  $("#p5050").addEventListener("click", use5050);
-  $("#pSkip").addEventListener("click", useSkip);
-  $("#pFreeze").addEventListener("click", useFreeze);
-  $("#pDouble").addEventListener("click", useDouble);
+// --- UI MANAGER ---
+const UI = {
+    showScreen: function(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        if (id === 'menu-screen') {
+            Persistence.load();
+        }
+    },
+    renderQuestion: function(q, isBoss) {
+        document.getElementById('q-category').innerText = q.cat;
+        // Show Diff
+        const diffText = q.diff === 1 ? "FÁCIL" : q.diff === 2 ? "MEDIO" : "DIFÍCIL";
+        const diffColor = q.diff === 1 ? "#10b981" : q.diff === 2 ? "#f59e0b" : "#ef4444";
+        const badge = document.getElementById('q-diff');
+        badge.innerText = diffText;
+        badge.style.color = diffColor;
+        badge.style.borderColor = diffColor;
 
-  $("#btnReplay").addEventListener("click", ()=> startGame(state.mode==="Reto Diario" ? "Reto Diario" : "Clásico"));
-  $("#btnCopy").addEventListener("click", ()=>{
-    const text = `Trivia Rush — ${state.mode}\nPuntaje: ${state.score}\nRacha máx.: ${state.maxStreak}\nAciertos: ${state.correct} | Errores: ${state.wrong}`;
-    navigator.clipboard?.writeText(text).then(()=>{
-      alert("Copiado ✅");
-    }).catch(()=>{
-      prompt("Copia manual:", text);
-    });
-  });
+        document.getElementById('q-text').innerText = q.q;
+        
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+        
+        if (isBoss) {
+            document.getElementById('game-screen').style.boxShadow = "inset 0 0 50px rgba(244, 63, 94, 0.2)";
+        } else {
+            document.getElementById('game-screen').style.boxShadow = "none";
+        }
 
-  // Keyboard
-  window.addEventListener("keydown", (e)=>{
-    if (screens.game.classList.contains("active")){
-      if (e.key === "Escape") showScreen("start");
-      if (e.key === "Enter" && !$("#btnNext").disabled) $("#btnNext").click();
-
-      if (["1","2","3","4"].includes(e.key)){
-        const idx = Number(e.key) - 1;
-        const btn = $(`#answers .ans[data-idx="${idx}"]`);
-        if (btn && !btn.disabled) btn.click();
-      }
-      if (e.key.toLowerCase()==="f") $("#p5050").click();
-      if (e.key.toLowerCase()==="s") $("#pSkip").click();
-      if (e.key.toLowerCase()==="c") $("#pFreeze").click();
+        q.a.forEach((opt, idx) => {
+            const btn = document.createElement('div');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => Game.submitAnswer(idx);
+            container.appendChild(btn);
+        });
+    },
+    updateTimer: function(current, max) {
+        const pct = (current / max) * 100;
+        const bar = document.getElementById('timer-bar');
+        bar.style.width = `${pct}%`;
+        if (pct < 30) bar.classList.add('danger');
+        else bar.classList.remove('danger');
+    },
+    updateHUD: function() {
+        document.getElementById('score-display').innerText = State.score;
+        document.getElementById('streak-display').innerText = State.streak;
+        
+        // FIX VISUAL INFINITE LIVES
+        const livesEl = document.getElementById('lives-display');
+        if (State.lives > 10) {
+            livesEl.innerText = "❤️ ∞"; 
+        } else {
+            livesEl.innerText = "❤️".repeat(Math.max(0, State.lives));
+        }
+    },
+    updatePowerUps: function() {
+        // Only 5050 remains
+        ['5050'].forEach(type => {
+            const btn = document.getElementById(`btn-${type}`);
+            const count = State.powers[type];
+            document.getElementById(`count-${type}`).innerText = count;
+            
+            if (count <= 0 || State.answered) btn.classList.add('disabled');
+            else btn.classList.remove('disabled');
+        });
+    },
+    showExplanation: function(isCorrect, text) {
+        const panel = document.getElementById('explanation-panel');
+        const title = document.getElementById('exp-result-text');
+        
+        title.innerText = isCorrect ? "¡CORRECTO!" : "INCORRECTO";
+        title.style.color = isCorrect ? "var(--success)" : "var(--accent)";
+        document.getElementById('exp-detail').innerText = text;
+        
+        panel.classList.add('show');
+    },
+    showFloatingScore: function(pts) {
+        const el = document.createElement('div');
+        el.className = 'floating-score';
+        el.innerText = `+${pts}`;
+        el.style.top = '60px'; 
+        el.style.right = '20px';
+        document.getElementById('game-screen').appendChild(el);
+        setTimeout(() => el.remove(), 1000);
     }
-  });
-}
+};
 
-wire();
+// --- CONFETTI SYSTEM ---
+const Confetti = {
+    canvas: document.getElementById('confetti-canvas'),
+    ctx: document.getElementById('confetti-canvas').getContext('2d'),
+    particles: [],
+    resize: function() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+    },
+    burst: function() {
+        this.resize();
+        for(let i=0; i<100; i++) {
+            this.particles.push({
+                x: this.canvas.width / 2,
+                y: this.canvas.height / 2,
+                vx: (Math.random() - 0.5) * 15,
+                vy: (Math.random() - 0.5) * 15,
+                life: 100,
+                color: `hsl(${Math.random()*360}, 100%, 50%)`
+            });
+        }
+        if(!this.isRunning) this.loop();
+    },
+    loop: function() {
+        this.isRunning = true;
+        this.ctx.clearRect(0,0,this.canvas.width, this.canvas.height);
+        
+        for(let i=0; i<this.particles.length; i++) {
+            let p = this.particles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vy += 0.2; // Gravity
+            p.life--;
+            this.ctx.fillStyle = p.color;
+            this.ctx.fillRect(p.x, p.y, 5, 5);
+        }
+        
+        this.particles = this.particles.filter(p => p.life > 0);
+        
+        if(this.particles.length > 0) requestAnimationFrame(() => this.loop());
+        else this.isRunning = false;
+    }
+};
+
+// --- PERSISTENCE ---
+const Persistence = {
+    key: 'trivia_rush_v1',
+    save: function(score, streak, mode) {
+        let data = JSON.parse(localStorage.getItem(this.key) || '{}');
+        
+        if (!data.bestScore || score > data.bestScore) data.bestScore = score;
+        if (!data.bestStreak || streak > data.bestStreak) data.bestStreak = streak;
+        if (mode === 'daily') {
+             if (!data.dailyScore || score > data.dailyScore) data.dailyScore = score;
+        }
+        
+        localStorage.setItem(this.key, JSON.stringify(data));
+    },
+    load: function() {
+        let data = JSON.parse(localStorage.getItem(this.key) || '{}');
+        document.getElementById('best-score').innerText = data.bestScore || 0;
+        document.getElementById('best-streak').innerText = data.bestStreak || 0;
+        document.getElementById('daily-score-prev').innerText = data.dailyScore ? `Record: ${data.dailyScore}` : 'Jugar';
+    }
+};
+
+// --- INITIALIZATION & EVENTS ---
+window.onload = function() {
+    UI.showScreen('menu-screen');
+};
+
+document.addEventListener('keydown', (e) => {
+    if (!document.getElementById('game-screen').classList.contains('active')) return;
+    if (e.key === 'Enter') {
+        // Allow manual skip if impatient
+        if (document.getElementById('explanation-panel').classList.contains('show')) {
+             if (State.autoNextTimeout) clearTimeout(State.autoNextTimeout);
+             Game.nextQuestion();
+        }
+    }
+    if (!State.answered) {
+        if (e.key.toLowerCase() === 'f') PowerUps.use('5050');
+    }
+});
+
 </script>
 </body>
 </html>
