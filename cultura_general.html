@@ -1,0 +1,1349 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+  <title>Trivia Rush — Cultura General</title>
+  <style>
+    :root{
+      --bg1:#0b1220;
+      --bg2:#0a2a3a;
+      --card:#0f1b2e;
+      --card2:#0e2236;
+      --text:#e8f0ff;
+      --muted:#9fb2d3;
+      --accent:#7c5cff;
+      --ok:#2fe37a;
+      --bad:#ff5b6e;
+      --warn:#ffcc66;
+      --shadow: 0 20px 60px rgba(0,0,0,.35);
+      --radius: 18px;
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);
+      background: radial-gradient(1200px 800px at 20% 10%, rgba(124,92,255,.22), transparent 55%),
+                  radial-gradient(1200px 800px at 80% 20%, rgba(47,227,122,.14), transparent 55%),
+                  linear-gradient(180deg, var(--bg1), var(--bg2));
+      min-height:100vh;
+      overflow-x:hidden;
+    }
+
+    .wrap{
+      width:min(980px, 92vw);
+      margin: 28px auto 40px;
+      display:grid;
+      gap:18px;
+    }
+
+    .top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+    }
+
+    .brand{
+      display:flex;align-items:center;gap:12px;
+      user-select:none;
+    }
+    .logo{
+      width:44px;height:44px;border-radius:14px;
+      background: conic-gradient(from 210deg, var(--accent), #2dd4bf, #60a5fa, var(--accent));
+      box-shadow: var(--shadow);
+      position:relative;
+      overflow:hidden;
+    }
+    .logo::after{
+      content:"";
+      position:absolute; inset:-30%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.25), transparent 55%);
+      transform: rotate(15deg);
+    }
+    .brand h1{
+      margin:0; font-size:18px; letter-spacing:.2px;
+    }
+    .brand p{
+      margin:0; color:var(--muted); font-size:12px;
+    }
+
+    .pill{
+      padding:10px 12px;
+      border-radius:999px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow: 0 10px 24px rgba(0,0,0,.18);
+      display:flex; gap:10px; align-items:center;
+      flex-wrap:wrap;
+    }
+    .pill .stat{
+      display:flex; gap:8px; align-items:baseline;
+      padding:6px 10px;
+      border-radius:999px;
+      background: rgba(0,0,0,.22);
+      border:1px solid rgba(255,255,255,.08);
+    }
+    .stat b{ font-size:13px; }
+    .stat span{ font-size:12px; color:var(--muted); }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:18px;
+    }
+
+    @media (max-width: 920px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+    .card .inner{ padding:18px; }
+
+    .screen{ display:none; }
+    .screen.active{ display:block; }
+
+    .hero{
+      padding:18px;
+      display:grid;
+      gap:12px;
+    }
+    .hero h2{
+      margin:0;
+      font-size:22px;
+      line-height:1.15;
+      letter-spacing:.2px;
+    }
+    .hero p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.45;
+      font-size:14px;
+    }
+
+    .modes{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+    }
+    @media (max-width:560px){
+      .modes{ grid-template-columns: 1fr; }
+    }
+
+    .mode{
+      padding:14px;
+      border-radius:16px;
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.10);
+      cursor:pointer;
+      transition: transform .12s ease, border-color .12s ease, background .12s ease;
+      position:relative;
+      overflow:hidden;
+    }
+    .mode:hover{
+      transform: translateY(-1px);
+      border-color: rgba(124,92,255,.45);
+      background: rgba(124,92,255,.10);
+    }
+    .mode h3{ margin:0 0 6px; font-size:15px; }
+    .mode p{ margin:0; font-size:13px; color:var(--muted); }
+    .tag{
+      display:inline-flex; align-items:center; gap:8px;
+      margin-top:10px;
+      padding:6px 10px;
+      border-radius:999px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    .btn{
+      appearance:none;
+      border:none;
+      cursor:pointer;
+      padding:12px 14px;
+      border-radius: 14px;
+      font-weight:700;
+      color:var(--text);
+      background: linear-gradient(180deg, rgba(124,92,255,.9), rgba(124,92,255,.72));
+      box-shadow: 0 18px 40px rgba(124,92,255,.22);
+      transition: transform .12s ease, filter .12s ease, opacity .12s ease;
+    }
+    .btn:hover{ transform: translateY(-1px); filter:brightness(1.03); }
+    .btn:active{ transform: translateY(0px); filter:brightness(.98); }
+    .btn.secondary{
+      background: rgba(255,255,255,.08);
+      box-shadow:none;
+      border:1px solid rgba(255,255,255,.12);
+      font-weight:650;
+    }
+    .btn.ghost{
+      background: transparent;
+      border:1px solid rgba(255,255,255,.14);
+      font-weight:650;
+      box-shadow:none;
+    }
+    .btn:disabled{ opacity:.5; cursor:not-allowed; transform:none; }
+
+    .aside .inner{
+      display:grid;
+      gap:12px;
+    }
+    .panel{
+      padding:14px;
+      border-radius:16px;
+      background: rgba(0,0,0,.18);
+      border:1px solid rgba(255,255,255,.10);
+    }
+    .panel h4{ margin:0 0 8px; font-size:13px; color:var(--muted); font-weight:700; letter-spacing:.2px; }
+    .panel .row{ display:flex; justify-content:space-between; gap:10px; margin:6px 0; font-size:13px; }
+    .kbd{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      padding:2px 6px; border-radius:8px;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.10);
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    /* Game UI */
+    .hud{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      padding:14px 18px;
+      background: rgba(0,0,0,.24);
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+    .hud-left{
+      display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    }
+    .badge{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:7px 10px;
+      border-radius:999px;
+      background: rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.10);
+      font-size:12px;
+      color:var(--muted);
+    }
+    .badge b{ color:var(--text); font-size:12px; }
+    .hearts{
+      display:inline-flex; gap:6px; align-items:center;
+      padding:7px 10px;
+      border-radius:999px;
+      background: rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.10);
+    }
+    .heart{
+      width:10px;height:10px;border-radius:3px;
+      background: rgba(255,255,255,.18);
+      transform: rotate(45deg);
+      position:relative;
+    }
+    .heart::before, .heart::after{
+      content:""; position:absolute; width:10px;height:10px; border-radius:50%;
+      background: inherit;
+    }
+    .heart::before{ left:-5px; top:0; }
+    .heart::after{ left:0; top:-5px; }
+    .heart.on{ background: rgba(255,91,110,.95); }
+
+    .timer{
+      min-width: 150px;
+      display:flex; align-items:center; gap:10px; justify-content:flex-end;
+    }
+    .bar{
+      width:110px; height:10px; border-radius:999px;
+      background: rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.10);
+      overflow:hidden;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.18);
+    }
+    .bar > i{
+      display:block; height:100%;
+      width:100%;
+      background: linear-gradient(90deg, var(--ok), var(--warn), var(--bad));
+      transform-origin:left center;
+      transform: scaleX(1);
+      transition: transform .18s linear;
+    }
+    .timer .t{
+      font-weight:800;
+      font-size:14px;
+      color:var(--text);
+      width:36px; text-align:right;
+    }
+
+    .qwrap{ padding:18px; display:grid; gap:12px; }
+    .qhead{
+      display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+    }
+    .category{
+      font-size:12px;
+      color:var(--muted);
+      display:inline-flex; align-items:center; gap:8px;
+      padding:7px 10px;
+      border-radius:999px;
+      background: rgba(124,92,255,.12);
+      border:1px solid rgba(124,92,255,.25);
+    }
+    .boss{
+      background: rgba(255,204,102,.12);
+      border-color: rgba(255,204,102,.28);
+    }
+    .qnum{
+      font-size:12px; color:var(--muted);
+      padding:7px 10px; border-radius:999px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      white-space:nowrap;
+    }
+    .question{
+      font-size:18px;
+      line-height:1.28;
+      margin:0;
+      letter-spacing:.1px;
+    }
+
+    .answers{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+    @media (max-width:620px){
+      .answers{ grid-template-columns: 1fr; }
+    }
+
+    .ans{
+      padding:12px 12px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.20);
+      cursor:pointer;
+      text-align:left;
+      color:var(--text);
+      display:flex; align-items:center; gap:10px;
+      transition: transform .12s ease, border-color .12s ease, background .12s ease;
+      position:relative;
+      overflow:hidden;
+      min-height: 52px;
+    }
+    .ans:hover{
+      transform: translateY(-1px);
+      border-color: rgba(124,92,255,.45);
+      background: rgba(124,92,255,.12);
+    }
+    .ans:disabled{ cursor:not-allowed; opacity:.82; transform:none; }
+    .chip{
+      width:30px;height:30px;border-radius:12px;
+      display:flex; align-items:center; justify-content:center;
+      font-weight:900; font-size:12px;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.10);
+      color:var(--muted);
+      flex: 0 0 auto;
+    }
+    .ans.correct{
+      border-color: rgba(47,227,122,.55);
+      background: rgba(47,227,122,.14);
+    }
+    .ans.wrong{
+      border-color: rgba(255,91,110,.55);
+      background: rgba(255,91,110,.12);
+    }
+    .ans.dim{
+      opacity:.55;
+      filter:saturate(.85);
+    }
+
+    .powers{
+      display:flex; flex-wrap:wrap; gap:10px;
+      padding: 0 18px 18px;
+    }
+    .power{
+      padding:10px 12px;
+      border-radius:14px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      color:var(--text);
+      cursor:pointer;
+      display:inline-flex; align-items:center; gap:10px;
+      font-weight:750;
+      transition: transform .12s ease, border-color .12s ease, background .12s ease, opacity .12s ease;
+      user-select:none;
+    }
+    .power:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.22); background: rgba(255,255,255,.08); }
+    .power:disabled{ opacity:.45; cursor:not-allowed; transform:none; }
+    .power small{ color:var(--muted); font-weight:700; }
+
+    .toast{
+      margin: 0 18px 18px;
+      padding:12px 14px;
+      border-radius:16px;
+      background: rgba(0,0,0,.22);
+      border:1px solid rgba(255,255,255,.10);
+      color:var(--muted);
+      display:none;
+    }
+    .toast.show{ display:block; }
+    .toast b{ color:var(--text); }
+
+    .footer-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      padding: 0 18px 18px;
+    }
+
+    /* Confetti */
+    .confetti{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      overflow:hidden;
+      display:none;
+      z-index:999;
+    }
+    .confetti.show{ display:block; }
+    .confetti i{
+      position:absolute;
+      top:-10vh;
+      width:10px;height:16px;
+      border-radius:4px;
+      opacity:.9;
+      animation: fall 1200ms linear forwards;
+      filter: drop-shadow(0 10px 12px rgba(0,0,0,.25));
+    }
+    @keyframes fall{
+      to{ transform: translate(var(--dx), 120vh) rotate(360deg); }
+    }
+
+    .tiny{
+      font-size:12px;color:var(--muted); line-height:1.35;
+    }
+    .divider{
+      height:1px;background:rgba(255,255,255,.08);
+      margin:12px 0;
+    }
+    .mono{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="confetti" id="confetti"></div>
+
+  <div class="wrap">
+    <div class="top">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>Trivia Rush</h1>
+          <p>Cultura general con rachas, poderes y jefes 🔥</p>
+        </div>
+      </div>
+
+      <div class="pill" aria-label="Resumen">
+        <div class="stat"><b id="bestScore">0</b><span>Mejor puntaje</span></div>
+        <div class="stat"><b id="bestStreak">0</b><span>Mejor racha</span></div>
+        <div class="stat"><b id="bestDaily">0</b><span>Récord diario</span></div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <!-- Main -->
+      <div class="card">
+        <!-- START SCREEN -->
+        <div class="screen active" id="screenStart">
+          <div class="hero">
+            <h2>Responde rápido, encadena rachas y usa poderes. Cada 5 aciertos: <span style="color:var(--warn);font-weight:900">Jefe</span>.</h2>
+            <p>Mi opinión: esto se siente como un “arcade” de preguntas, no como la trivia aburrida de siempre. Ideal para viciarte 5 minutos.</p>
+
+            <div class="modes">
+              <button class="mode" id="btnClassic" type="button">
+                <h3>Modo Clásico</h3>
+                <p>12 preguntas · 3 vidas · timer por pregunta</p>
+                <div class="tag">🎯 Mejor para empezar</div>
+              </button>
+
+              <button class="mode" id="btnTimeAttack" type="button">
+                <h3>Contrarreloj</h3>
+                <p>60 segundos · sin parar · racha manda</p>
+                <div class="tag">⚡ Puro estrés rico</div>
+              </button>
+
+              <button class="mode" id="btnDaily" type="button">
+                <h3>Reto Diario</h3>
+                <p>Mismas preguntas para todos hoy</p>
+                <div class="tag">📅 Perfecto para competir</div>
+              </button>
+
+              <button class="mode" id="btnPractice" type="button">
+                <h3>Práctica</h3>
+                <p>Sin vidas · sin presión · aprende con datos</p>
+                <div class="tag">🧠 Modo estudio</div>
+              </button>
+            </div>
+
+            <div class="divider"></div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end">
+              <button class="btn secondary" id="btnResetStats" type="button">Reset récords</button>
+              <button class="btn" id="btnStartDefault" type="button">Jugar ya</button>
+            </div>
+
+            <p class="tiny">Tip: Usa teclado <span class="kbd">1</span> <span class="kbd">2</span> <span class="kbd">3</span> <span class="kbd">4</span> para responder rápido. Poderes: <span class="kbd">F</span> 50/50 · <span class="kbd">S</span> Saltar · <span class="kbd">C</span> Congelar</p>
+          </div>
+        </div>
+
+        <!-- GAME SCREEN -->
+        <div class="screen" id="screenGame">
+          <div class="hud">
+            <div class="hud-left">
+              <div class="badge">Puntaje: <b id="score">0</b></div>
+              <div class="badge">Racha: <b id="streak">0</b> <span id="multText" style="color:var(--muted);font-weight:700;margin-left:6px">x1</span></div>
+              <div class="hearts" title="Vidas">
+                <span class="heart on" id="h1"></span>
+                <span class="heart on" id="h2"></span>
+                <span class="heart on" id="h3"></span>
+              </div>
+            </div>
+
+            <div class="timer" aria-label="Tiempo">
+              <div class="bar" aria-hidden="true"><i id="barFill"></i></div>
+              <div class="t"><span id="time">15</span>s</div>
+            </div>
+          </div>
+
+          <div class="qwrap">
+            <div class="qhead">
+              <div class="category" id="category">📚 Cultura</div>
+              <div class="qnum" id="qnum">1/12</div>
+            </div>
+
+            <p class="question" id="question">Pregunta…</p>
+
+            <div class="answers" id="answers"></div>
+          </div>
+
+          <div class="powers">
+            <button class="power" id="p5050" type="button" title="Elimina 2 opciones incorrectas">
+              🎲 50/50 <small>(<span id="c5050">1</span>)</small>
+            </button>
+            <button class="power" id="pSkip" type="button" title="Salta la pregunta sin perder vida">
+              ⏭️ Saltar <small>(<span id="cSkip">1</span>)</small>
+            </button>
+            <button class="power" id="pFreeze" type="button" title="Congela el tiempo 5s">
+              🧊 Congelar <small>(<span id="cFreeze">1</span>)</small>
+            </button>
+            <button class="power" id="pDouble" type="button" title="Duplica puntos del próximo acierto">
+              ✨ Doble <small>(<span id="cDouble">0</span>)</small>
+            </button>
+          </div>
+
+          <div class="toast" id="toast"></div>
+
+          <div class="footer-actions">
+            <button class="btn ghost" id="btnQuit" type="button">Salir</button>
+            <button class="btn secondary" id="btnNext" type="button" disabled>Siguiente</button>
+          </div>
+        </div>
+
+        <!-- END SCREEN -->
+        <div class="screen" id="screenEnd">
+          <div class="hero">
+            <h2 id="endTitle">¡Fin!</h2>
+            <p id="endDesc">Resumen…</p>
+
+            <div class="panel">
+              <div class="row"><span>Modo</span><b id="endMode">—</b></div>
+              <div class="row"><span>Puntaje</span><b id="endScore">0</b></div>
+              <div class="row"><span>Racha máx.</span><b id="endMaxStreak">0</b></div>
+              <div class="row"><span>Aciertos</span><b id="endCorrect">0</b></div>
+              <div class="row"><span>Errores</span><b id="endWrong">0</b></div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end">
+              <button class="btn secondary" id="btnCopy" type="button">Copiar resultado</button>
+              <button class="btn" id="btnReplay" type="button">Jugar otra vez</button>
+            </div>
+
+            <p class="tiny">Pro tip: si quieres más preguntas, abajo en el JS hay un array <span class="mono">QUESTION_BANK</span>. Solo agrega más.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Aside -->
+      <div class="card aside">
+        <div class="inner">
+          <div class="panel">
+            <h4>¿Cómo ganas?</h4>
+            <div class="row"><span>✅ Acierto</span><span>+ puntos + tiempo</span></div>
+            <div class="row"><span>🔥 Racha</span><span>multiplicador</span></div>
+            <div class="row"><span>👑 Jefe</span><span>vale más puntos</span></div>
+          </div>
+
+          <div class="panel">
+            <h4>Poderes</h4>
+            <div class="row"><span>🎲 50/50</span><span class="kbd">F</span></div>
+            <div class="row"><span>⏭️ Saltar</span><span class="kbd">S</span></div>
+            <div class="row"><span>🧊 Congelar</span><span class="kbd">C</span></div>
+            <div class="row"><span>✨ Doble</span><span>se gana</span></div>
+          </div>
+
+          <div class="panel">
+            <h4>Reglas rápidas</h4>
+            <p class="tiny" style="margin:0">
+              • Tienes 3 vidas (excepto Práctica).<br/>
+              • Cada 5 aciertos seguidos aparece un <b style="color:var(--warn)">Jefe</b> (pregunta difícil).<br/>
+              • Si respondes muy rápido, te premia con más puntos.<br/>
+              • En el Reto Diario, el set se genera igual para el día de hoy.
+            </p>
+          </div>
+
+          <div class="panel">
+            <h4>Atajos</h4>
+            <div class="row"><span>Responder</span><span><span class="kbd">1</span> <span class="kbd">2</span> <span class="kbd">3</span> <span class="kbd">4</span></span></div>
+            <div class="row"><span>Siguiente</span><span class="kbd">Enter</span></div>
+            <div class="row"><span>Salir</span><span class="kbd">Esc</span></div>
+          </div>
+
+          <div class="panel">
+            <h4>Mini idea para hacerlo MÁS adictivo</h4>
+            <p class="tiny" style="margin:0">
+              Si te gusta, el siguiente upgrade sería: “liga semanal” (ranking en localStorage),
+              y cartas de “eventos” (p.ej. “Solo ciencia por 3 preguntas”).
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* =========================
+   TRIVIA RUSH — PURE JS
+   ========================= */
+
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+
+/* ---- Question Bank (editable) ----
+   Cada pregunta:
+   {
+     cat: "Geografía",
+     q: "¿Pregunta?",
+     a: ["op1","op2","op3","op4"],
+     correct: 1, // índice
+     explain: "Dato corto/curioso."
+     diff: 1..3  (1 fácil, 2 medio, 3 difícil)
+   }
+*/
+const QUESTION_BANK = [
+  // Ecuador / LatAm
+  {cat:"Ecuador", q:"¿Cuál es la capital de Ecuador?", a:["Guayaquil","Quito","Cuenca","Manta"], correct:1, explain:"Quito es la capital y está a ~2.850 m de altitud.", diff:1},
+  {cat:"Ecuador", q:"¿Qué archipiélago ecuatoriano es Patrimonio Natural de la Humanidad por la UNESCO?", a:["Galápagos","Juan Fernández","Malvinas","Chiloé"], correct:0, explain:"Las Galápagos fueron uno de los primeros sitios UNESCO (1978).", diff:1},
+  {cat:"Ecuador", q:"¿Qué volcán se ve muy cerca de Quito y suele ‘vigilar’ el valle?", a:["Cotopaxi","Chimborazo","Cayambe","Pichincha"], correct:3, explain:"El Pichincha está justo al oeste de Quito.", diff:1},
+  {cat:"Ecuador", q:"¿Cuál es el punto más alto de Ecuador?", a:["Cotopaxi","Chimborazo","Cayambe","Antisana"], correct:1, explain:"El Chimborazo es el más alto del país (y el punto más ‘lejano’ del centro por abultamiento terrestre).", diff:2},
+
+  // Ciencia
+  {cat:"Ciencia", q:"¿Qué planeta es conocido por sus anillos más visibles?", a:["Marte","Saturno","Urano","Neptuno"], correct:1, explain:"Saturno tiene un sistema de anillos muy brillante y extenso.", diff:1},
+  {cat:"Ciencia", q:"¿Cuál es la unidad básica de la vida?", a:["Molécula","Átomo","Célula","Órgano"], correct:2, explain:"La célula es la unidad estructural y funcional de los seres vivos.", diff:1},
+  {cat:"Ciencia", q:"¿Qué gas es más abundante en la atmósfera terrestre?", a:["Oxígeno","Nitrógeno","CO₂","Argón"], correct:1, explain:"El nitrógeno es ~78% del aire.", diff:2},
+  {cat:"Ciencia", q:"¿Qué partícula tiene carga negativa?", a:["Protón","Neutrón","Electrón","Positrón"], correct:2, explain:"El electrón tiene carga negativa.", diff:1},
+
+  // Historia
+  {cat:"Historia", q:"¿En qué continente surgió el Antiguo Egipto?", a:["Asia","Europa","África","Oceanía"], correct:2, explain:"Egipto se desarrolló en el noreste de África, alrededor del Nilo.", diff:1},
+  {cat:"Historia", q:"¿Qué imperio construyó Machu Picchu?", a:["Azteca","Inca","Maya","Romano"], correct:1, explain:"Machu Picchu fue construido por los incas en el siglo XV.", diff:1},
+  {cat:"Historia", q:"¿Qué invento se asocia a Gutenberg?", a:["La brújula","La pólvora","La imprenta de tipos móviles","El telescopio"], correct:2, explain:"La imprenta aceleró la difusión del conocimiento en Europa.", diff:2},
+
+  // Geografía
+  {cat:"Geografía", q:"¿Cuál es el río más largo del mundo (según muchas mediciones modernas)?", a:["Nilo","Amazonas","Yangtsé","Misisipi"], correct:1, explain:"Dependiendo del método, Amazonía y Nilo compiten, pero hoy muchas fuentes dan ventaja al Amazonas.", diff:3},
+  {cat:"Geografía", q:"¿Cuál es el país más grande del mundo por superficie?", a:["China","Estados Unidos","Canadá","Rusia"], correct:3, explain:"Rusia es el país más grande por área total.", diff:1},
+  {cat:"Geografía", q:"¿En qué país está la ciudad de Petra?", a:["Egipto","Jordania","Israel","Marruecos"], correct:1, explain:"Petra está en Jordania y fue un gran centro nabateo.", diff:2},
+
+  // Arte / Cultura
+  {cat:"Arte", q:"¿Quién pintó la Mona Lisa?", a:["Van Gogh","Da Vinci","Picasso","Miguel Ángel"], correct:1, explain:"Leonardo da Vinci la pintó en el Renacimiento.", diff:1},
+  {cat:"Cultura", q:"¿Qué idioma tiene más hablantes nativos?", a:["Inglés","Español","Mandarín","Hindi"], correct:2, explain:"El mandarín lidera en hablantes nativos.", diff:2},
+  {cat:"Cultura", q:"¿Qué instrumento tiene teclas y cuerdas y se toca con martillos internos?", a:["Violín","Piano","Arpa","Flauta"], correct:1, explain:"En el piano, martillos golpean cuerdas al presionar teclas.", diff:2},
+
+  // Deportes
+  {cat:"Deportes", q:"¿Cuántos jugadores por equipo hay en cancha en fútbol (sin contar suplentes)?", a:["9","10","11","12"], correct:2, explain:"Son 11 por equipo en el campo.", diff:1},
+  {cat:"Deportes", q:"¿En tenis, cómo se llama el marcador 40-40?", a:["Break","Deuce","Tie-break","Love"], correct:1, explain:"Deuce = iguales en 40.", diff:2},
+  {cat:"Deportes", q:"¿Qué país ganó el Mundial de fútbol 2002?", a:["Brasil","Alemania","Francia","Italia"], correct:0, explain:"Brasil ganó en 2002 (su quinto título).", diff:2},
+
+  // Tecnología
+  {cat:"Tecnología", q:"¿Qué significa ‘CPU’?", a:["Central Processing Unit","Computer Personal Unit","Control Process Utility","Core Power Usage"], correct:0, explain:"Es la Unidad Central de Procesamiento.", diff:1},
+  {cat:"Tecnología", q:"¿Qué lenguaje se ejecuta directamente en el navegador (sin compilar) para la mayoría de sitios web?", a:["Python","Java","JavaScript","C#"], correct:2, explain:"JavaScript es el estándar del navegador.", diff:1},
+  {cat:"Tecnología", q:"¿Qué es ‘HTTPS’ principalmente?", a:["Un antivirus","Un protocolo seguro de comunicación web","Un tipo de Wi-Fi","Un sistema operativo"], correct:1, explain:"HTTPS cifra la comunicación entre navegador y servidor (TLS).", diff:2},
+
+  // “Boss” candidates (difícil)
+  {cat:"Jefe", q:"¿Cuál de estos elementos NO es un gas noble?", a:["Neón","Kriptón","Cloro","Argón"], correct:2, explain:"Cloro es un halógeno; los gases nobles incluyen Ne, Ar, Kr…", diff:3},
+  {cat:"Jefe", q:"¿Qué obra literaria comienza con ‘En un lugar de la Mancha…’?", a:["La Celestina","Don Quijote","Cien años de soledad","El Lazarillo"], correct:1, explain:"Es el inicio de Don Quijote de la Mancha.", diff:2},
+  {cat:"Jefe", q:"¿Qué océano es el más grande?", a:["Atlántico","Índico","Pacífico","Ártico"], correct:2, explain:"El Pacífico es el océano más grande.", diff:2},
+  {cat:"Jefe", q:"¿En qué año llegó el hombre a la Luna (Apolo 11)?", a:["1965","1969","1972","1977"], correct:1, explain:"Fue en 1969.", diff:2},
+];
+
+// Más preguntas rápidas para variedad
+const EXTRA_QUESTIONS = [
+  {cat:"Ciencia", q:"¿Cuál es el metal líquido a temperatura ambiente más conocido?", a:["Hierro","Mercurio","Aluminio","Cobre"], correct:1, explain:"El mercurio es líquido a temperatura ambiente.", diff:2},
+  {cat:"Geografía", q:"¿Cuál es la montaña más alta del mundo sobre el nivel del mar?", a:["K2","Everest","Aconcagua","Denali"], correct:1, explain:"El Everest es el más alto sobre el nivel del mar.", diff:1},
+  {cat:"Historia", q:"¿La ‘Guerra Fría’ fue principalmente entre…?", a:["EE.UU. y URSS","China y Japón","España y Francia","Brasil y Argentina"], correct:0, explain:"EE.UU. y la URSS lideraron el bloque occidental y soviético.", diff:2},
+  {cat:"Cultura", q:"¿Qué continente tiene más países?", a:["Europa","África","Asia","América"], correct:1, explain:"África tiene la mayor cantidad de países (más de 50).", diff:3},
+  {cat:"Deportes", q:"¿Cuántos puntos vale un triple en baloncesto?", a:["1","2","3","4"], correct:2, explain:"Un triple vale 3 puntos.", diff:1},
+  {cat:"Tecnología", q:"¿Qué significa ‘Wi-Fi’ en uso común?", a:["Internet por cable","Red inalámbrica","Satélite","Un navegador"], correct:1, explain:"Se usa para referirse a redes inalámbricas (IEEE 802.11).", diff:1},
+  {cat:"Arte", q:"¿Qué estilo se asocia con Claude Monet?", a:["Cubismo","Impresionismo","Surrealismo","Barroco"], correct:1, explain:"Monet es uno de los símbolos del impresionismo.", diff:2},
+  {cat:"Ecuador", q:"¿Qué moneda se usa oficialmente en Ecuador desde 2000?", a:["Sucre","Euro","Dólar estadounidense","Peso"], correct:2, explain:"Ecuador adoptó el dólar estadounidense en 2000.", diff:1},
+];
+QUESTION_BANK.push(...EXTRA_QUESTIONS);
+
+/* ======= State ======= */
+const screens = {
+  start: $("#screenStart"),
+  game: $("#screenGame"),
+  end: $("#screenEnd"),
+};
+
+const state = {
+  mode: "Clásico",
+  total: 12,
+  timePerQ: 15,
+  timeLeft: 15,
+  timerId: null,
+  frozen: false,
+  freezeLeftMs: 0,
+  lives: 3,
+  score: 0,
+  streak: 0,
+  maxStreak: 0,
+  correct: 0,
+  wrong: 0,
+  qIndex: 0,
+  pool: [],
+  current: null,
+  answered: false,
+  bossNow: false,
+  doubleNext: false,
+  powers: { fifty: 1, skip: 1, freeze: 1, dbl: 0 },
+  dailySeed: null,
+};
+
+/* ======= Storage ======= */
+const LS = {
+  bestScore: "trivia_bestScore",
+  bestStreak: "trivia_bestStreak",
+  bestDaily: "trivia_bestDaily",
+};
+function loadStats(){
+  $("#bestScore").textContent = String(Number(localStorage.getItem(LS.bestScore) || 0));
+  $("#bestStreak").textContent = String(Number(localStorage.getItem(LS.bestStreak) || 0));
+  $("#bestDaily").textContent = String(Number(localStorage.getItem(LS.bestDaily) || 0));
+}
+function saveStat(key, value){
+  localStorage.setItem(key, String(value));
+  loadStats();
+}
+
+/* ======= RNG (for Daily mode) ======= */
+function xfnv1a(str){
+  let h = 2166136261 >>> 0;
+  for (let i=0; i<str.length; i++){
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+function mulberry32(a){
+  return function(){
+    let t = a += 0x6D2B79F5;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  }
+}
+function shuffle(arr, rand=Math.random){
+  const a = arr.slice();
+  for (let i=a.length-1; i>0; i--){
+    const j = Math.floor(rand() * (i+1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* ======= UI helpers ======= */
+function showScreen(name){
+  Object.values(screens).forEach(s => s.classList.remove("active"));
+  screens[name].classList.add("active");
+}
+
+function setHearts(lives){
+  ["h1","h2","h3"].forEach((id, idx)=>{
+    const el = $("#"+id);
+    el.classList.toggle("on", idx < lives);
+  });
+}
+
+function setPowers(){
+  $("#c5050").textContent = state.powers.fifty;
+  $("#cSkip").textContent = state.powers.skip;
+  $("#cFreeze").textContent = state.powers.freeze;
+  $("#cDouble").textContent = state.powers.dbl;
+  $("#p5050").disabled = state.powers.fifty <= 0 || state.answered;
+  $("#pSkip").disabled = state.powers.skip <= 0 || state.answered;
+  $("#pFreeze").disabled = state.powers.freeze <= 0 || state.answered || state.frozen;
+  $("#pDouble").disabled = state.powers.dbl <= 0 || state.answered || state.doubleNext;
+}
+
+function updateHUD(){
+  $("#score").textContent = state.score;
+  $("#streak").textContent = state.streak;
+  state.maxStreak = Math.max(state.maxStreak, state.streak);
+  const mult = 1 + Math.floor(state.streak / 3) * 0.25; // 0-2: x1, 3-5: x1.25, 6-8: x1.5...
+  $("#multText").textContent = "x" + mult.toFixed(2).replace(".00","");
+  setHearts(state.lives);
+}
+
+function toast(html, tone="neutral"){
+  const t = $("#toast");
+  t.classList.add("show");
+  t.style.borderColor =
+    tone==="ok" ? "rgba(47,227,122,.35)" :
+    tone==="bad"? "rgba(255,91,110,.35)" :
+    tone==="warn"? "rgba(255,204,102,.35)" :
+    "rgba(255,255,255,.10)";
+  t.style.background =
+    tone==="ok" ? "rgba(47,227,122,.10)" :
+    tone==="bad"? "rgba(255,91,110,.10)" :
+    tone==="warn"? "rgba(255,204,102,.10)" :
+    "rgba(0,0,0,.22)";
+  t.innerHTML = html;
+}
+function hideToast(){
+  const t = $("#toast");
+  t.classList.remove("show");
+  t.innerHTML = "";
+}
+
+function confettiBurst(){
+  const c = $("#confetti");
+  c.innerHTML = "";
+  c.classList.add("show");
+  const colors = ["#7c5cff","#2fe37a","#60a5fa","#ffcc66","#ff5b6e","#2dd4bf"];
+  const n = 90;
+  for (let i=0; i<n; i++){
+    const el = document.createElement("i");
+    const x = Math.random() * 100;
+    const dx = (Math.random()*2-1) * 18 + "vw";
+    const dur = 900 + Math.random()*700;
+    el.style.left = x + "vw";
+    el.style.background = colors[(Math.random()*colors.length)|0];
+    el.style.setProperty("--dx", dx);
+    el.style.animationDuration = dur + "ms";
+    el.style.opacity = (0.55 + Math.random()*0.45).toFixed(2);
+    el.style.transform = `translate(0,0) rotate(${Math.random()*180}deg)`;
+    c.appendChild(el);
+  }
+  setTimeout(()=> c.classList.remove("show"), 1300);
+}
+
+/* ======= Game Flow ======= */
+function basePoints(q){
+  // diff 1..3 => 100..180
+  const diffBase = 90 + q.diff*30;
+  return diffBase;
+}
+function multiplier(){
+  return 1 + Math.floor(state.streak / 3) * 0.25;
+}
+
+function buildPool(){
+  // Selección de preguntas: mezcla general + “jefe” separado
+  const normal = QUESTION_BANK.filter(x => x.cat !== "Jefe");
+  const bosses = QUESTION_BANK.filter(x => x.cat === "Jefe");
+
+  let rand = Math.random;
+  if (state.mode === "Reto Diario"){
+    const seed = state.dailySeed;
+    rand = mulberry32(seed);
+  }
+
+  const shuffledNormal = shuffle(normal, rand);
+  const shuffledBoss = shuffle(bosses, rand);
+
+  // Insertar un boss “virtual” cuando toque (cada 5 aciertos seguidos),
+  // pero también dejamos bosses en el pool por si se necesita.
+  state.pool = {
+    normal: shuffledNormal,
+    bosses: shuffledBoss,
+    ni: 0,
+    bi: 0,
+  };
+}
+
+function nextQuestion(){
+  state.answered = false;
+  hideToast();
+  $("#btnNext").disabled = true;
+
+  // Modo Contrarreloj: termina cuando se acabe el global timer (state.timeLeft global)
+  if (state.mode !== "Contrarreloj"){
+    if (state.qIndex >= state.total){
+      endGame(true);
+      return;
+    }
+  }
+
+  // Decide si toca boss (cada 5 de racha, pero no si ya estás en boss)
+  state.bossNow = (state.streak > 0 && state.streak % 5 === 0);
+
+  // Obtener pregunta
+  let q;
+  if (state.bossNow){
+    q = state.pool.bosses[state.pool.bi++] || state.pool.normal[state.pool.ni++];
+  } else {
+    q = state.pool.normal[state.pool.ni++] || state.pool.bosses[state.pool.bi++];
+  }
+  if (!q){
+    endGame(true);
+    return;
+  }
+
+  state.current = q;
+  state.qIndex++;
+
+  // Timer per question
+  if (state.mode === "Contrarreloj"){
+    // En contrarreloj, el timeLeft es global; aquí solo refrescamos UI
+  } else {
+    state.timeLeft = state.timePerQ;
+  }
+
+  renderQuestion();
+  setPowers();
+  startTimer();
+}
+
+function renderQuestion(){
+  const q = state.current;
+  const isBoss = state.bossNow || q.cat==="Jefe";
+  $("#category").textContent = (isBoss ? "👑 JEFE" : "📚 " + q.cat);
+  $("#category").classList.toggle("boss", isBoss);
+
+  if (state.mode === "Contrarreloj"){
+    $("#qnum").textContent = "∞ / 60s";
+  } else {
+    $("#qnum").textContent = `${state.qIndex}/${state.total}`;
+  }
+
+  $("#question").textContent = q.q;
+
+  const letters = ["1","2","3","4"];
+  const answersEl = $("#answers");
+  answersEl.innerHTML = "";
+
+  q.a.forEach((txt, idx)=>{
+    const btn = document.createElement("button");
+    btn.className = "ans";
+    btn.type = "button";
+    btn.dataset.idx = String(idx);
+    btn.innerHTML = `<span class="chip">${letters[idx]}</span><span>${escapeHtml(txt)}</span>`;
+    btn.addEventListener("click", ()=> choose(idx));
+    answersEl.appendChild(btn);
+  });
+
+  updateHUD();
+}
+
+function escapeHtml(s){
+  return String(s)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+/* ======= Timer ======= */
+function stopTimer(){
+  if (state.timerId) clearInterval(state.timerId);
+  state.timerId = null;
+}
+function updateTimerUI(){
+  $("#time").textContent = String(Math.max(0, Math.ceil(state.timeLeft)));
+  const max = (state.mode==="Contrarreloj") ? 60 : state.timePerQ;
+  const frac = Math.max(0, Math.min(1, state.timeLeft / max));
+  $("#barFill").style.transform = `scaleX(${frac})`;
+}
+function startTimer(){
+  stopTimer();
+  updateTimerUI();
+
+  state.timerId = setInterval(()=>{
+    if (state.frozen){
+      state.freezeLeftMs -= 100;
+      if (state.freezeLeftMs <= 0){
+        state.frozen = false;
+      }
+      return;
+    }
+
+    // Contrarreloj: timeLeft global baja siempre
+    state.timeLeft -= 0.1;
+
+    if (state.timeLeft <= 0){
+      if (state.mode === "Práctica"){
+        // En práctica, solo avanza
+        timeOutNoPenalty();
+      } else if (state.mode === "Contrarreloj"){
+        // fin de juego por tiempo
+        endGame(false);
+      } else {
+        timeOutPenalty();
+      }
+    }
+    updateTimerUI();
+  }, 100);
+}
+
+function timeOutPenalty(){
+  stopTimer();
+  if (state.answered) return;
+  state.answered = true;
+  state.wrong++;
+  state.streak = 0;
+  state.lives = Math.max(0, state.lives - 1);
+  markAnswers(null, state.current.correct);
+  toast(`<b>⏰ Se acabó el tiempo.</b> ${escapeHtml(state.current.explain || "")}`, "bad");
+  $("#btnNext").disabled = false;
+
+  if (state.lives <= 0){
+    endGame(false);
+  }
+  setPowers();
+  updateHUD();
+}
+
+function timeOutNoPenalty(){
+  stopTimer();
+  if (state.answered) return;
+  state.answered = true;
+  markAnswers(null, state.current.correct);
+  toast(`<b>⏰ Tiempo.</b> ${escapeHtml(state.current.explain || "")}`, "warn");
+  $("#btnNext").disabled = false;
+  setPowers();
+}
+
+/* ======= Answering ======= */
+function choose(idx){
+  if (state.answered) return;
+
+  state.answered = true;
+  stopTimer();
+
+  const q = state.current;
+  const correct = (idx === q.correct);
+
+  if (correct){
+    state.correct++;
+    state.streak++;
+
+    const speedBonus = (state.mode==="Contrarreloj")
+      ? 0
+      : Math.floor(Math.max(0, state.timeLeft) * 6); // más rápido = más puntos
+
+    let pts = basePoints(q);
+    if (state.bossNow || q.cat==="Jefe") pts = Math.round(pts * 1.35);
+
+    pts = Math.round((pts + speedBonus) * multiplier());
+
+    if (state.doubleNext){
+      pts *= 2;
+      state.doubleNext = false;
+      toast(`<b>✨ ¡Doble activado!</b> +${pts} puntos. ${escapeHtml(q.explain || "")}`, "ok");
+    } else {
+      toast(`<b>✅ Correcto.</b> +${pts} puntos. ${escapeHtml(q.explain || "")}`, "ok");
+    }
+
+    state.score += pts;
+
+    // Premio: cada 4 aciertos, ganas “Doble”
+    if (state.streak > 0 && state.streak % 4 === 0){
+      state.powers.dbl++;
+      toast(`${$("#toast").innerHTML}<br><span style="color:var(--muted)"><b>🎁 Bonus:</b> ganaste un poder ✨ Doble.</span>`, "ok");
+    }
+
+    // En clásico/práctica: pequeño bonus de tiempo por acierto
+    if (state.mode !== "Contrarreloj" && state.mode !== "Práctica"){
+      state.timeLeft = Math.min(state.timePerQ, state.timeLeft + 2);
+    }
+
+    // Confetti si respondes un boss
+    if (state.bossNow || q.cat==="Jefe") confettiBurst();
+  } else {
+    state.wrong++;
+    state.streak = 0;
+
+    if (state.mode !== "Práctica"){
+      state.lives = Math.max(0, state.lives - 1);
+    }
+
+    toast(`<b>❌ Incorrecto.</b> La respuesta era: <b>${escapeHtml(q.a[q.correct])}</b><br>${escapeHtml(q.explain || "")}`, "bad");
+  }
+
+  markAnswers(idx, q.correct);
+  $("#btnNext").disabled = false;
+  setPowers();
+  updateHUD();
+
+  if (state.mode !== "Práctica" && state.mode !== "Contrarreloj" && state.lives <= 0){
+    endGame(false);
+  }
+}
+
+function markAnswers(chosenIdx, correctIdx){
+  const btns = $$("#answers .ans");
+  btns.forEach((b, i)=>{
+    b.disabled = true;
+    if (i === correctIdx) b.classList.add("correct");
+    if (chosenIdx !== null && i === chosenIdx && i !== correctIdx) b.classList.add("wrong");
+    if (i !== correctIdx && i !== chosenIdx) b.classList.add("dim");
+  });
+}
+
+/* ======= Powers ======= */
+function use5050(){
+  if (state.answered || state.powers.fifty<=0) return;
+  state.powers.fifty--;
+  const q = state.current;
+  const wrongIdx = [0,1,2,3].filter(i => i !== q.correct);
+  shuffle(wrongIdx).slice(0,2).forEach(i=>{
+    const btn = $(`#answers .ans[data-idx="${i}"]`);
+    if (btn){ btn.disabled = true; btn.classList.add("dim"); btn.style.opacity = ".35"; }
+  });
+  toast(`<b>🎲 50/50</b> eliminó 2 opciones.`, "neutral");
+  setPowers();
+}
+
+function useSkip(){
+  if (state.answered || state.powers.skip<=0) return;
+  state.powers.skip--;
+  stopTimer();
+  state.answered = true;
+  toast(`<b>⏭️ Saltaste</b> sin perder vida.`, "neutral");
+  $("#btnNext").disabled = false;
+  setPowers();
+}
+
+function useFreeze(){
+  if (state.answered || state.powers.freeze<=0 || state.frozen) return;
+  state.powers.freeze--;
+  state.frozen = true;
+  state.freezeLeftMs = 5000;
+  toast(`<b>🧊 Tiempo congelado</b> por 5s.`, "neutral");
+  setPowers();
+}
+
+function useDouble(){
+  if (state.answered || state.powers.dbl<=0 || state.doubleNext) return;
+  state.powers.dbl--;
+  state.doubleNext = true;
+  toast(`<b>✨ Doble</b> activado: el próximo acierto vale x2 puntos.`, "neutral");
+  setPowers();
+}
+
+/* ======= Start / End ======= */
+function resetRun(){
+  stopTimer();
+  Object.assign(state, {
+    timeLeft: state.timePerQ,
+    lives: (state.mode==="Práctica" ? 3 : 3),
+    score: 0,
+    streak: 0,
+    maxStreak: 0,
+    correct: 0,
+    wrong: 0,
+    qIndex: 0,
+    current: null,
+    answered: false,
+    bossNow: false,
+    doubleNext: false,
+    powers: { fifty: 1, skip: 1, freeze: 1, dbl: 0 },
+    frozen: false,
+    freezeLeftMs: 0,
+  });
+  hideToast();
+  setHearts(3);
+}
+
+function startGame(mode){
+  state.mode = mode;
+
+  // Configs por modo
+  if (mode==="Clásico"){
+    state.total = 12;
+    state.timePerQ = 15;
+    state.lives = 3;
+  } else if (mode==="Práctica"){
+    state.total = 14;
+    state.timePerQ = 9999; // sin presión real
+    state.lives = 3;
+  } else if (mode==="Contrarreloj"){
+    state.total = 999999;
+    state.timePerQ = 60; // se usa como global
+    state.lives = 3;
+  } else if (mode==="Reto Diario"){
+    state.total = 12;
+    state.timePerQ = 15;
+    state.lives = 3;
+  }
+
+  // Seed diario
+  if (mode==="Reto Diario"){
+    const today = new Date();
+    const key = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}-${String(today.getDate()).padStart(2,"0")}`;
+    state.dailySeed = xfnv1a("TRIVIA_RUSH_" + key);
+  } else {
+    state.dailySeed = null;
+  }
+
+  resetRun();
+  buildPool();
+
+  // Iniciar timer global en Contrarreloj
+  if (mode==="Contrarreloj"){
+    state.timeLeft = 60;
+  } else {
+    state.timeLeft = state.timePerQ;
+  }
+
+  showScreen("game");
+  nextQuestion();
+}
+
+function endGame(wonByQuestions){
+  stopTimer();
+
+  // Ajusta UI final
+  showScreen("end");
+  $("#endMode").textContent = state.mode;
+  $("#endScore").textContent = state.score;
+  $("#endMaxStreak").textContent = state.maxStreak;
+  $("#endCorrect").textContent = state.correct;
+  $("#endWrong").textContent = state.wrong;
+
+  let title = "¡Fin del juego!";
+  let desc = "";
+  if (state.mode==="Contrarreloj"){
+    title = "⏱️ Se acabó el tiempo";
+    desc = `Puntaje final: <b>${state.score}</b>. Tu mejor racha fue <b>${state.maxStreak}</b>.`;
+  } else if (state.mode==="Práctica"){
+    title = "🧠 Práctica completa";
+    desc = `Te llevas <b>${state.correct}</b> aciertos. Lo importante aquí es aprender rápido con los datos curiosos.`;
+  } else {
+    if (state.lives<=0) {
+      title = "💀 Te quedaste sin vidas";
+      desc = `Puntaje: <b>${state.score}</b>. La revancha siempre arregla todo.`;
+    } else if (wonByQuestions){
+      title = "🏁 Run completado";
+      desc = `Buenísimo: <b>${state.score}</b> puntos con racha máx. <b>${state.maxStreak}</b>.`;
+      confettiBurst();
+    }
+  }
+  $("#endTitle").textContent = title;
+  $("#endDesc").innerHTML = desc;
+
+  // Guardar récords
+  const bestScore = Number(localStorage.getItem(LS.bestScore) || 0);
+  if (state.score > bestScore) saveStat(LS.bestScore, state.score);
+
+  const bestStreak = Number(localStorage.getItem(LS.bestStreak) || 0);
+  if (state.maxStreak > bestStreak) saveStat(LS.bestStreak, state.maxStreak);
+
+  if (state.mode==="Reto Diario"){
+    const bestDaily = Number(localStorage.getItem(LS.bestDaily) || 0);
+    if (state.score > bestDaily) saveStat(LS.bestDaily, state.score);
+  }
+}
+
+/* ======= Buttons / Events ======= */
+function wire(){
+  loadStats();
+
+  $("#btnStartDefault").addEventListener("click", ()=> startGame("Clásico"));
+  $("#btnClassic").addEventListener("click", ()=> startGame("Clásico"));
+  $("#btnTimeAttack").addEventListener("click", ()=> startGame("Contrarreloj"));
+  $("#btnDaily").addEventListener("click", ()=> startGame("Reto Diario"));
+  $("#btnPractice").addEventListener("click", ()=> startGame("Práctica"));
+
+  $("#btnResetStats").addEventListener("click", ()=>{
+    localStorage.removeItem(LS.bestScore);
+    localStorage.removeItem(LS.bestStreak);
+    localStorage.removeItem(LS.bestDaily);
+    loadStats();
+    alert("Récords reiniciados ✅");
+  });
+
+  $("#btnQuit").addEventListener("click", ()=> showScreen("start"));
+  $("#btnNext").addEventListener("click", ()=>{
+    // En contrarreloj: seguir mientras haya tiempo
+    if (state.mode==="Contrarreloj"){
+      // si se saltó, no penaliza
+    } else if (state.mode !== "Práctica" && state.lives<=0){
+      endGame(false);
+      return;
+    }
+    nextQuestion();
+  });
+
+  $("#p5050").addEventListener("click", use5050);
+  $("#pSkip").addEventListener("click", useSkip);
+  $("#pFreeze").addEventListener("click", useFreeze);
+  $("#pDouble").addEventListener("click", useDouble);
+
+  $("#btnReplay").addEventListener("click", ()=> startGame(state.mode==="Reto Diario" ? "Reto Diario" : "Clásico"));
+  $("#btnCopy").addEventListener("click", ()=>{
+    const text = `Trivia Rush — ${state.mode}\nPuntaje: ${state.score}\nRacha máx.: ${state.maxStreak}\nAciertos: ${state.correct} | Errores: ${state.wrong}`;
+    navigator.clipboard?.writeText(text).then(()=>{
+      alert("Copiado ✅");
+    }).catch(()=>{
+      prompt("Copia manual:", text);
+    });
+  });
+
+  // Keyboard
+  window.addEventListener("keydown", (e)=>{
+    if (screens.game.classList.contains("active")){
+      if (e.key === "Escape") showScreen("start");
+      if (e.key === "Enter" && !$("#btnNext").disabled) $("#btnNext").click();
+
+      if (["1","2","3","4"].includes(e.key)){
+        const idx = Number(e.key) - 1;
+        const btn = $(`#answers .ans[data-idx="${idx}"]`);
+        if (btn && !btn.disabled) btn.click();
+      }
+      if (e.key.toLowerCase()==="f") $("#p5050").click();
+      if (e.key.toLowerCase()==="s") $("#pSkip").click();
+      if (e.key.toLowerCase()==="c") $("#pFreeze").click();
+    }
+  });
+}
+
+wire();
+</script>
+</body>
+</html>
