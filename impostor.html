@@ -26,7 +26,8 @@
     <!-- Babel (para JSX en navegador - sin build) -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-    <script type="text/babel">
+    <!-- Importante: presets para JSX -->
+    <script type="text/babel" data-presets="env,react">
       const { useState, useEffect, useRef } = React;
 
       // --- DATOS ---
@@ -109,7 +110,7 @@
         const startTimeRef = useRef(null);
         const rafRef = useRef(null);
 
-        // FIX race condition: usar ref como fuente de verdad
+        // Evita el bug de “llegó al 100% pero al soltar no marca visto”
         const revealedRef = useRef(false);
 
         useEffect(() => setIsLocked(player.seen), [player.seen]);
@@ -130,7 +131,9 @@
           setProgress(0);
 
           const el = e.currentTarget;
-          try { el.setPointerCapture?.(e.pointerId); } catch {}
+          if (el && el.setPointerCapture) {
+            try { el.setPointerCapture(e.pointerId); } catch (err) {}
+          }
 
           setHolding(true);
           startTimeRef.current = Date.now();
@@ -155,6 +158,429 @@
         const endHold = (e) => {
           if (isLocked) return;
 
-          const el = e?.currentTarget;
-          try {
-            if (el?.hasPointerCapture?.(e.poi
+          const el = e && e.currentTarget ? e.currentTarget : null;
+          if (el && el.hasPointerCapture && el.releasePointerCapture) {
+            try {
+              if (el.hasPointerCapture(e.pointerId)) el.releasePointerCapture(e.pointerId);
+            } catch (err) {}
+          }
+
+          if (rafRef.current) cancelAnimationFrame(rafRef.current);
+
+          if (revealedRef.current) {
+            onRevealComplete(player.id);
+            setIsLocked(true);
+          }
+
+          setHolding(false);
+          setRevealed(false);
+          revealedRef.current = false;
+          setProgress(0);
+        };
+
+        return (
+          <div
+            className={`
+              relative overflow-hidden rounded-2xl border-2 transition-all select-none touch-none
+              flex flex-col items-center justify-center p-4 cursor-pointer
+              ${className}
+              ${isLocked ? 'bg-slate-900 border-slate-700 opacity-50' : 'bg-slate-800 border-indigo-500/50 active:border-indigo-400 active:bg-slate-700'}
+            `}
+            style={{
+              WebkitTouchCallout: 'none',
+              WebkitUserSelect: 'none',
+              userSelect: 'none',
+              touchAction: 'none'
+            }}
+            onPointerDown={startHold}
+            onPointerUp={endHold}
+            onPointerLeave={endHold}
+            onPointerCancel={endHold}
+            onContextMenu={(ev) => ev.preventDefault()}
+          >
+            {!isLocked && holding && !revealed && (
+              <div className="absolute bottom-0 left-0 right-0 bg-indigo-600/20" style={{ height: `${progress}%` }} />
+            )}
+
+            <div className="z-10 text-center w-full pointer-events-none">
+              {isLocked ? (
+                <div className="flex flex-col items-center text-slate-500">
+                  <span className="font-bold text-lg line-through">{player.name}</span>
+                  <span className="text-xs uppercase tracking-widest mt-1 text-emerald-500 font-bold">Visto ✅</span>
+                </div>
+              ) : revealed ? (
+                role === 'impostor' ? (
+                  <div className="flex flex-col items-center">
+                    <div className="text-6xl mb-3">💀</div>
+                    <span className="text-red-400 font-black text-2xl uppercase tracking-widest">¡Eres el Impostor!</span>
+                    <p className="text-sm text-slate-400 mt-2">Disimula y miente.</p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center">
+                    <span className="text-sm text-indigo-300 uppercase tracking-widest mb-2">Tu palabra es</span>
+                    <span className="text-white font-black text-4xl bg-slate-900/50 px-6 py-2 rounded-xl border border-slate-700">
+                      {secretWord}
+                    </span>
+                  </div>
+                )
+              ) : (
+                <div className="flex flex-col items-center">
+                  <span className="font-bold text-3xl text-white mb-4">{player.name}</span>
+                  <div className="flex items-center gap-2 text-sm text-indigo-300 bg-indigo-500/10 px-4 py-2 rounded-full">
+                    <span>👆</span>
+                    <span>Mantén para revelar</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      }
+
+      function App() {
+        const [phase, setPhase] = useState('setup'); // setup, reveal, starter, result
+        const [players, setPlayers] = useState([]);
+        const [gameData, setGameData] = useState({
+          category: 'Aleatorio',
+          word: '',
+          impostorId: null,
+          starterName: '',
+          playerRoles: []
+        });
+
+        const [currentRevealIndex, setCurrentRevealIndex] = useState(0);
+        const [newName, setNewName] = useState('');
+        const [selectedCat, setSelectedCat] = useState('Aleatorio');
+        const [showTutorial, setShowTutorial] = useState(false);
+
+        useEffect(() => {
+          const saved = localStorage.getItem('impostorPlayers');
+          if (saved) setPlayers(JSON.parse(saved));
+        }, []);
+
+        useEffect(() => {
+          localStorage.setItem('impostorPlayers', JSON.stringify(players));
+        }, [players]);
+
+        const addPlayer = () => {
+          if (!newName.trim()) return;
+          setPlayers(players.concat([{ id: Date.now(), name: newName.trim() }]));
+          setNewName('');
+        };
+
+        const removePlayer = (id) => setPlayers(players.filter(p => p.id !== id));
+
+        const resetPlayers = () => {
+          if (confirm('¿Borrar todos los nombres y empezar de cero?')) {
+            setPlayers([]);
+            localStorage.removeItem('impostorPlayers');
+            setPhase('setup');
+          }
+        };
+
+        const generateRound = () => {
+          if (players.length < 3) return alert('Se necesitan al menos 3 jugadores.');
+
+          let finalCat = selectedCat;
+          if (selectedCat === 'Aleatorio') {
+            const keys = Object.keys(CATEGORIAS);
+            finalCat = keys[Math.floor(Math.random() * keys.length)];
+          }
+          const words = CATEGORIAS[finalCat];
+          const secretWord = words[Math.floor(Math.random() * words.length)];
+
+          const impostorIndex = Math.floor(Math.random() * players.length);
+          const impostorId = players[impostorIndex].id;
+
+          const roles = players.map(p => ({
+            id: p.id,
+            name: p.name,
+            role: p.id === impostorId ? 'impostor' : 'citizen',
+            seen: false
+          }));
+
+          for (let i = roles.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            const tmp = roles[i];
+            roles[i] = roles[j];
+            roles[j] = tmp;
+          }
+
+          setGameData({ category: finalCat, word: secretWord, impostorId, starterName: '', playerRoles: roles });
+          setCurrentRevealIndex(0);
+          setPhase('reveal');
+        };
+
+        const markAsSeen = (id) => {
+          setGameData(prev => ({
+            ...prev,
+            playerRoles: prev.playerRoles.map(p => (p.id === id ? { ...p, seen: true } : p))
+          }));
+        };
+
+        const chooseStarter = () => {
+          const randomPlayer = players[Math.floor(Math.random() * players.length)];
+          setGameData(prev => ({ ...prev, starterName: randomPlayer.name }));
+          setPhase('starter');
+        };
+
+        const nextReveal = () => {
+          if (currentRevealIndex < gameData.playerRoles.length - 1) setCurrentRevealIndex(i => i + 1);
+          else chooseStarter();
+        };
+
+        const startNewGame = () => {
+          setPhase('setup');
+          setGameData(prev => ({ ...prev, playerRoles: [], word: '', starterName: '' }));
+        };
+
+        // --- SETUP ---
+        if (phase === 'setup') {
+          return (
+            <div className="min-h-screen text-slate-100 p-6 flex flex-col font-sans max-w-md mx-auto">
+              <header className="mb-6 mt-4 text-center">
+                <h1 className="text-3xl font-black text-indigo-400 tracking-tighter uppercase mb-1">Impostor</h1>
+                <p className="text-slate-500 text-sm">Configuración de la Partida</p>
+              </header>
+
+              {/* Tutorial */}
+              <div className="mb-6">
+                <button
+                  onClick={() => setShowTutorial(s => !s)}
+                  className="w-full bg-slate-900 border border-slate-800 rounded-2xl px-4 py-3 flex items-center justify-between hover:bg-slate-800/60 transition-all"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">📘</span>
+                    <span className="font-bold text-slate-200">{showTutorial ? 'Ocultar tutorial' : 'Ver tutorial'}</span>
+                  </div>
+                  <span className="text-slate-400 text-xl">{showTutorial ? '−' : '+'}</span>
+                </button>
+
+                {showTutorial && (
+                  <div className="mt-3 bg-slate-900 border border-slate-800 rounded-2xl p-4 text-slate-200 space-y-4">
+                    <div>
+                      <h3 className="font-black text-indigo-300 mb-2">1) Preparación</h3>
+                      <ol className="list-decimal ml-5 space-y-1 text-slate-300">
+                        <li>Agrega los nombres (mínimo 3).</li>
+                        <li>Elige una categoría o “Aleatorio”.</li>
+                        <li>Presiona <span className="font-bold">Generar ronda</span>.</li>
+                      </ol>
+                    </div>
+                    <div>
+                      <h3 className="font-black text-indigo-300 mb-2">2) Reparto de roles</h3>
+                      <ol className="list-decimal ml-5 space-y-1 text-slate-300">
+                        <li>Pásense el celular.</li>
+                        <li>Mantén presionada tu tarjeta para revelar.</li>
+                        <li>Al soltar, queda “Visto ✅”.</li>
+                        <li>Presiona “Siguiente jugador”.</li>
+                      </ol>
+                    </div>
+                    <div>
+                      <h3 className="font-black text-indigo-300 mb-2">3) Pistas</h3>
+                      <ol className="list-decimal ml-5 space-y-1 text-slate-300">
+                        <li>La app dirá quién empieza.</li>
+                        <li>Cada jugador da 1 pista sin decir la palabra.</li>
+                      </ol>
+                    </div>
+                    <div>
+                      <h3 className="font-black text-indigo-300 mb-2">4) Resultado</h3>
+                      <ol className="list-decimal ml-5 space-y-1 text-slate-300">
+                        <li>Discuten y votan offline.</li>
+                        <li>Revelen palabra e impostor.</li>
+                      </ol>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-6 flex-1">
+                {/* Jugadores */}
+                <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800">
+                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 block">
+                    Jugadores ({players.length})
+                  </label>
+
+                  <div className="flex gap-2 mb-4">
+                    <input
+                      type="text"
+                      value={newName}
+                      onChange={(e) => setNewName(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && addPlayer()}
+                      placeholder="Nombre..."
+                      className="flex-1 bg-slate-800 border-none rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none placeholder-slate-600"
+                    />
+                    <button
+                      onClick={addPlayer}
+                      className="bg-indigo-600 w-12 rounded-xl flex items-center justify-center text-white hover:bg-indigo-500 active:scale-95 transition-all"
+                      aria-label="Agregar"
+                    >
+                      ➕
+                    </button>
+                  </div>
+
+                  <div className="max-h-48 overflow-y-auto space-y-2 custom-scrollbar">
+                    {players.length === 0 && (
+                      <p className="text-center text-slate-600 italic py-2 text-sm">Agrega al menos 3 jugadores</p>
+                    )}
+
+                    {players.map(p => (
+                      <div key={p.id} className="flex justify-between items-center bg-slate-800/50 px-3 py-2 rounded-lg">
+                        <span className="font-medium truncate">{p.name}</span>
+                        <button onClick={() => removePlayer(p.id)} className="text-slate-500 hover:text-red-400 p-1" aria-label="Eliminar">
+                          🗑️
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Categoría */}
+                <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800">
+                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 block">Categoría</label>
+
+                  <div className="flex overflow-x-auto gap-2 pb-2 -mx-1 px-1 custom-scrollbar">
+                    <button
+                      onClick={() => setSelectedCat('Aleatorio')}
+                      className={`flex-shrink-0 py-2 px-4 rounded-xl text-sm font-semibold transition-all border whitespace-nowrap ${
+                        selectedCat === 'Aleatorio'
+                          ? 'bg-indigo-600 text-white border-indigo-500 shadow-indigo-500/20 shadow-lg'
+                          : 'bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700'
+                      }`}
+                    >
+                      🎲 Aleatorio
+                    </button>
+
+                    {Object.keys(CATEGORIAS).map(cat => (
+                      <button
+                        key={cat}
+                        onClick={() => setSelectedCat(cat)}
+                        className={`flex-shrink-0 py-2 px-4 rounded-xl text-sm font-semibold transition-all border whitespace-nowrap ${
+                          selectedCat === cat
+                            ? 'bg-indigo-600 text-white border-indigo-500 shadow-indigo-500/20 shadow-lg'
+                            : 'bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700'
+                        }`}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6 space-y-3">
+                <Button onClick={generateRound} disabled={players.length < 3}>
+                  ▶️ Generar Ronda
+                </Button>
+
+                {players.length > 0 && (
+                  <Button variant="danger" onClick={resetPlayers} className="text-sm py-2">
+                    🧨 Resetear Jugadores
+                  </Button>
+                )}
+              </div>
+            </div>
+          );
+        }
+
+        // --- REVEAL ---
+        if (phase === 'reveal') {
+          const currentPlayer = gameData.playerRoles[currentRevealIndex];
+          const isLastPlayer = currentRevealIndex === gameData.playerRoles.length - 1;
+
+          return (
+            <div className="min-h-screen text-slate-100 p-6 flex flex-col font-sans max-w-md mx-auto">
+              <div className="flex justify-between items-center mb-6 mt-2">
+                <h2 className="text-xl font-bold text-white">Reparto de Roles</h2>
+                <span className="text-xs font-mono bg-slate-900 px-3 py-1 rounded-full text-slate-400 border border-slate-800">
+                  {currentRevealIndex + 1} / {gameData.playerRoles.length}
+                </span>
+              </div>
+
+              <div className="flex-1 flex flex-col justify-center pb-12">
+                <Card
+                  key={currentPlayer.id}
+                  player={currentPlayer}
+                  role={currentPlayer.role}
+                  secretWord={gameData.word}
+                  onRevealComplete={markAsSeen}
+                  className="w-full h-96 shadow-2xl shadow-black/50"
+                />
+              </div>
+
+              <div className="fixed bottom-8 left-0 right-0 px-6 max-w-md mx-auto">
+                {currentPlayer.seen ? (
+                  <Button onClick={nextReveal} variant="success">
+                    {isLastPlayer ? '🚀 Iniciar Juego' : '➡️ Siguiente Jugador'}
+                  </Button>
+                ) : (
+                  <div className="text-center text-slate-500 text-sm pb-4">
+                    Mantén presionada la tarjeta para revelar...
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        }
+
+        // --- STARTER ---
+        if (phase === 'starter') {
+          return (
+            <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center max-w-md mx-auto text-slate-100">
+              <div className="w-20 h-20 bg-indigo-600 rounded-full flex items-center justify-center mb-6 shadow-xl shadow-indigo-600/30">
+                <span className="text-3xl">🔀</span>
+              </div>
+
+              <h2 className="text-slate-400 uppercase tracking-widest font-bold text-sm mb-2">Quien empieza es</h2>
+              <h1 className="text-5xl font-black text-white mb-12 truncate max-w-full">
+                {gameData.starterName}
+              </h1>
+
+              <p className="text-slate-500 mb-8 max-w-xs mx-auto">
+                Hagan una pregunta a {gameData.starterName} y que comience el debate.
+              </p>
+
+              <Button onClick={() => setPhase('result')}>
+                👁️ Revelar impostor y palabra
+              </Button>
+            </div>
+          );
+        }
+
+        // --- RESULT ---
+        return (
+          <div className="min-h-screen text-slate-100 p-6 flex flex-col max-w-md mx-auto">
+            <div className="flex-1 flex flex-col items-center justify-center space-y-8">
+              <div className="text-center w-full">
+                <h2 className="text-slate-500 text-sm font-bold uppercase tracking-widest mb-2">Palabra de la ronda</h2>
+                <div className="bg-slate-900 border-2 border-slate-800 rounded-2xl p-6 relative overflow-hidden">
+                  <span className="text-3xl font-black text-white relative z-10">{gameData.word}</span>
+                  <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/10 to-transparent"></div>
+                </div>
+              </div>
+
+              <div className="text-center w-full">
+                <h2 className="text-red-500/80 text-sm font-bold uppercase tracking-widest mb-2">El Impostor era</h2>
+                <div className="bg-red-500/10 border-2 border-red-500/20 rounded-2xl p-6">
+                  <span className="text-3xl font-black text-red-400">
+                    {(players.find(p => p.id === gameData.impostorId) || {}).name}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8 space-y-3">
+              <Button onClick={startNewGame}>
+                🔄 Nuevo Juego
+              </Button>
+              <Button variant="danger" onClick={resetPlayers}>
+                🗑️ Resetear Jugadores
+              </Button>
+            </div>
+          </div>
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+  </body>
+</html>
