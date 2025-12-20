@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Impostor - Juego</title>
 
-    <!-- Tailwind (CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
@@ -23,67 +22,154 @@
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 
-    <!-- Babel (para JSX en navegador - sin build) -->
+    <!-- Babel (JSX en navegador) -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-    <!-- Importante: presets para JSX -->
     <script type="text/babel" data-presets="env,react">
       const { useState, useEffect, useRef } = React;
 
-      // --- DATOS ---
-      const CATEGORIAS = {
+      // =========================
+      // CATEGORÍAS
+      // =========================
+
+      const BASE_CATEGORIAS = {
         'Fútbol y Leyendas': [
-          'Messi','CR7','Maradona','Pelé','Mbappé',
-          'Real Madrid','Barcelona','Boca Juniors','River Plate','Selección',
-          'VAR','Árbitro','Neymar','Haaland','Guardiola',
-          'Mundial','Champions','Trofeo','Estadio',
-          'Bernabéu','Bombonera','Dibu','Vinicius','Chicharito','Kane'
+          'Messi', 'CR7', 'Maradona', 'Pelé', 'Mbappé',
+          'Real Madrid', 'Barcelona', 'Boca Juniors', 'River Plate', 'VAR',
+          'Árbitro', 'Neymar', 'Haaland', 'Guardiola',
+          'Mundial', 'Champions', 'Trofeo', 'Estadio',
+          'Bernabéu', 'Bombonera', 'Dibu', 'Vinicius', 'Chicharito', 'Kane',
+          'Hat-trick', 'Balón de Oro', 'Tiki-taka', 'Penalti'
         ],
         'Personajes Épicos': [
-          'Goku','Batman','Spiderman','Harry Potter','Darth Vader',
-          'Bob Esponja','Homero','Shrek','Barbie','Mario Bros',
-          'Pikachu','Iron Man','El Chavo','John Wick','Elsa',
-          'Yoda','Mickey','Deadpool','Thanos','Heisenberg',
-          'Merlina','Jack Sparrow','Voldemort','Buzz','Minion'
+          'Goku', 'Batman', 'Spiderman', 'Harry Potter', 'Darth Vader',
+          'Bob Esponja', 'Homero', 'Shrek', 'Barbie', 'Mario Bros',
+          'Pikachu', 'Iron Man', 'El Chavo', 'John Wick', 'Elsa',
+          'Yoda', 'Mickey', 'Deadpool', 'Thanos', 'Heisenberg',
+          'Merlina', 'Jack Sparrow', 'Voldemort', 'Buzz', 'Minion',
+          'Joker', 'Naruto', 'Luffy', 'Kratos'
         ],
         'Comida Culpable': [
-          'Pizza','Tacos','Sushi','Hamburguesa',
-          'Papas','Alitas','Churros','Cerveza','Tequila',
-          'Fernet','Mate','Paella','Ceviche','Arepa',
-          'Empanada','Helado','Chocolate','Café',
-          'Nachos','Palomitas','HotDog','Ramen','Lasagna','Torta'
+          'Pizza', 'Tacos', 'Sushi', 'Hamburguesa',
+          'Papas', 'Alitas', 'Churros', 'Tequila',
+          'Fernet', 'Mate', 'Paella', 'Ceviche', 'Arepa',
+          'Empanada', 'Helado', 'Chocolate', 'Café',
+          'Nachos', 'Palomitas', 'HotDog', 'Ramen', 'Lasagna', 'Torta',
+          'Brownie', 'Nutella', 'Burrito', 'Shawarma', 'Encebollado'
         ],
         'Lugares de Ficción': [
-          'Hogwarts','Mordor','Estrella de la Muerte','Fondo de Bikini','Wakanda',
-          'Jurassic Park','Narnia','Gotham','Springfield','Winterfell',
-          'Matrix','Fábrica Wonka','País Maravillas','Asgard','La Comarca',
-          'Tatooine','Isla Calavera','Silent Hill','Area 51','Triángulo Bermudas',
-          'Minecraft','San Andreas','Pueblo Paleta','Inframundo'
+          'Hogwarts', 'Mordor', 'Estrella de la Muerte', 'Fondo de Bikini', 'Wakanda',
+          'Jurassic Park', 'Narnia', 'Gotham', 'Springfield', 'Winterfell',
+          'Matrix', 'Fábrica Wonka', 'País Maravillas', 'Asgard', 'La Comarca',
+          'Tatooine', 'Isla Calavera', 'Silent Hill', 'Area 51', 'Triángulo Bermudas',
+          'Minecraft', 'San Andreas', 'Pueblo Paleta', 'Inframundo',
+          'Hyrule', 'Pandora'
         ],
         'Momentos Vergonzosos': [
-          'Caída','Olvido','Pedo','Moco',
-          'Rechazo','Eructo','Mancha','Cremallera',
-          'Ex','Visto','Silencio','Deuda',
-          'Mentira','Tropezón','Ronquido','Sudor',
-          'Grano','Gallo','Malaliento','Caspa'
+          'Caída', 'Olvido', 'Pedo', 'Moco',
+          'Rechazo', 'Eructo', 'Mancha', 'Cremallera',
+          'Ex', 'Visto', 'Silencio', 'Deuda',
+          'Mentira', 'Tropezón', 'Ronquido', 'Sudor',
+          'Grano', 'Gallo', 'Malaliento', 'Caspa'
         ],
         'Objetos Perdidos': [
-          'Llaves','Control','Calcetín','Dignidad','Cartera',
-          'Celular','Lentes','Paciencia','Cargador','Audífonos',
-          'Dinero','Tiempo','Memoria','Pasaporte','Dieta',
-          'Ticket','Esperanza','Autobús','Wifi'
+          'Llaves', 'Control', 'Calcetín', 'Dignidad', 'Cartera',
+          'Celular', 'Lentes', 'Paciencia', 'Cargador', 'Audífonos',
+          'Dinero', 'Tiempo', 'Memoria', 'Pasaporte', 'Dieta',
+          'Ticket', 'Esperanza', 'Autobús', 'Wifi',
+          'Paraguas', 'Tarjeta', 'Mouse'
         ],
         'Animales Raros': [
-          'Ornitorrinco','Ajolote','Capibara','Perezoso','Narval',
-          'Suricata','Lémur','Komodo','Tardígrado','Medusa',
-          'Pez Gota','Kiwi','Tasmania','Canguro','Koala',
-          'Hiena','Camaleón','Pulpo','Mapache','Alpaca','Llama','Puercoespín'
-        ],
+          'Ornitorrinco', 'Ajolote', 'Capibara', 'Perezoso', 'Narval',
+          'Suricata', 'Lémur', 'Komodo', 'Tardígrado', 'Medusa',
+          'Pez Gota', 'Kiwi', 'Diablo de Tasmania', 'Canguro', 'Koala',
+          'Hiena', 'Camaleón', 'Pulpo', 'Mapache', 'Alpaca', 'Llama', 'Puercoespín'
+        ]
       };
 
+      const CATEGORIAS_NUEVAS = {
+        'Ecuador Mode 🇪🇨': [
+          'Quito', 'Guayaquil', 'Cuenca', 'Mitad del Mundo', 'Panecillo',
+          'Teleférico', 'La Carolina', 'Centro Histórico', 'Otavalo', 'Baños',
+          'Galápagos', 'Cotopaxi', 'Chimborazo', 'Mindo', 'Montañita',
+          'Ceviche', 'Encebollado', 'Hornado', 'Cuy', 'Llapingachos',
+          'Colada morada', 'Fanesca', 'Empanada de viento', 'Choclo', 'Yahuarlocro',
+          'Liga', 'Barcelona SC', 'Emelec', 'Independiente del Valle', 'El Nacional'
+        ],
+        'Marcas y Apps 📱': [
+          'WhatsApp', 'Instagram', 'TikTok', 'YouTube', 'Netflix',
+          'Spotify', 'Uber', 'Google', 'Apple', 'Android',
+          'iPhone', 'Samsung', 'X (Twitter)', 'Facebook', 'Snapchat',
+          'Amazon', 'Mercado Libre', 'PayPal', 'Zoom', 'Teams',
+          'Gmail', 'Google Maps', 'Waze', 'ChatGPT', 'Canva',
+          'Adobe', 'Photoshop', 'CapCut', 'Notion', 'Telegram'
+        ],
+        'Cosas de Oficina 🧠': [
+          'Excel', 'PowerPoint', 'Word', 'Outlook', 'Reunión',
+          'KPI', 'Dashboard', 'Reporte', 'Presentación', 'Minuta',
+          'Deadline', 'Seguimiento', 'Feedback', 'OKR', 'Sprint',
+          'Jira', 'Trello', 'Teams', 'Slack', 'Correo',
+          'Adjunto', 'Firma', 'Calendario', 'Llamada', 'Videollamada',
+          'Comité', 'Presupuesto', 'Plan de acción', 'Backlog', 'Status'
+        ],
+        'Viajes ✈️': [
+          'Pasaporte', 'Visa', 'Maleta', 'Equipaje de mano', 'Aduana',
+          'Check-in', 'Boarding pass', 'Puerta de embarque', 'Escala', 'Retraso',
+          'Hostel', 'Hotel', 'Airbnb', 'Mapa', 'Itinerario',
+          'Tour', 'Guía', 'Souvenir', 'Cambio de moneda', 'Seguro de viaje',
+          'Aeropuerto', 'Avión', 'Taxi', 'Metro', 'Tren',
+          'Playa', 'Montaña', 'Museo', 'Restaurante', 'Propina'
+        ]
+      };
+
+      const CATEGORIAS_FAMILIA = {
+        'Momentos Vergonzosos (Familia) 😅': [
+          'Caída', 'Olvido', 'Tropiezo', 'Mancha',
+          'Moco', 'Eructo', 'Cremallera', 'Etiqueta afuera',
+          'Visto', 'Silencio incómodo', 'Deuda',
+          'Mentira piadosa', 'Ronquido', 'Sudor',
+          'Grano', 'Gallo', 'Mal aliento', 'Caspa',
+          'Risa nerviosa', 'Se me cayó el vaso'
+        ],
+        'Comida Familiar 🍲': [
+          'Pizza', 'Hamburguesa', 'Tacos', 'Sushi',
+          'Empanada', 'Arepa', 'Ceviche', 'Encebollado',
+          'Arroz con pollo', 'Pasta', 'Lasagna', 'Ramen',
+          'Helado', 'Chocolate', 'Galletas', 'Brownie',
+          'Churros', 'Papas fritas', 'HotDog', 'Sandwich'
+        ],
+        'Animales (Familia) 🐾': [
+          'Perro', 'Gato', 'Conejo', 'Tortuga',
+          'Delfín', 'Ballena', 'Pingüino', 'Koala',
+          'Panda', 'León', 'Elefante', 'Jirafa',
+          'Mono', 'Oso', 'Zorro', 'Lobo',
+          'Caballo', 'Vaca', 'Gallina', 'Pato'
+        ]
+      };
+
+      function buildCategories(isFamilyMode) {
+        // Merge base + nuevas
+        const merged = Object.assign({}, BASE_CATEGORIAS, CATEGORIAS_NUEVAS);
+
+        if (!isFamilyMode) return merged;
+
+        // Modo familia: ocultar categoría "Momentos Vergonzosos" (la original)
+        // y agregar categorías family-friendly
+        if (merged['Momentos Vergonzosos']) {
+          delete merged['Momentos Vergonzosos'];
+        }
+
+        return Object.assign({}, merged, CATEGORIAS_FAMILIA);
+      }
+
+      // =========================
+      // CONFIG
+      // =========================
       const HOLD_DURATION = 700;
 
-      // --- UI ---
+      // =========================
+      // UI
+      // =========================
       function Button({ onClick, children, variant='primary', className='', disabled=false }) {
         const base =
           "w-full py-3 px-4 rounded-xl font-bold transition-all transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg";
@@ -109,16 +195,12 @@
 
         const startTimeRef = useRef(null);
         const rafRef = useRef(null);
-
-        // Evita el bug de “llegó al 100% pero al soltar no marca visto”
         const revealedRef = useRef(false);
 
         useEffect(() => setIsLocked(player.seen), [player.seen]);
 
         useEffect(() => {
-          return () => {
-            if (rafRef.current) cancelAnimationFrame(rafRef.current);
-          };
+          return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
         }, []);
 
         const startHold = (e) => {
@@ -160,9 +242,7 @@
 
           const el = e && e.currentTarget ? e.currentTarget : null;
           if (el && el.hasPointerCapture && el.releasePointerCapture) {
-            try {
-              if (el.hasPointerCapture(e.pointerId)) el.releasePointerCapture(e.pointerId);
-            } catch (err) {}
+            try { if (el.hasPointerCapture(e.pointerId)) el.releasePointerCapture(e.pointerId); } catch (err) {}
           }
 
           if (rafRef.current) cancelAnimationFrame(rafRef.current);
@@ -237,6 +317,9 @@
         );
       }
 
+      // =========================
+      // APP
+      // =========================
       function App() {
         const [phase, setPhase] = useState('setup'); // setup, reveal, starter, result
         const [players, setPlayers] = useState([]);
@@ -253,14 +336,35 @@
         const [selectedCat, setSelectedCat] = useState('Aleatorio');
         const [showTutorial, setShowTutorial] = useState(false);
 
+        // ✅ Modo Familia
+        const [isFamilyMode, setIsFamilyMode] = useState(false);
+
+        // Persistencia jugadores + family mode
         useEffect(() => {
           const saved = localStorage.getItem('impostorPlayers');
           if (saved) setPlayers(JSON.parse(saved));
+
+          const savedMode = localStorage.getItem('impostorFamilyMode');
+          if (savedMode === '1') setIsFamilyMode(true);
         }, []);
 
         useEffect(() => {
           localStorage.setItem('impostorPlayers', JSON.stringify(players));
         }, [players]);
+
+        useEffect(() => {
+          localStorage.setItem('impostorFamilyMode', isFamilyMode ? '1' : '0');
+        }, [isFamilyMode]);
+
+        const activeCategories = buildCategories(isFamilyMode);
+
+        // Si el usuario tenía seleccionada una categoría que ya no existe (por el modo familia), volver a Aleatorio
+        useEffect(() => {
+          if (selectedCat !== 'Aleatorio' && !activeCategories[selectedCat]) {
+            setSelectedCat('Aleatorio');
+          }
+          // eslint-disable-next-line
+        }, [isFamilyMode]);
 
         const addPlayer = () => {
           if (!newName.trim()) return;
@@ -281,12 +385,14 @@
         const generateRound = () => {
           if (players.length < 3) return alert('Se necesitan al menos 3 jugadores.');
 
+          const cats = buildCategories(isFamilyMode);
+
           let finalCat = selectedCat;
           if (selectedCat === 'Aleatorio') {
-            const keys = Object.keys(CATEGORIAS);
+            const keys = Object.keys(cats);
             finalCat = keys[Math.floor(Math.random() * keys.length)];
           }
-          const words = CATEGORIAS[finalCat];
+          const words = cats[finalCat];
           const secretWord = words[Math.floor(Math.random() * words.length)];
 
           const impostorIndex = Math.floor(Math.random() * players.length);
@@ -299,6 +405,7 @@
             seen: false
           }));
 
+          // Shuffle cards
           for (let i = roles.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             const tmp = roles[i];
@@ -334,7 +441,9 @@
           setGameData(prev => ({ ...prev, playerRoles: [], word: '', starterName: '' }));
         };
 
-        // --- SETUP ---
+        // =========================
+        // SETUP
+        // =========================
         if (phase === 'setup') {
           return (
             <div className="min-h-screen text-slate-100 p-6 flex flex-col font-sans max-w-md mx-auto">
@@ -342,6 +451,27 @@
                 <h1 className="text-3xl font-black text-indigo-400 tracking-tighter uppercase mb-1">Impostor</h1>
                 <p className="text-slate-500 text-sm">Configuración de la Partida</p>
               </header>
+
+              {/* Toggle Modo Familia */}
+              <div className="mb-4 bg-slate-900 border border-slate-800 rounded-2xl p-4 flex items-center justify-between">
+                <div>
+                  <div className="font-bold text-slate-200">Modo Familia</div>
+                  <div className="text-xs text-slate-500">Oculta categorías “picantes” y usa palabras aptas.</div>
+                </div>
+                <button
+                  onClick={() => setIsFamilyMode(v => !v)}
+                  className={`w-14 h-8 rounded-full border transition-all relative ${
+                    isFamilyMode ? 'bg-emerald-600/30 border-emerald-500/40' : 'bg-slate-800 border-slate-700'
+                  }`}
+                  aria-label="Modo familia"
+                >
+                  <span
+                    className={`absolute top-1 w-6 h-6 rounded-full bg-white transition-all ${
+                      isFamilyMode ? 'left-7' : 'left-1'
+                    }`}
+                  />
+                </button>
+              </div>
 
               {/* Tutorial */}
               <div className="mb-6">
@@ -357,37 +487,28 @@
                 </button>
 
                 {showTutorial && (
-                  <div className="mt-3 bg-slate-900 border border-slate-800 rounded-2xl p-4 text-slate-200 space-y-4">
+                  <div className="mt-3 bg-slate-900 border border-slate-800 rounded-2xl p-4 text-slate-200 space-y-3">
                     <div>
-                      <h3 className="font-black text-indigo-300 mb-2">1) Preparación</h3>
-                      <ol className="list-decimal ml-5 space-y-1 text-slate-300">
-                        <li>Agrega los nombres (mínimo 3).</li>
-                        <li>Elige una categoría o “Aleatorio”.</li>
-                        <li>Presiona <span className="font-bold">Generar ronda</span>.</li>
+                      <div className="font-black text-indigo-300 mb-1">1) Preparación</div>
+                      <ol className="list-decimal ml-5 space-y-1 text-slate-300 text-sm">
+                        <li>Agrega nombres (mínimo 3).</li>
+                        <li>Elige categoría o “Aleatorio”.</li>
+                        <li>Presiona <b>Generar ronda</b>.</li>
                       </ol>
                     </div>
                     <div>
-                      <h3 className="font-black text-indigo-300 mb-2">2) Reparto de roles</h3>
-                      <ol className="list-decimal ml-5 space-y-1 text-slate-300">
+                      <div className="font-black text-indigo-300 mb-1">2) Roles</div>
+                      <ol className="list-decimal ml-5 space-y-1 text-slate-300 text-sm">
                         <li>Pásense el celular.</li>
-                        <li>Mantén presionada tu tarjeta para revelar.</li>
+                        <li>Mantén presionada tu tarjeta para ver tu rol/palabra.</li>
                         <li>Al soltar, queda “Visto ✅”.</li>
-                        <li>Presiona “Siguiente jugador”.</li>
                       </ol>
                     </div>
                     <div>
-                      <h3 className="font-black text-indigo-300 mb-2">3) Pistas</h3>
-                      <ol className="list-decimal ml-5 space-y-1 text-slate-300">
-                        <li>La app dirá quién empieza.</li>
-                        <li>Cada jugador da 1 pista sin decir la palabra.</li>
-                      </ol>
-                    </div>
-                    <div>
-                      <h3 className="font-black text-indigo-300 mb-2">4) Resultado</h3>
-                      <ol className="list-decimal ml-5 space-y-1 text-slate-300">
-                        <li>Discuten y votan offline.</li>
-                        <li>Revelen palabra e impostor.</li>
-                      </ol>
+                      <div className="font-black text-indigo-300 mb-1">3) Pistas</div>
+                      <div className="text-slate-300 text-sm">
+                        Den 1 pista cada uno (sin decir la palabra). Voten offline.
+                      </div>
                     </div>
                   </div>
                 )}
@@ -450,7 +571,7 @@
                       🎲 Aleatorio
                     </button>
 
-                    {Object.keys(CATEGORIAS).map(cat => (
+                    {Object.keys(activeCategories).map(cat => (
                       <button
                         key={cat}
                         onClick={() => setSelectedCat(cat)}
@@ -482,7 +603,9 @@
           );
         }
 
-        // --- REVEAL ---
+        // =========================
+        // REVEAL
+        // =========================
         if (phase === 'reveal') {
           const currentPlayer = gameData.playerRoles[currentRevealIndex];
           const isLastPlayer = currentRevealIndex === gameData.playerRoles.length - 1;
@@ -490,7 +613,10 @@
           return (
             <div className="min-h-screen text-slate-100 p-6 flex flex-col font-sans max-w-md mx-auto">
               <div className="flex justify-between items-center mb-6 mt-2">
-                <h2 className="text-xl font-bold text-white">Reparto de Roles</h2>
+                <div>
+                  <h2 className="text-xl font-bold text-white">Reparto de Roles</h2>
+                  <div className="text-xs text-slate-500 mt-1">Categoría: <span className="text-slate-300 font-semibold">{gameData.category}</span></div>
+                </div>
                 <span className="text-xs font-mono bg-slate-900 px-3 py-1 rounded-full text-slate-400 border border-slate-800">
                   {currentRevealIndex + 1} / {gameData.playerRoles.length}
                 </span>
@@ -522,7 +648,9 @@
           );
         }
 
-        // --- STARTER ---
+        // =========================
+        // STARTER
+        // =========================
         if (phase === 'starter') {
           return (
             <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center max-w-md mx-auto text-slate-100">
@@ -546,7 +674,9 @@
           );
         }
 
-        // --- RESULT ---
+        // =========================
+        // RESULT
+        // =========================
         return (
           <div className="min-h-screen text-slate-100 p-6 flex flex-col max-w-md mx-auto">
             <div className="flex-1 flex flex-col items-center justify-center space-y-8">
