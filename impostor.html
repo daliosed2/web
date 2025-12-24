@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Impostor - Juego</title>
 
+    <!-- ✅ Google Analytics (GA4) -->
+    <!-- Reemplaza G-XXXXXXXXXX por tu Measurement ID -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-TPRYYR8VJP');
+    </script>
+
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
@@ -149,12 +159,8 @@
 
       function buildCategories(isFamilyMode) {
         const merged = Object.assign({}, BASE_CATEGORIAS, CATEGORIAS_NUEVAS);
-
         if (!isFamilyMode) return merged;
-
-        // Quitar "Momentos Vergonzosos" original y poner las family
         if (merged['Momentos Vergonzosos']) delete merged['Momentos Vergonzosos'];
-
         return Object.assign({}, merged, CATEGORIAS_FAMILIA);
       }
 
@@ -195,14 +201,10 @@
         const revealedRef = useRef(false);
 
         useEffect(() => setIsLocked(player.seen), [player.seen]);
-
-        useEffect(() => {
-          return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
-        }, []);
+        useEffect(() => () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); }, []);
 
         const startHold = (e) => {
           if (isLocked) return;
-
           if (rafRef.current) cancelAnimationFrame(rafRef.current);
 
           revealedRef.current = false;
@@ -339,7 +341,7 @@
         const [gameData, setGameData] = useState({
           category: 'Aleatorio',
           word: '',
-          impostorIds: [],      // ✅ AHORA ES ARRAY
+          impostorIds: [],
           starterName: '',
           playerRoles: []
         });
@@ -349,13 +351,9 @@
         const [selectedCat, setSelectedCat] = useState('Aleatorio');
         const [showTutorial, setShowTutorial] = useState(false);
 
-        // ✅ Modo Familia
         const [isFamilyMode, setIsFamilyMode] = useState(false);
-
-        // ✅ Cantidad de impostores
         const [impostorCount, setImpostorCount] = useState(1);
 
-        // Persistencia
         useEffect(() => {
           const saved = localStorage.getItem('impostorPlayers');
           if (saved) setPlayers(JSON.parse(saved));
@@ -384,15 +382,12 @@
 
         const activeCategories = buildCategories(isFamilyMode);
 
-        // Si categoría seleccionada deja de existir por modo familia
         useEffect(() => {
           if (selectedCat !== 'Aleatorio' && !activeCategories[selectedCat]) {
             setSelectedCat('Aleatorio');
           }
-          // eslint-disable-next-line
         }, [isFamilyMode]);
 
-        // ✅ Ajustar impostorCount cuando cambian jugadores (no puede ser >= jugadores)
         useEffect(() => {
           const maxImp = Math.max(1, players.length - 1);
           if (impostorCount > maxImp) setImpostorCount(maxImp);
@@ -416,10 +411,7 @@
 
         const generateRound = () => {
           if (players.length < 3) return alert('Se necesitan al menos 3 jugadores.');
-
-          if (impostorCount >= players.length) {
-            return alert('Los impostores deben ser menos que la cantidad de jugadores.');
-          }
+          if (impostorCount >= players.length) return alert('Los impostores deben ser menos que la cantidad de jugadores.');
 
           const cats = buildCategories(isFamilyMode);
 
@@ -431,12 +423,10 @@
           const words = cats[finalCat];
           const secretWord = words[Math.floor(Math.random() * words.length)];
 
-          // ✅ Elegir K impostores únicos
           const ids = players.map(p => p.id);
           const shuffledIds = shuffleArray(ids);
           const impostorIds = shuffledIds.slice(0, impostorCount);
 
-          // Roles (se mantienen en el orden de players por lógica)
           const roles = players.map(p => ({
             id: p.id,
             name: p.name,
@@ -444,7 +434,6 @@
             seen: false
           }));
 
-          // Shuffle de tarjetas para que no se note el orden de players
           const shuffledRoles = shuffleArray(roles);
 
           setGameData({
@@ -466,14 +455,10 @@
           }));
         };
 
-        // ✅ STARTER NUNCA IMPOSITOR
         const chooseStarter = () => {
           const impostorIds = gameData.impostorIds || [];
           const candidates = players.filter(p => impostorIds.indexOf(p.id) === -1);
-
-          // Si por alguna razón no hay candidatos (edge), cae al pool general
           const pool = candidates.length ? candidates : players;
-
           const randomPlayer = pool[Math.floor(Math.random() * pool.length)];
           setGameData(prev => ({ ...prev, starterName: randomPlayer.name }));
           setPhase('starter');
@@ -494,9 +479,7 @@
           setImpostorCount(n => Math.min(maxImp, n + 1));
         };
 
-        const decImpostors = () => {
-          setImpostorCount(n => Math.max(1, n - 1));
-        };
+        const decImpostors = () => setImpostorCount(n => Math.max(1, n - 1));
 
         // =========================
         // SETUP
@@ -511,7 +494,6 @@
                 <p className="text-slate-500 text-sm">Configuración de la Partida</p>
               </header>
 
-              {/* Modo Familia */}
               <div className="mb-4 bg-slate-900 border border-slate-800 rounded-2xl p-4 flex items-center justify-between">
                 <div>
                   <div className="font-bold text-slate-200">Modo Familia</div>
@@ -524,57 +506,30 @@
                   }`}
                   aria-label="Modo familia"
                 >
-                  <span
-                    className={`absolute top-1 w-6 h-6 rounded-full bg-white transition-all ${
-                      isFamilyMode ? 'left-7' : 'left-1'
-                    }`}
-                  />
+                  <span className={`absolute top-1 w-6 h-6 rounded-full bg-white transition-all ${isFamilyMode ? 'left-7' : 'left-1'}`} />
                 </button>
               </div>
 
-              {/* Cantidad de impostores */}
               <div className="mb-6 bg-slate-900 border border-slate-800 rounded-2xl p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="font-bold text-slate-200">Impostores</div>
-                    <div className="text-xs text-slate-500">
-                      El impostor nunca empieza. Máximo: {maxImp}
-                    </div>
+                    <div className="text-xs text-slate-500">El impostor nunca empieza. Máximo: {maxImp}</div>
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <button
-                      onClick={decImpostors}
-                      className="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 text-white font-black active:scale-95"
-                      aria-label="Menos impostores"
-                    >
-                      −
-                    </button>
-
-                    <div className="min-w-[44px] text-center font-black text-xl text-white">
-                      {impostorCount}
-                    </div>
-
+                    <button onClick={decImpostors} className="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 text-white font-black active:scale-95">−</button>
+                    <div className="min-w-[44px] text-center font-black text-xl text-white">{impostorCount}</div>
                     <button
                       onClick={incImpostors}
                       className="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 text-white font-black active:scale-95"
-                      aria-label="Más impostores"
                       disabled={impostorCount >= maxImp}
                       style={{ opacity: impostorCount >= maxImp ? 0.4 : 1 }}
-                    >
-                      +
-                    </button>
+                    >+</button>
                   </div>
                 </div>
-
-                {players.length < 3 && (
-                  <div className="mt-3 text-xs text-amber-400">
-                    Agrega al menos 3 jugadores para configurar bien la partida.
-                  </div>
-                )}
               </div>
 
-              {/* Tutorial */}
               <div className="mb-6">
                 <button
                   onClick={() => setShowTutorial(s => !s)}
@@ -608,20 +563,15 @@
                     </div>
                     <div>
                       <div className="font-black text-indigo-300 mb-1">3) Pistas</div>
-                      <div className="text-slate-300 text-sm">
-                        Den 1 pista cada uno (sin decir la palabra). Voten offline.
-                      </div>
+                      <div className="text-slate-300 text-sm">Den 1 pista cada uno (sin decir la palabra). Voten offline.</div>
                     </div>
                   </div>
                 )}
               </div>
 
               <div className="space-y-6 flex-1">
-                {/* Jugadores */}
                 <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800">
-                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 block">
-                    Jugadores ({players.length})
-                  </label>
+                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 block">Jugadores ({players.length})</label>
 
                   <div className="flex gap-2 mb-4">
                     <input
@@ -632,13 +582,7 @@
                       placeholder="Nombre..."
                       className="flex-1 bg-slate-800 border-none rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none placeholder-slate-600"
                     />
-                    <button
-                      onClick={addPlayer}
-                      className="bg-indigo-600 w-12 rounded-xl flex items-center justify-center text-white hover:bg-indigo-500 active:scale-95 transition-all"
-                      aria-label="Agregar"
-                    >
-                      ➕
-                    </button>
+                    <button onClick={addPlayer} className="bg-indigo-600 w-12 rounded-xl flex items-center justify-center text-white hover:bg-indigo-500 active:scale-95 transition-all">➕</button>
                   </div>
 
                   <div className="max-h-48 overflow-y-auto space-y-2 custom-scrollbar">
@@ -649,15 +593,12 @@
                     {players.map(p => (
                       <div key={p.id} className="flex justify-between items-center bg-slate-800/50 px-3 py-2 rounded-lg">
                         <span className="font-medium truncate">{p.name}</span>
-                        <button onClick={() => removePlayer(p.id)} className="text-slate-500 hover:text-red-400 p-1" aria-label="Eliminar">
-                          🗑️
-                        </button>
+                        <button onClick={() => removePlayer(p.id)} className="text-slate-500 hover:text-red-400 p-1" aria-label="Eliminar">🗑️</button>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* Categoría */}
                 <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800">
                   <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 block">Categoría</label>
 
@@ -706,7 +647,7 @@
         }
 
         // =========================
-        // REVEAL
+        // REVEAL (sin categoría)
         // =========================
         if (phase === 'reveal') {
           const currentPlayer = gameData.playerRoles[currentRevealIndex];
@@ -718,9 +659,10 @@
                 <div>
                   <h2 className="text-xl font-bold text-white">Reparto de Roles</h2>
                   <div className="text-xs text-slate-500 mt-1">
-                    Categoría: <span className="text-slate-300 font-semibold">{gameData.category}</span> · Impostores: <span className="text-slate-300 font-semibold">{gameData.impostorIds.length}</span>
+                    Impostores: <span className="text-slate-300 font-semibold">{gameData.impostorIds.length}</span>
                   </div>
                 </div>
+
                 <span className="text-xs font-mono bg-slate-900 px-3 py-1 rounded-full text-slate-400 border border-slate-800">
                   {currentRevealIndex + 1} / {gameData.playerRoles.length}
                 </span>
