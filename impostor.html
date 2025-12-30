@@ -6,8 +6,7 @@
     <title>Impostor - Juego</title>
 
     <!-- ✅ Google Analytics (GA4) -->
-    <!-- Reemplaza G-XXXXXXXXXX por tu Measurement ID -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TPRYYR8VJP"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
@@ -170,7 +169,92 @@
       const HOLD_DURATION = 700;
 
       // =========================
-      // UI
+      // RANDOM MEJORADO + SHUFFLE
+      // =========================
+      function randInt(max) {
+        if (max <= 0) return 0;
+        if (window.crypto && crypto.getRandomValues) {
+          const arr = new Uint32Array(1);
+          crypto.getRandomValues(arr);
+          return arr[0] % max;
+        }
+        return Math.floor(Math.random() * max);
+      }
+
+      function shuffleArray(arr) {
+        const a = arr.slice();
+        for (let i = a.length - 1; i > 0; i--) {
+          const j = randInt(i + 1);
+          const tmp = a[i];
+          a[i] = a[j];
+          a[j] = tmp;
+        }
+        return a;
+      }
+
+      // =========================
+      // ANTI-RACHAS: MISMO IMPOSTOR <= 2 SEGUIDAS
+      // - Aplica para 1 impostor (típico)
+      // - Si hay varios, aplica al set completo
+      // =========================
+      function pickImpostorIds(players, impostorCount) {
+        const ids = players.map(p => p.id);
+
+        let lastKey = localStorage.getItem('impostor_last_key') || '';
+        let streak = parseInt(localStorage.getItem('impostor_streak') || '0', 10);
+
+        // Si cambian jugadores, resetea racha
+        if (lastKey) {
+          const lastIds = lastKey.split(',').map(n => parseInt(n, 10)).filter(n => !isNaN(n));
+          for (let i = 0; i < lastIds.length; i++) {
+            if (ids.indexOf(lastIds[i]) === -1) {
+              lastKey = '';
+              streak = 0;
+              localStorage.removeItem('impostor_last_key');
+              localStorage.removeItem('impostor_streak');
+              break;
+            }
+          }
+        }
+
+        const MAX_TRIES = 30;
+        let chosen = null;
+
+        for (let t = 0; t < MAX_TRIES; t++) {
+          const shuffled = shuffleArray(ids);
+          const candidate = shuffled.slice(0, impostorCount).slice().sort(function(a,b){ return a-b; });
+          const key = candidate.join(',');
+
+          if (streak >= 2 && key === lastKey) continue;
+
+          chosen = candidate;
+          break;
+        }
+
+        // Fallback forzado
+        if (!chosen) {
+          if (impostorCount === 1 && ids.length > 1) {
+            const lastId = lastKey ? parseInt(lastKey, 10) : null;
+            const pool = ids.filter(id => id !== lastId);
+            chosen = [ pool[randInt(pool.length)] ].sort(function(a,b){ return a-b; });
+          } else {
+            chosen = shuffleArray(ids).slice(0, impostorCount).slice().sort(function(a,b){ return a-b; });
+          }
+        }
+
+        const newKey = chosen.join(',');
+        if (newKey === lastKey) {
+          localStorage.setItem('impostor_streak', String(streak + 1));
+        } else {
+          localStorage.setItem('impostor_streak', '1');
+          localStorage.setItem('impostor_last_key', newKey);
+        }
+
+        return chosen;
+      }
+
+      // =========================
+      // UI COMPONENTS
       // =========================
       function Button({ onClick, children, variant='primary', className='', disabled=false }) {
         const base =
@@ -319,20 +403,6 @@
       }
 
       // =========================
-      // HELPERS
-      // =========================
-      function shuffleArray(arr) {
-        const a = arr.slice();
-        for (let i = a.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          const tmp = a[i];
-          a[i] = a[j];
-          a[j] = tmp;
-        }
-        return a;
-      }
-
-      // =========================
       // APP
       // =========================
       function App() {
@@ -405,6 +475,8 @@
           if (confirm('¿Borrar todos los nombres y empezar de cero?')) {
             setPlayers([]);
             localStorage.removeItem('impostorPlayers');
+            localStorage.removeItem('impostor_last_key');
+            localStorage.removeItem('impostor_streak');
             setPhase('setup');
           }
         };
@@ -418,14 +490,12 @@
           let finalCat = selectedCat;
           if (selectedCat === 'Aleatorio') {
             const keys = Object.keys(cats);
-            finalCat = keys[Math.floor(Math.random() * keys.length)];
+            finalCat = keys[randInt(keys.length)];
           }
           const words = cats[finalCat];
-          const secretWord = words[Math.floor(Math.random() * words.length)];
+          const secretWord = words[randInt(words.length)];
 
-          const ids = players.map(p => p.id);
-          const shuffledIds = shuffleArray(ids);
-          const impostorIds = shuffledIds.slice(0, impostorCount);
+          const impostorIds = pickImpostorIds(players, impostorCount);
 
           const roles = players.map(p => ({
             id: p.id,
@@ -455,11 +525,12 @@
           }));
         };
 
+        // Starter nunca impostor
         const chooseStarter = () => {
           const impostorIds = gameData.impostorIds || [];
           const candidates = players.filter(p => impostorIds.indexOf(p.id) === -1);
           const pool = candidates.length ? candidates : players;
-          const randomPlayer = pool[Math.floor(Math.random() * pool.length)];
+          const randomPlayer = pool[randInt(pool.length)];
           setGameData(prev => ({ ...prev, starterName: randomPlayer.name }));
           setPhase('starter');
         };
@@ -481,9 +552,7 @@
 
         const decImpostors = () => setImpostorCount(n => Math.max(1, n - 1));
 
-        // =========================
         // SETUP
-        // =========================
         if (phase === 'setup') {
           const maxImp = Math.max(1, players.length - 1);
 
@@ -514,7 +583,7 @@
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="font-bold text-slate-200">Impostores</div>
-                    <div className="text-xs text-slate-500">El impostor nunca empieza. Máximo: {maxImp}</div>
+                    <div className="text-xs text-slate-500">Máximo: {maxImp} · (Anti-rachas: máx 2 seguidas)</div>
                   </div>
 
                   <div className="flex items-center gap-2">
@@ -571,7 +640,9 @@
 
               <div className="space-y-6 flex-1">
                 <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800">
-                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 block">Jugadores ({players.length})</label>
+                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 block">
+                    Jugadores ({players.length})
+                  </label>
 
                   <div className="flex gap-2 mb-4">
                     <input
@@ -646,9 +717,7 @@
           );
         }
 
-        // =========================
         // REVEAL (sin categoría)
-        // =========================
         if (phase === 'reveal') {
           const currentPlayer = gameData.playerRoles[currentRevealIndex];
           const isLastPlayer = currentRevealIndex === gameData.playerRoles.length - 1;
@@ -695,9 +764,7 @@
           );
         }
 
-        // =========================
         // STARTER
-        // =========================
         if (phase === 'starter') {
           return (
             <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center max-w-md mx-auto text-slate-100">
@@ -721,9 +788,7 @@
           );
         }
 
-        // =========================
         // RESULT
-        // =========================
         const impostorNames = players
           .filter(p => gameData.impostorIds.indexOf(p.id) !== -1)
           .map(p => p.name);
@@ -760,12 +825,8 @@
             </div>
 
             <div className="mt-8 space-y-3">
-              <Button onClick={startNewGame}>
-                🔄 Nuevo Juego
-              </Button>
-              <Button variant="danger" onClick={resetPlayers}>
-                🗑️ Resetear Jugadores
-              </Button>
+              <Button onClick={startNewGame}>🔄 Nuevo Juego</Button>
+              <Button variant="danger" onClick={resetPlayers}>🗑️ Resetear Jugadores</Button>
             </div>
           </div>
         );
