@@ -1,8 +1,8 @@
 name: Automatización Blog David Martinez
 on:
   schedule:
-    - cron: '0 13 * * *' 
-  workflow_dispatch: 
+    - cron: '0 13 * * *' # 08:00 AM hora Ecuador (13:00 UTC)
+  workflow_dispatch: # Permite ejecución manual con el botón "Run workflow"
   push:
     branches:
       - "codex/crear-página-web-personal"
@@ -11,8 +11,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: write # Vital para que el bot pueda publicar el archivo
     
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
     steps:
       - name: Checkout del código
         uses: actions/checkout@v4
@@ -22,9 +25,9 @@ jobs:
       - name: Configurar Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.11'
 
-      - - name: Instalar librerías y ejecutar IA
+      - name: Instalar librerías y ejecutar IA
         env:
           NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
