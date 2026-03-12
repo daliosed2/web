@@ -1,15 +1,24 @@
 name: Automatización Blog David Martinez
 on:
   schedule:
-    - cron: '0 13 * * *' # Esto se ejecuta todos los días a las 08:00 AM hora Ecuador (13:00 UTC)
-  workflow_dispatch: # Esto permite que tú lo ejecutes manualmente cuando quieras probar
+    - cron: '0 13 * * *' # 08:00 AM hora Ecuador (13:00 UTC)
+  workflow_dispatch: # Activa el botón de "Run workflow"
+  push:
+    branches:
+      - "codex/crear-página-web-personal"
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    # IMPORTANTE: Permisos para que el bot pueda crear el archivo del post
+    permissions:
+      contents: write
+    
     steps:
       - name: Checkout del código
         uses: actions/checkout@v3
+        with:
+          ref: "codex/crear-página-web-personal"
 
       - name: Configurar Python
         uses: actions/setup-python@v4
@@ -32,4 +41,4 @@ jobs:
           git config --global user.email 'bot@davidfernandomartinez.com'
           git add .
           git commit -m "🤖 IA: Nuevo artículo sobre tecnología publicado" || echo "No hay cambios para commitear"
-          git push
+          git push origin "codex/crear-página-web-personal"
