@@ -17,13 +17,8 @@ def limpiar_nombre_archivo(texto):
     return texto[:65]
 
 def obtener_noticia():
-    # Ampliamos el rango a 7 días pero ordenamos por frescura
-    # Esto garantiza que si hoy es un día "lento" de noticias, tome la mejor de ayer
     hace_7_dias = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')
-    
     url = "https://newsapi.org/v2/everything"
-    
-    # Query diversificada: IA mundial, Big Tech y Negocios Digitales
     queries = [
         'OpenAI OR "Inteligencia Artificial" OR ChatGPT',
         'NVIDIA OR "Apple Intelligence" OR Google Gemini',
@@ -31,57 +26,49 @@ def obtener_noticia():
     ]
     
     for q in queries:
-        params = {
-            'q': q,
-            'from': hace_7_dias,
-            'language': 'es',
-            'sortBy': 'publishedAt',
-            'pageSize': 10,
-            'apiKey': NEWS_API_KEY
-        }
-        
+        params = {'q': q, 'from': hace_7_dias, 'language': 'es', 'sortBy': 'publishedAt', 'pageSize': 10, 'apiKey': NEWS_API_KEY}
         try:
             response = requests.get(url, params=params)
             data = response.json()
             if data.get('articles'):
-                # Buscamos el primer artículo que tenga descripción (evita spam)
                 for art in data['articles']:
                     if art['description'] and len(art['description']) > 50:
                         return art
-        except Exception as e:
-            print(f"⚠️ Fallo con query {q}: {e}")
-            continue
-            
+        except: continue
     return None
 
 def redactar_articulo(noticia):
     prompt = f"""
-    Eres David Martínez, consultor con MBA. Genera el código HTML para una entrada de blog premium.
-    Noticia: {noticia['title']}
+    Eres David Martínez. Genera un HTML profesional para esta noticia: {noticia['title']}
     Fuente: {noticia['url']}
-    Descripción: {noticia['description']}
-
-    REQUISITOS ESTRUCTURALES:
-    1. Comienza con <!DOCTYPE html>.
-    2. En el <head>, incluye <link rel="stylesheet" href="../style.css">.
-    3. CSS Interno para diseño .article (idéntico a tus otras entradas).
-    4. Envuelve todo en <main class="container article">.
-    5. Usa etiquetas <h2 class="label"> para: 1. RESUMEN EJECUTIVO, 2. ANÁLISIS ESTRATÉGICO, 3. IMPACTO EN EL MERCADO.
-    6. Incluye la fuente con un enlace <a> y el botón de modo oscuro 🌓.
-
-    IMPORTANTE: No uses bloques de código (```). Solo HTML puro.
-    """
     
+    ESTRUCTURA OBLIGATORIA:
+    1. <!DOCTYPE html> y <head> con:
+       - <link rel="stylesheet" href="../style.css">
+       - <script defer src="../script.js"></script> 
+    2. En el <body>:
+       - <button id="toggle-mode" aria-label="Cambiar modo oscuro">🌓</button>
+       - <main class="container article">
+         <h1>{noticia['title']}</h1>
+         <h2 class="label">1. Resumen Ejecutivo</h2>
+         <p>(Redacta un análisis profesional aquí)</p>
+         <h2 class="label">2. Impacto Estratégico</h2>
+         <p>(Redacta el valor estratégico aquí)</p>
+         <h2 class="label">3. Fuente</h2>
+         <a href="{noticia['url']}" target="_blank">Leer noticia original</a>
+         <nav class="post-nav"><a href="../benchmark.html" class="back-button">Volver al Blog</a></nav>
+       </main>
+
+    REGLA: Devuelve SOLO el HTML, sin bloques de código ```.
+    """
     completion = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
         messages=[{"role": "user", "content": prompt}],
-        temperature=0.4,
+        temperature=0.3
     )
-    
     content = completion.choices[0].message.content.strip()
     if content.startswith("```"):
-        content = re.sub(r'^```html?\s*', '', content)
-        content = re.sub(r'\s*```$', '', content)
+        content = re.sub(r'^```html?\s*', '', content).replace('```', '')
     return content
 
 # Ejecución
@@ -91,12 +78,8 @@ if noticia:
         html_final = redactar_articulo(noticia)
         slug = limpiar_nombre_archivo(noticia['title'])
         filename = f"blog/{slug}.html"
-        
         os.makedirs("blog", exist_ok=True)
         with open(filename, "w", encoding="utf-8") as f:
             f.write(html_final)
-        print(f"✅ Éxito: {filename}")
-    except Exception as e:
-        print(f"❌ Error: {e}")
-else:
-    print("❌ No se encontró nada relevante en ninguna categoría.")
+        print(f"✅ Publicado: {filename}")
+    except Exception as e: print(f"❌ Error: {e}")
