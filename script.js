@@ -1,52 +1,47 @@
-// 1. GESTIÓN MODO OSCURO
-const toggleButton = document.getElementById('toggle-mode');
-const body = document.body;
+// --- 1. MODO OSCURO ---
+const btn = document.getElementById('toggle-mode');
 
-function applyTheme(dark) {
-    if (dark) {
-        body.classList.add('dark');
-        if (toggleButton) toggleButton.textContent = '☀️';
+function setDarkMode(isDark) {
+    if (isDark) {
+        document.body.classList.add('dark');
+        if (btn) btn.textContent = '☀️';
+        localStorage.setItem('color-mode', 'dark');
     } else {
-        body.classList.remove('dark');
-        if (toggleButton) toggleButton.textContent = '🌓';
+        document.body.classList.remove('dark');
+        if (btn) btn.textContent = '🌓';
+        localStorage.setItem('color-mode', 'light');
     }
 }
 
-// Inicializar tema al cargar
-let isDark = localStorage.getItem('color-mode') === 'dark' || 
-             (localStorage.getItem('color-mode') === null && window.matchMedia('(prefers-color-scheme: dark)').matches);
+// Cargar preferencia inicial
+const saved = localStorage.getItem('color-mode');
+const prefers = window.matchMedia('(prefers-color-scheme: dark)').matches;
+setDarkMode(saved === 'dark' || (saved === null && prefers));
 
-applyTheme(isDark);
-
-// Evento Clic
-if (toggleButton) {
-    toggleButton.addEventListener('click', () => {
-        isDark = !body.classList.contains('dark');
-        applyTheme(isDark);
-        localStorage.setItem('color-mode', isDark ? 'dark' : 'light');
-    });
+// Escuchar clic
+if (btn) {
+    btn.onclick = () => {
+        const currentlyDark = document.body.classList.contains('dark');
+        setDarkMode(!currentlyDark);
+    };
 }
 
-// 2. CARGA DE POSTS DINÁMICOS
-async function loadPosts() {
-    const container = document.getElementById('dynamic-posts');
-    if (!container) return;
-
-    try {
-        const res = await fetch('https://api.github.com/repos/daliosed2/web/contents/blog?ref=codex/crear-p%C3%A1gina-web-personal');
-        const files = await res.json();
-        
-        if (Array.isArray(files)) {
-            container.innerHTML = '';
-            files.filter(f => f.name.endsWith('.html')).reverse().forEach(file => {
-                const card = document.createElement('a');
-                card.href = `blog/${file.name}`;
-                card.className = 'card';
-                card.innerHTML = `🌐 ${file.name.replace('.html', '').replace(/-/g, ' ').toUpperCase()}`;
-                container.appendChild(card);
-            });
-        }
-    } catch (e) { console.log("Posts no cargados"); }
+// --- 2. CARGA DE NOTICIAS ---
+const dynamicContainer = document.getElementById('dynamic-posts');
+if (dynamicContainer) {
+    fetch('https://api.github.com/repos/daliosed2/web/contents/blog?ref=codex/crear-p%C3%A1gina-web-personal')
+        .then(res => res.json())
+        .then(data => {
+            if (Array.isArray(data)) {
+                dynamicContainer.innerHTML = '';
+                data.filter(f => f.name.endsWith('.html')).reverse().forEach(file => {
+                    const card = document.createElement('a');
+                    card.href = `blog/${file.name}`;
+                    card.className = 'card';
+                    card.innerHTML = `🌐 ${file.name.replace('.html', '').replace(/-/g, ' ').toUpperCase()}`;
+                    dynamicContainer.appendChild(card);
+                });
+            }
+        })
+        .catch(err => console.error("Error GitHub:", err));
 }
-
-document.addEventListener('DOMContentLoaded', loadPosts);
