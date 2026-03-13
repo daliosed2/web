@@ -19,20 +19,16 @@ def limpiar_nombre_archivo(texto):
 def obtener_noticia():
     hace_7_dias = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')
     url = "https://newsapi.org/v2/everything"
-    queries = [
-        'OpenAI OR "Inteligencia Artificial" OR ChatGPT',
-        'NVIDIA OR "Apple Intelligence" OR Google Gemini',
-        'Tecnología OR "Transformación Digital" OR Meta'
-    ]
+    queries = ['OpenAI OR ChatGPT OR NVIDIA', 'Inteligencia Artificial', 'Tecnologia Innovacion']
     
     for q in queries:
-        params = {'q': q, 'from': hace_7_dias, 'language': 'es', 'sortBy': 'publishedAt', 'pageSize': 10, 'apiKey': NEWS_API_KEY}
+        params = {'q': q, 'from': hace_7_dias, 'language': 'es', 'sortBy': 'publishedAt', 'pageSize': 5, 'apiKey': NEWS_API_KEY}
         try:
             response = requests.get(url, params=params)
             data = response.json()
             if data.get('articles'):
                 for art in data['articles']:
-                    if art['description'] and len(art['description']) > 50:
+                    if art.get('description') and len(art['description']) > 50:
                         return art
         except: continue
     return None
@@ -40,26 +36,18 @@ def obtener_noticia():
 def redactar_articulo(noticia):
     prompt = f"""
     Eres David Martínez. Genera un HTML profesional para esta noticia: {noticia['title']}
-    Fuente: {noticia['url']}
+    Fuente original: {noticia['url']}
     
     ESTRUCTURA OBLIGATORIA:
-    1. <!DOCTYPE html> y <head> con:
-       - <link rel="stylesheet" href="../style.css">
-       - <script defer src="../script.js"></script> 
-    2. En el <body>:
-       - <button id="toggle-mode" aria-label="Cambiar modo oscuro">🌓</button>
-       - <main class="container article">
-         <h1>{noticia['title']}</h1>
-         <h2 class="label">1. Resumen Ejecutivo</h2>
-         <p>(Redacta un análisis profesional aquí)</p>
-         <h2 class="label">2. Impacto Estratégico</h2>
-         <p>(Redacta el valor estratégico aquí)</p>
-         <h2 class="label">3. Fuente</h2>
-         <a href="{noticia['url']}" target="_blank">Leer noticia original</a>
-         <nav class="post-nav"><a href="../benchmark.html" class="back-button">Volver al Blog</a></nav>
-       </main>
-
-    REGLA: Devuelve SOLO el HTML, sin bloques de código ```.
+    - <!DOCTYPE html> y <head> con <link rel="stylesheet" href="../style.css"> y <script defer src="../script.js"></script>
+    - En el <body>: <button id="toggle-mode">🌓</button>
+    - <main class="container article">
+      <h1>{noticia['title']}</h1>
+      <h2 class="label">Contexto</h2> <p>(Resumen profesional)</p>
+      <h2 class="label">Análisis Estratégico</h2> <p>(Análisis MBA)</p>
+      <a href="{noticia['url']}" target="_blank">Fuente original</a>
+      <nav class="post-nav"><a href="../benchmark.html">Volver al Blog</a></nav>
+    </main>
     """
     completion = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
@@ -67,9 +55,14 @@ def redactar_articulo(noticia):
         temperature=0.3
     )
     content = completion.choices[0].message.content.strip()
-    if content.startswith("```"):
-        content = re.sub(r'^```html?\s*', '', content).replace('```', '')
-    return content
+    
+    # LIMPIEZA TOTAL: Solo lo que está entre <!DOCTYPE y </html>
+    if "<!DOCTYPE" in content:
+        content = content[content.find("<!DOCTYPE"):]
+    if "</html>" in content:
+        content = content[:content.find("</html>")+7]
+    
+    return content.replace("```html", "").replace("```", "").strip()
 
 # Ejecución
 noticia = obtener_noticia()
@@ -81,5 +74,5 @@ if noticia:
         os.makedirs("blog", exist_ok=True)
         with open(filename, "w", encoding="utf-8") as f:
             f.write(html_final)
-        print(f"✅ Publicado: {filename}")
+        print(f"✅ Éxito: {filename}")
     except Exception as e: print(f"❌ Error: {e}")
