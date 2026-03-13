@@ -2,46 +2,61 @@ import os
 import requests
 import re
 from groq import Groq
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # 1. Configuración de APIs
-# Asegúrate de que en GitHub Secrets los nombres coincidan exactamente
 NEWS_API_KEY = os.getenv("NEWS_API_KEY")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 client = Groq(api_key=GROQ_API_KEY)
 
 def limpiar_nombre_archivo(texto):
-    # Genera un nombre de archivo amigable para URL
     texto = texto.lower()
     texto = re.sub(r'[^a-z0-9\s-]', '', texto)
     texto = re.sub(r'\s+', '-', texto).strip('-')
-    return texto[:60]
+    return texto[:65]
 
 def obtener_noticia():
-    # URL construida de forma limpia sin corchetes de markdown
-    url = "https://newsapi.org/v2/everything"
-    params = {
-        'q': 'IA tecnologia',
-        'language': 'es',
-        'sortBy': 'publishedAt',
-        'pageSize': 1,
-        'apiKey': NEWS_API_KEY
-    }
+    # Ampliamos el rango a 7 días pero ordenamos por frescura
+    # Esto garantiza que si hoy es un día "lento" de noticias, tome la mejor de ayer
+    hace_7_dias = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')
     
-    try:
-        response = requests.get(url, params=params)
-        response.raise_for_status()
-        data = response.json()
-        if data.get('articles'):
-            return data['articles'][0]
-    except Exception as e:
-        print(f"❌ Error al conectar con NewsAPI: {e}")
+    url = "https://newsapi.org/v2/everything"
+    
+    # Query diversificada: IA mundial, Big Tech y Negocios Digitales
+    queries = [
+        'OpenAI OR "Inteligencia Artificial" OR ChatGPT',
+        'NVIDIA OR "Apple Intelligence" OR Google Gemini',
+        'Tecnología OR "Transformación Digital" OR Meta'
+    ]
+    
+    for q in queries:
+        params = {
+            'q': q,
+            'from': hace_7_dias,
+            'language': 'es',
+            'sortBy': 'publishedAt',
+            'pageSize': 10,
+            'apiKey': NEWS_API_KEY
+        }
+        
+        try:
+            response = requests.get(url, params=params)
+            data = response.json()
+            if data.get('articles'):
+                # Buscamos el primer artículo que tenga descripción (evita spam)
+                for art in data['articles']:
+                    if art['description'] and len(art['description']) > 50:
+                        return art
+        except Exception as e:
+            print(f"⚠️ Fallo con query {q}: {e}")
+            continue
+            
     return None
 
 def redactar_articulo(noticia):
     prompt = f"""
-    Eres David Martínez, consultor con MBA. Genera el código HTML para una entrada de blog profesional.
+    Eres David Martínez, consultor con MBA. Genera el código HTML para una entrada de blog premium.
     Noticia: {noticia['title']}
     Fuente: {noticia['url']}
     Descripción: {noticia['description']}
@@ -49,35 +64,27 @@ def redactar_articulo(noticia):
     REQUISITOS ESTRUCTURALES:
     1. Comienza con <!DOCTYPE html>.
     2. En el <head>, incluye <link rel="stylesheet" href="../style.css">.
-    3. Usa este CSS interno exactamente:
-       .article{{max-width:780px;margin:0 auto;text-align:left;padding:40px 20px; font-family: sans-serif;}}
-       .article h1{{font-size: 2.5rem; line-height: 1.2; margin-bottom: 2rem;}}
-       .article h2.label{{color:#b5b5b5; margin-top:2.5rem; font-weight:600; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px;}}
-       .article p{{line-height:1.8; margin-bottom: 1.5rem; font-size: 1.1rem; color: var(--text-color);}}
-       .post-nav{{margin-top:50px; border-top: 1px solid #444; padding-top: 30px;}}
-       .back-button{{padding:12px 24px; background:#222; color:#fff; text-decoration:none; border-radius:8px; display: inline-block;}}
+    3. CSS Interno para diseño .article (idéntico a tus otras entradas).
+    4. Envuelve todo en <main class="container article">.
+    5. Usa etiquetas <h2 class="label"> para: 1. RESUMEN EJECUTIVO, 2. ANÁLISIS ESTRATÉGICO, 3. IMPACTO EN EL MERCADO.
+    6. Incluye la fuente con un enlace <a> y el botón de modo oscuro 🌓.
 
-    4. En el <body>, pon el botón <button id="toggle-mode">🌓</button>.
-    5. Envuelve TODO en <main class="container article">.
-    6. Secciones: <h1>Título noticia</h1>, <h2 class="label">1. Resumen Ejecutivo</h2>, <h2 class="label">2. Impacto Estratégico y Valor en Latam</h2>, <h2 class="label">3. Fuente Original</h2>.
-
-    IMPORTANTE: Devuelve SOLO el código HTML limpio. Nada de comentarios ni bloques de código markdown (```).
+    IMPORTANTE: No uses bloques de código (```). Solo HTML puro.
     """
     
     completion = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
         messages=[{"role": "user", "content": prompt}],
-        temperature=0.3,
+        temperature=0.4,
     )
     
     content = completion.choices[0].message.content.strip()
-    # Limpieza de seguridad por si la IA pone etiquetas de código
     if content.startswith("```"):
         content = re.sub(r'^```html?\s*', '', content)
         content = re.sub(r'\s*```$', '', content)
     return content
 
-# 2. Ejecución
+# Ejecución
 noticia = obtener_noticia()
 if noticia:
     try:
@@ -88,8 +95,8 @@ if noticia:
         os.makedirs("blog", exist_ok=True)
         with open(filename, "w", encoding="utf-8") as f:
             f.write(html_final)
-        print(f"✅ Artículo publicado con éxito: {filename}")
+        print(f"✅ Éxito: {filename}")
     except Exception as e:
-        print(f"❌ Error en el proceso: {e}")
+        print(f"❌ Error: {e}")
 else:
-    print("❌ No se pudo obtener la noticia.")
+    print("❌ No se encontró nada relevante en ninguna categoría.")
