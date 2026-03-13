@@ -19,7 +19,7 @@ def limpiar_nombre_archivo(texto):
 def obtener_noticia():
     hace_7_dias = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')
     url = "https://newsapi.org/v2/everything"
-    queries = ['OpenAI OR ChatGPT OR NVIDIA', 'Inteligencia Artificial', 'Tecnologia Innovacion']
+    queries = ['OpenAI OR ChatGPT', 'NVIDIA AI', 'Tecnologia Innovacion']
     
     for q in queries:
         params = {'q': q, 'from': hace_7_dias, 'language': 'es', 'sortBy': 'publishedAt', 'pageSize': 5, 'apiKey': NEWS_API_KEY}
@@ -36,15 +36,15 @@ def obtener_noticia():
 def redactar_articulo(noticia):
     prompt = f"""
     Eres David Martínez. Genera un HTML profesional para esta noticia: {noticia['title']}
-    Fuente original: {noticia['url']}
+    Fuente: {noticia['url']}
     
-    ESTRUCTURA OBLIGATORIA:
+    ESTRUCTURA:
     - <!DOCTYPE html> y <head> con <link rel="stylesheet" href="../style.css"> y <script defer src="../script.js"></script>
     - En el <body>: <button id="toggle-mode">🌓</button>
     - <main class="container article">
       <h1>{noticia['title']}</h1>
-      <h2 class="label">Contexto</h2> <p>(Resumen profesional)</p>
-      <h2 class="label">Análisis Estratégico</h2> <p>(Análisis MBA)</p>
+      <h2 class="label">Contexto</h2> <p>(Resumen ejecutivo)</p>
+      <h2 class="label">Impacto Estratégico</h2> <p>(Análisis MBA)</p>
       <a href="{noticia['url']}" target="_blank">Fuente original</a>
       <nav class="post-nav"><a href="../benchmark.html">Volver al Blog</a></nav>
     </main>
@@ -52,15 +52,15 @@ def redactar_articulo(noticia):
     completion = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
         messages=[{"role": "user", "content": prompt}],
-        temperature=0.3
+        temperature=0.2
     )
     content = completion.choices[0].message.content.strip()
     
-    # LIMPIEZA TOTAL: Solo lo que está entre <!DOCTYPE y </html>
-    if "<!DOCTYPE" in content:
-        content = content[content.find("<!DOCTYPE"):]
-    if "</html>" in content:
-        content = content[:content.find("</html>")+7]
+    # BUSCAMOS EL INICIO DEL HTML REAL
+    inicio = content.find("<!DOCTYPE")
+    fin = content.find("</html>")
+    if inicio != -1 and fin != -1:
+        content = content[inicio:fin+7]
     
     return content.replace("```html", "").replace("```", "").strip()
 
@@ -74,5 +74,5 @@ if noticia:
         os.makedirs("blog", exist_ok=True)
         with open(filename, "w", encoding="utf-8") as f:
             f.write(html_final)
-        print(f"✅ Éxito: {filename}")
+        print(f"✅ Publicado: {filename}")
     except Exception as e: print(f"❌ Error: {e}")
