@@ -36,13 +36,21 @@ if (toggleButton) {
     applyMode(useDark);
   });
 }
+
 async function loadDynamicPosts() {
     const container = document.getElementById('dynamic-posts');
     if (!container) return;
 
+    // URL codificada para evitar conflictos con la tilde en la rama "página"
+    const url = 'https://api.github.com/repos/daliosed2/web/contents/blog?ref=codex/crear-p%C3%A1gina-web-personal';
+
     try {
-        // Consultamos la API pública de GitHub para tu rama específica
-        const response = await fetch('https://api.github.com/repos/daliosed2/web/contents/blog?ref=codex/crear-página-web-personal');
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            throw new Error(`GitHub API respondió con status: ${response.status}`);
+        }
+
         const files = await response.json();
 
         if (Array.isArray(files)) {
