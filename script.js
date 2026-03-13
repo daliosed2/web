@@ -36,3 +36,45 @@ if (toggleButton) {
     applyMode(useDark);
   });
 }
+async function loadDynamicPosts() {
+    const container = document.getElementById('dynamic-posts');
+    if (!container) return;
+
+    try {
+        // Consultamos la API pública de GitHub para tu rama específica
+        const response = await fetch('https://api.github.com/repos/daliosed2/web/contents/blog?ref=codex/crear-página-web-personal');
+        const files = await response.json();
+
+        if (Array.isArray(files)) {
+            container.innerHTML = ''; // Limpiar mensaje de carga
+            
+            // Filtramos solo archivos HTML y ordenamos (más reciente arriba)
+            const htmlFiles = files.filter(f => f.name.endsWith('.html')).reverse();
+
+            if (htmlFiles.length === 0) {
+                container.innerHTML = '<p>No hay artículos automáticos aún.</p>';
+                return;
+            }
+
+            htmlFiles.forEach(file => {
+                const card = document.createElement('a');
+                // IMPORTANTE: La ruta relativa para llegar a la carpeta blog
+                card.href = `blog/${file.name}`;
+                card.className = 'card';
+                card.target = '_blank';
+                
+                // Formateamos el título: post-2026-03-12 -> 🤖 POST 2026 03 12
+                const cleanName = file.name.replace('.html', '').replace(/-/g, ' ').toUpperCase();
+                card.innerHTML = `🤖 ${cleanName}`;
+                
+                container.appendChild(card);
+            });
+        }
+    } catch (error) {
+        console.error("Error al cargar posts dinámicos:", error);
+        container.innerHTML = '<p>🤖 El bot está redactando nuevas noticias...</p>';
+    }
+}
+
+// Escucha cuando el DOM esté listo para ejecutar la carga
+document.addEventListener('DOMContentLoaded', loadDynamicPosts);
