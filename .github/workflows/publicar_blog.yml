@@ -1,8 +1,8 @@
 name: Automatización Blog David Martinez
 on:
   schedule:
-    - cron: '0 13 * * *' # Ejecución diaria a las 08:00 AM (ECT)
-  workflow_dispatch: # Botón manual en la pestaña Actions
+    - cron: '0 13 * * *' # 08:00 AM Ecuador
+  workflow_dispatch: # Permite que lo actives tú cuando quieras
   push:
     branches:
       - "codex/crear-página-web-personal"
@@ -11,23 +11,20 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Permiso para que el bot haga el commit y push
+      contents: write
     
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
     steps:
       - name: Checkout del código
         uses: actions/checkout@v4
         with:
-          ref: "codex/crear-página-web-personal"
+          fetch-depth: 0
 
       - name: Configurar Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Instalar librerías y ejecutar IA
+      - name: Instalar y Ejecutar
         env:
           NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
@@ -36,10 +33,10 @@ jobs:
           pip install requests groq
           python scripts/autoblog.py
 
-      - name: Subir cambios al repositorio
+      - name: Subir cambios
         run: |
           git config --global user.name 'David-AI-Bot'
           git config --global user.email 'bot@davidfernandomartinez.com'
           git add .
-          git commit -m "🤖 IA: Publicación automática de noticia tecnológica" || echo "No hay cambios"
-          git push origin "codex/crear-página-web-personal"
+          git commit -m "🤖 IA: Publicación diaria $(date +'%Y-%m-%d')" || exit 0
+          git push origin HEAD
