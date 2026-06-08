@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lanzamiento de GPT-5 – David Martínez</title>
+
+  <!-- Hoja global -->
+  <link rel="stylesheet" href="../style.css" />
+
+  <!-- Ajustes “blog” (solo afectan a .article) -->
+  <style>
+    .article{max-width:780px;margin:0 auto;text-align:left;}
+    .article h1{margin-bottom:.5rem;}
+    .article h2{color:#b5b5b5;margin-top:2rem;font-weight:600;}
+    .article img{display:block;max-width:100%;height:auto;border-radius:10px;
+                 margin:1rem auto;box-shadow:0 2px 5px rgba(0,0,0,.08);}
+    .article ul{padding-left:1.4rem;list-style:disc;}
+    .article time{display:block;text-align:center;margin-bottom:1rem;color:#9a9a9a;font-size:.85rem;}
+    table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.95rem;}
+    th,td{border:1px solid #ddd;padding:.4rem .6rem;text-align:left;}
+    th{background:var(--card-bg);font-weight:600;}
+  </style>
+
+  <script defer src="../script.js"></script>
+</head>
+
+<body>
+  <button id="toggle-mode" aria-label="Cambiar modo oscuro">🌓</button>
+
+  <main class="container article">
+    <h1>Lanzamiento de GPT-5</h1>
+    <time datetime="2025-08-07">Actualizado: 07 ago 2025</time>
+
+    <!-- El Anuncio Histórico -->
+    <h2 class="label">/el anuncio histórico</h2>
+    <p>El 7 de agosto de 2025 OpenAI lanzó oficialmente GPT-5 para todos los usuarios de ChatGPT, marcando un hito en la evolución de los modelos de lenguaje avanzados.</p>
+    <p>Sam Altman lo describió como “el modelo más inteligente, rápido y útil hasta la fecha” y comparó el salto cualitativo con pasar de conversar con un estudiante universitario a interactuar con un experto de nivel doctorado.</p>
+
+    <!-- Sistema Unificado -->
+    <h2 class="label">/sistema unificado y razonamiento adaptativo</h2>
+    <p>GPT-5 integra un sistema unificado que combina respuestas rápidas con un modo de razonamiento profundo (<em>GPT-5 thinking</em>), gestionado por un router en tiempo real que decide cuándo emplear cada modalidad según la complejidad de la tarea.</p>
+
+    <!-- Capacidades Mejoradas -->
+    <h2 class="label">/capacidades mejoradas clave</h2>
+    <ul>
+      <li>Reducción de alucinaciones: solo 1,6 % en HealthBench Hard Hallucinations.</li>
+      <li>Mayor honestidad al describir imágenes inexistentes y respuestas más confiables.</li>
+      <li>Codificación: 74,9 % en SWE-bench Verified y 88 % en Aider polyglot.</li>
+      <li>Multimodal: texto, imagen, audio y video, con ventana de contexto ampliada.</li>
+    </ul>
+
+    <!-- Modelos y Precios -->
+    <h2 class="label">/modelos y precios</h2>
+    <p>OpenAI ofrece GPT-5 en tres variantes API más un modelo de chat:</p>
+    <table>
+      <thead><tr><th>Modelo</th><th>Entrada<br>(1 M tokens)</th><th>Salida<br>(1 M tokens)</th></tr></thead>
+      <tbody>
+        <tr><td>gpt-5</td><td>$1.25</td><td>$10.00</td></tr>
+        <tr><td>gpt-5-mini</td><td>$0.25</td><td>$2.00</td></tr>
+        <tr><td>gpt-5-nano</td><td>$0.05</td><td>$0.40</td></tr>
+      </tbody>
+    </table>
+    <p>Incluyen parámetros de razonamiento, herramientas integradas y caché de prompt.</p>
+
+    <!-- Primeras Impresiones -->
+    <h2 class="label">/primeras impresiones de la industria</h2>
+    <p>Altman comparó el avance con el Proyecto Manhattan; Aaron Levie (Box) habló de “un avance completo”; Amgen, Cursor y Vercel destacaron precisión y calidad de código.</p>
+
+    <!-- Reacciones Críticas -->
+    <h2 class="label">/reacciones críticas</h2>
+    <p>Gary Marcus mantiene escepticismo sobre el rendimiento real; Geoffrey Hinton esperaba mejoras en acertijos lógicos; Yann LeCun señala límites del Transformer; Ilya Sutskever advierte del “pico de datos”.</p>
+
+    <!-- Evaluaciones Independientes -->
+    <h2 class="label">/evaluaciones técnicas independientes</h2>
+    <p>Latent.Space lo ve como inicio de una nueva era para agentes; Claire Vo nota sesgo hacia lo técnico por encima de negocio.</p>
+
+    <!-- Comparación -->
+    <h2 class="label">/comparación con la competencia</h2>
+    <ul>
+      <li>Codificación: 74,9 % vs 74,5 % de Claude Opus 4.1.</li>
+      <li>Ciencias: 89,4 % en GPQA Diamond, superando a Claude.</li>
+      <li>Salud: 1,6 % de alucinaciones vs 12,9 % de GPT-4o.</li>
+    </ul>
+
+    <!-- Desafíos Persistentes -->
+    <h2 class="label">/desafíos persistentes</h2>
+    <ul>
+      <li>Navegación web: aún por debajo de o3 en algunos casos de aerolíneas.</li>
+      <li>Retail: rendimiento ligeramente menor que Claude en comercio electrónico.</li>
+    </ul>
+
+    <!-- Implicaciones -->
+    <h2 class="label">/implicaciones para el mercado</h2>
+    <p>Llega cuando las empresas definen presupuestos de TI y OpenAI reporta millones de usuarios pagos Plus/Pro/Enterprise.</p>
+
+    <!-- Disponibilidad -->
+    <h2 class="label">/disponibilidad global</h2>
+    <p>Disponible de inmediato para Free, Plus, Pro y Team; Enterprise y Edu a lo largo de la semana de lanzamiento.</p>
+
+    <!-- Perspectivas -->
+    <h2 class="label">/perspectivas futuras</h2>
+    <p>Altman aclara que GPT-5 no es AGI y no aprende en producción; OpenAI ya diseña la ruta hacia “superinteligencia”.</p>
+
+    <!-- Conclusiones -->
+    <h2 class="label">/conclusiones</h2>
+    <p>GPT-5 supone un salto real en razonamiento y codificación, con debates abiertos sobre seguridad y dirección futura. El éxito dependerá de su impacto en flujos de trabajo empresariales.</p>
+
+    <a href="index.html" class="back-button">Volver al inicio</a>
+  </main>
+</body>
+</html>
