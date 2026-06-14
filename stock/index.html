@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bandido Store - Cloud Core v7.1</title>
+    <title>Bandido Store - Cloud Core v8.0 (Filtros Avanzados)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
@@ -50,7 +50,7 @@
                     </div>
                 </div>
                 <span class="bg-yellow-500/10 text-yellow-500 text-[10px] font-bold px-2 py-0.5 rounded-full border border-yellow-500/20 md:ml-2">
-                    UX v7.1
+                    UX v8.0
                 </span>
             </div>
             <div class="flex w-full md:w-auto overflow-x-auto hide-scrollbar items-center gap-2 justify-start md:justify-center py-1">
@@ -96,7 +96,7 @@
                     <p class="text-3xl font-black text-white" id="kpiCapitalBodega">$0.00</p>
                 </div>
                 <div class="bg-[#151a21] p-6 rounded-2xl border border-blue-500/30 bg-gradient-to-br from-[#151a21] to-blue-500/5 shadow-lg relative overflow-hidden">
-                    <div class="absolute -right-2 -top-2 text-blue-500/10 text-8xl"></div>
+                    <div class="absolute -right-2 -top-2 text-blue-500/10 text-8xl">📈</div>
                     <p class="text-blue-400 text-xs font-bold uppercase tracking-wider mb-1">Venta Proyectada</p>
                     <p class="text-3xl font-black text-blue-400" id="kpiIngresoPotencial">$0.00</p>
                 </div>
@@ -109,7 +109,7 @@
                     <p class="text-3xl font-black text-orange-400" id="kpiCostoVendido">$0.00</p>
                 </div>
                 <div class="bg-[#151a21] p-6 rounded-2xl border border-yellow-500/30 bg-gradient-to-br from-[#151a21] to-yellow-500/5 shadow-lg relative overflow-hidden">
-                    <div class="absolute -right-2 -top-2 text-yellow-500/10 text-8xl"></div>
+                    <div class="absolute -right-2 -top-2 text-yellow-500/10 text-8xl">💰</div>
                     <p class="text-yellow-500 text-xs font-bold uppercase tracking-wider mb-1">Utilidad Bruta</p>
                     <div class="flex items-baseline gap-2">
                         <p class="text-4xl font-black text-yellow-400" id="kpiUtilidadNeta">$0.00</p>
@@ -200,14 +200,28 @@
 
                 <section class="xl:col-span-2">
                     <div class="bg-[#151a21] p-5 lg:p-6 rounded-2xl border border-gray-800 shadow-lg">
-                        <div class="flex flex-col sm:flex-row justify-between mb-4 lg:mb-6 gap-4">
-                            <h2 class="text-lg font-black uppercase italic tracking-tight text-white flex items-center gap-2">
-                                <span>📦 Stock en Bodega</span>
+                        
+                        <div class="flex flex-col xl:flex-row justify-between mb-4 lg:mb-6 gap-4">
+                            <h2 class="text-lg font-black uppercase italic tracking-tight text-white flex items-center gap-2 whitespace-nowrap">
+                                <span>📦 Stock</span>
                                 <span class="text-xs font-normal text-gray-400 normal-case italic bg-gray-800 px-2 py-0.5 rounded-md" id="contadorProductos">0</span>
                             </h2>
-                            <div class="relative w-full sm:w-72">
-                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">🔍</div>
-                                <input type="text" id="buscadorInventario" oninput="renderizarTodo()" placeholder="Buscar prenda..." class="w-full bg-[#0b0c10] border border-gray-700 rounded-xl pl-9 pr-4 py-3 lg:py-2 text-white focus:outline-none focus:border-yellow-500 text-base md:text-sm">
+                            
+                            <div class="flex flex-col sm:flex-row gap-2 w-full xl:w-auto">
+                                <select id="filtroStock" onchange="renderizarTodo()" class="w-full sm:w-36 bg-[#0b0c10] border border-gray-700 rounded-xl px-3 py-3 lg:py-2 text-white font-bold focus:outline-none focus:border-yellow-500 text-sm appearance-none">
+                                    <option value="ALL">Todo el Stock</option>
+                                    <option value="IN_STOCK">✅ Disponibles</option>
+                                    <option value="OUT_OF_STOCK">❌ Agotados</option>
+                                </select>
+                                
+                                <select id="filtroTalla" onchange="renderizarTodo()" class="w-full sm:w-36 bg-[#0b0c10] border border-gray-700 rounded-xl px-3 py-3 lg:py-2 text-white font-bold focus:outline-none focus:border-yellow-500 text-sm appearance-none">
+                                    <option value="ALL">Tallas (Todas)</option>
+                                </select>
+                                
+                                <div class="relative w-full sm:w-64">
+                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">🔍</div>
+                                    <input type="text" id="buscadorInventario" oninput="renderizarTodo()" placeholder="Buscar prenda..." class="w-full bg-[#0b0c10] border border-gray-700 rounded-xl pl-9 pr-4 py-3 lg:py-2 text-white focus:outline-none focus:border-yellow-500 text-base md:text-sm">
+                                </div>
                             </div>
                         </div>
 
@@ -292,14 +306,14 @@
         // =========================================================
         // 🚨 URL DE GOOGLE APPS SCRIPT
         // =========================================================
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwnD0gR_HKZT1H_HWF8EeYoAOV3WKuL9ZdpILVuWi1o8e3ygk05knM5sQFEsIk55qKF2w/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwIYmkpEZJLpd7-vjMegieOcQvdRvCfdUJ7Srl9TXxJWXc9DWzfzJnP4RzAAtLC03PxLQ/exec';
 
         let inventario = JSON.parse(localStorage.getItem('bandido_inventario')) || [];
         let ventas = JSON.parse(localStorage.getItem('bandido_ventas_historial')) || [];
         let idEdicionActiva = null;
         let idProductoParaVender = null;
         
-        // 🛡️ EL CANDADO DE SINCRONIZACIÓN (Evita el borrado por "Condición de Carrera")
+        // 🛡️ EL CANDADO DE SINCRONIZACIÓN
         let nubeSincronizada = false;
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -308,7 +322,7 @@
             if(SCRIPT_URL && SCRIPT_URL !== '') {
                 cargarDesdeNube();
             } else {
-                nubeSincronizada = true; // Si no hay URL, permite operar en local.
+                nubeSincronizada = true; 
             }
         });
 
@@ -356,8 +370,7 @@
                 localStorage.setItem('bandido_inventario', JSON.stringify(inventario));
                 localStorage.setItem('bandido_ventas_historial', JSON.stringify(ventas));
                 renderizarTodo();
-                
-                nubeSincronizada = true; // ✅ CANDADO ABIERTO: NUBE Y CELULAR ESTÁN SINCRONIZADOS
+                nubeSincronizada = true; 
             } catch (e) {
                 console.error("Error conectando a nube:", e);
                 alert("⚠️ Error de conexión con la nube. Asegúrate de tener internet. Trabajarás en modo local.");
@@ -371,12 +384,10 @@
             renderizarTodo();
 
             if(SCRIPT_URL && SCRIPT_URL !== '') {
-                // 🛡️ SISTEMA DE BLOQUEO DE ESCRITURA
                 if(!nubeSincronizada && inventario.length > 0) {
                     console.warn("Nube no sincronizada. Se evita el envío para no sobreescribir datos.");
                     return;
                 }
-
                 document.getElementById('cloudSync').classList.remove('hidden');
                 fetch(SCRIPT_URL, {
                     method: 'POST',
@@ -585,31 +596,59 @@
             }
         }
 
-        // --- RENDERIZADO VISUAL ---
+        // --- RENDERIZADO VISUAL Y FILTROS ---
         function renderizarTodo() {
             const tbodyInv = document.getElementById('tablaInventario');
             const tbodyVen = document.getElementById('tablaVentas');
+            
+            // Valores de los filtros
             const term = (document.getElementById('buscadorInventario')?.value || '').toLowerCase().trim();
+            const fStock = document.getElementById('filtroStock')?.value || 'ALL';
+            const fTalla = document.getElementById('filtroTalla')?.value || 'ALL';
             
             tbodyInv.innerHTML = '';
             tbodyVen.innerHTML = '';
 
+            // Dinamizar listas desplegables (Campañas y Tallas)
             const camps = [...new Set(inventario.map(i => i.campana || 'General'))];
             document.getElementById('listaCampanas').innerHTML = camps.map(c => `<option value="${c}">`).join('');
+            
+            // Poblar Filtro de Tallas dinámicamente según lo que haya en bodega
+            const tallasUnicas = [...new Set(inventario.map(i => i.talla))].sort();
+            const selectTallaFiltro = document.getElementById('filtroTalla');
+            if (selectTallaFiltro) {
+                const valorActualTalla = selectTallaFiltro.value;
+                selectTallaFiltro.innerHTML = '<option value="ALL">Tallas (Todas)</option>' + tallasUnicas.map(t => `<option value="${t}">Talla ${t}</option>`).join('');
+                selectTallaFiltro.value = tallasUnicas.includes(valorActualTalla) ? valorActualTalla : 'ALL';
+            }
 
+            // Variables de KPI Globales (Se calculan sobre TODA la bodega, no solo lo filtrado)
             let cBodega = 0, iPotencial = 0, sTotal = 0;
             let iTotales = 0, cVendido = 0, uNeta = 0;
 
             const invFiltro = inventario.filter(i => {
+                // Sumamos KPIs generales
                 cBodega += (i.precioCosto * i.stock);
                 iPotencial += (i.precioVenta * i.stock);
                 sTotal += i.stock;
-                if(term === '') return true;
-                return `${i.modelo} ${i.categoria} ${i.talla} ${i.genero||''} ${i.campana||''}`.toLowerCase().includes(term);
+                
+                // Aplicamos Lógica de Filtros Múltiples
+                let matchText = true;
+                let matchStock = true;
+                let matchTalla = true;
+
+                if (term !== '') {
+                    matchText = `${i.modelo} ${i.categoria} ${i.talla} ${i.genero||''} ${i.campana||''}`.toLowerCase().includes(term);
+                }
+                if (fStock === 'IN_STOCK') matchStock = i.stock > 0;
+                if (fStock === 'OUT_OF_STOCK') matchStock = i.stock === 0;
+                if (fTalla !== 'ALL') matchTalla = i.talla === fTalla;
+
+                return matchText && matchStock && matchTalla;
             });
 
             if(invFiltro.length === 0 && inventario.length > 0) {
-                tbodyInv.innerHTML = `<div class="p-8 text-center text-gray-500 italic border-t border-gray-800">No se encontraron prendas</div>`;
+                tbodyInv.innerHTML = `<div class="p-8 text-center text-gray-500 italic border-t border-gray-800">No hay prendas que coincidan con los filtros</div>`;
             } else {
                 invFiltro.forEach(i => {
                     let stClass = i.stock === 0 ? "text-red-400 bg-red-500/10 border-red-500/20" : (i.stock <= 3 ? "text-orange-400 bg-orange-500/10 border-orange-500/20" : "text-emerald-400 bg-emerald-500/10 border-emerald-500/20");
@@ -721,7 +760,7 @@
             document.getElementById('kpiUtilidadNeta').innerText = `$${uNeta.toFixed(2)}`;
             document.getElementById('kpiMargen').innerText = `${(iTotales > 0 ? (uNeta / iTotales) * 100 : 0).toFixed(1)}%`;
             
-            document.getElementById('contadorProductos').innerText = term ? `Filtro: ${invFiltro.length}` : `${inventario.length}`;
+            document.getElementById('contadorProductos').innerText = (fStock !== 'ALL' || fTalla !== 'ALL' || term !== '') ? `Filtrado: ${invFiltro.length}` : `${inventario.length}`;
             document.getElementById('contadorVentas').innerText = `${ventas.length}`;
         }
 
@@ -770,7 +809,7 @@
                     if (confirm(`📊 Detectados ${nInv.length} artículos y ${nVen.length} ventas.\n¿Sobreescribir datos actuales?`)) {
                         inventario = nInv; ventas = nVen; guardarDatos();
                         alert("✅ Sincronizado con éxito.");
-                        nubeSincronizada = true; // Permite guardar si se sobreescribió localmente
+                        nubeSincronizada = true;
                     }
                 } else alert("❌ CSV no compatible.");
             };
