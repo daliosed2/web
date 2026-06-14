@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bandido Store - Cloud Core v6.0</title>
+    <title>Bandido Store - Cloud Core v7.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
@@ -52,7 +52,7 @@
                     </div>
                 </div>
                 <span class="bg-yellow-500/10 text-yellow-500 text-[10px] font-bold px-2 py-0.5 rounded-full border border-yellow-500/20 md:ml-2">
-                    UX v6.0
+                    UX v7.0
                 </span>
             </div>
             <div class="flex w-full md:w-auto overflow-x-auto hide-scrollbar items-center gap-2 justify-start md:justify-center py-1">
@@ -98,7 +98,7 @@
                     <p class="text-3xl font-black text-white" id="kpiCapitalBodega">$0.00</p>
                 </div>
                 <div class="bg-[#151a21] p-6 rounded-2xl border border-blue-500/30 bg-gradient-to-br from-[#151a21] to-blue-500/5 shadow-lg relative overflow-hidden">
-                    <div class="absolute -right-2 -top-2 text-blue-500/10 text-8xl">📈</div>
+                    <div class="absolute -right-2 -top-2 text-blue-500/10 text-8xl"></div>
                     <p class="text-blue-400 text-xs font-bold uppercase tracking-wider mb-1">Venta Proyectada</p>
                     <p class="text-3xl font-black text-blue-400" id="kpiIngresoPotencial">$0.00</p>
                 </div>
@@ -112,7 +112,7 @@
                     <p class="text-3xl font-black text-orange-400" id="kpiCostoVendido">$0.00</p>
                 </div>
                 <div class="bg-[#151a21] p-6 rounded-2xl border border-yellow-500/30 bg-gradient-to-br from-[#151a21] to-yellow-500/5 shadow-lg relative overflow-hidden">
-                    <div class="absolute -right-2 -top-2 text-yellow-500/10 text-8xl">💰</div>
+                    <div class="absolute -right-2 -top-2 text-yellow-500/10 text-8xl"></div>
                     <p class="text-yellow-500 text-xs font-bold uppercase tracking-wider mb-1">Utilidad Bruta</p>
                     <div class="flex items-baseline gap-2">
                         <p class="text-4xl font-black text-yellow-400" id="kpiUtilidadNeta">$0.00</p>
@@ -123,9 +123,16 @@
         </div>
 
         <div id="tab-inventario" class="tab-content hidden">
+            
+            <div class="xl:hidden mb-6">
+                <button type="button" onclick="toggleFormulario()" class="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-black uppercase italic tracking-tight py-4 rounded-xl shadow-lg transition-all active:scale-95 flex justify-center items-center gap-2 text-sm">
+                    <span id="iconoToggle">➕</span> <span id="textoToggle">Registrar Nueva Mercancía</span>
+                </button>
+            </div>
+
             <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
                 
-                <section class="xl:col-span-1 bg-[#151a21] p-5 lg:p-6 rounded-2xl border border-gray-800 h-fit sticky top-24 shadow-lg" id="seccionFormulario">
+                <section class="xl:col-span-1 bg-[#151a21] p-5 lg:p-6 rounded-2xl border border-gray-800 h-fit xl:sticky top-24 shadow-lg hidden xl:block transition-all duration-300" id="seccionFormulario">
                     <h2 class="text-lg font-black uppercase italic tracking-tight text-white mb-6 flex items-center gap-2" id="tituloFormulario">
                         <span>⚡ Ingreso Rápido</span>
                     </h2>
@@ -184,10 +191,10 @@
                         </div>
                         
                         <div class="flex gap-3 pt-3 lg:pt-4">
-                            <button type="submit" id="btnAccionPrincipal" class="flex-1 bg-white text-black font-black uppercase italic tracking-tight py-4 rounded-xl shadow-md active:scale-95 text-sm lg:text-base">
+                            <button type="submit" id="btnAccionPrincipal" class="flex-1 bg-white hover:bg-gray-200 text-black font-black uppercase italic tracking-tight py-4 rounded-xl transition-all shadow-md transform active:scale-95 text-sm lg:text-base">
                                 💾 Registrar
                             </button>
-                            <button type="button" id="btnCancelarEdicion" onclick="cancelarEdicion()" class="hidden bg-gray-800 text-white font-bold uppercase py-4 px-4 rounded-xl text-xs border border-gray-600">
+                            <button type="button" id="btnCancelarEdicion" onclick="cancelarEdicion()" class="hidden bg-gray-800 hover:bg-gray-700 text-white font-bold uppercase py-4 px-4 rounded-xl transition-all text-xs border border-gray-600">
                                 ❌ Cancelar
                             </button>
                         </div>
@@ -320,6 +327,24 @@
             btnActivo.classList.add('text-yellow-500', 'border-yellow-500');
         }
 
+        // Función para ocultar/mostrar formulario en móvil
+        function toggleFormulario() {
+            const form = document.getElementById('seccionFormulario');
+            const icono = document.getElementById('iconoToggle');
+            const texto = document.getElementById('textoToggle');
+            
+            if (form.classList.contains('hidden')) {
+                form.classList.remove('hidden');
+                icono.innerText = '➖';
+                texto.innerText = 'Ocultar Formulario';
+                form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else {
+                form.classList.add('hidden');
+                icono.innerText = '➕';
+                texto.innerText = 'Registrar Nueva Mercancía';
+            }
+        }
+
         async function cargarDesdeNube() {
             document.getElementById('cloudLoader').classList.remove('hidden');
             try {
@@ -396,10 +421,17 @@
                 if (idx !== -1) inventario[idx] = { ...inventario[idx], ...datos };
                 cancelarEdicion();
             } else {
-                inventario.unshift({ id: Date.now().toString(), ...datos }); // Agrega al inicio para verlo rápido
+                inventario.unshift({ id: Date.now().toString(), ...datos }); 
                 document.getElementById('productForm').reset();
                 document.getElementById('campana').value = '';
                 actualizarTallas(); 
+                
+                // Ocultar formulario en móvil después de guardar
+                if (window.innerWidth < 1280) {
+                    document.getElementById('seccionFormulario').classList.add('hidden');
+                    document.getElementById('iconoToggle').innerText = '➕';
+                    document.getElementById('textoToggle').innerText = 'Registrar Nueva Mercancía';
+                }
             }
             guardarDatos();
         }
@@ -424,8 +456,14 @@
             btn.className = 'flex-1 bg-yellow-500 text-black font-black uppercase italic py-4 rounded-xl shadow-md text-sm lg:text-base';
             document.getElementById('btnCancelarEdicion').classList.remove('hidden');
             
-            // En móvil, hacer scroll suave arriba
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            // Asegurar que el formulario sea visible en móvil y scrollear
+            const form = document.getElementById('seccionFormulario');
+            form.classList.remove('hidden');
+            if(window.innerWidth < 1280) {
+                document.getElementById('iconoToggle').innerText = '➖';
+                document.getElementById('textoToggle').innerText = 'Ocultar Formulario';
+            }
+            form.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         function cancelarEdicion() {
@@ -437,6 +475,12 @@
             btn.innerHTML = '💾 Registrar';
             btn.className = 'flex-1 bg-white text-black font-black uppercase italic py-4 rounded-xl shadow-md text-sm lg:text-base';
             document.getElementById('btnCancelarEdicion').classList.add('hidden');
+            
+            if (window.innerWidth < 1280) {
+                document.getElementById('seccionFormulario').classList.add('hidden');
+                document.getElementById('iconoToggle').innerText = '➕';
+                document.getElementById('textoToggle').innerText = 'Registrar Nueva Mercancía';
+            }
         }
 
         function eliminarProducto(id) {
@@ -473,7 +517,7 @@
 
         function confirmarVenta(e) {
             e.preventDefault();
-            const idx = inventario.findIndex(i => i.id.toString() === idProductoParaVender);
+            const idx = inventario.findIndex(i => i.id.toString() === idProductoParaVender.toString());
             if (idx === -1) return;
 
             const prod = inventario[idx];
@@ -483,7 +527,7 @@
 
             if (isNaN(precioCobrado) || precioCobrado < 0) return alert("❌ Precio inválido.");
 
-            ventas.unshift({ // Agrega al inicio para verla rápido en la tabla
+            ventas.unshift({
                 idVenta: Date.now().toString(),
                 fecha: new Date().toLocaleString('es-ES', { year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' }),
                 modelo: prod.modelo,
@@ -501,7 +545,7 @@
             prod.stock--; 
             guardarDatos();
             cerrarModalVenta();
-            cambiarPestana('tab-ventas'); // Lleva al usuario a ver su venta
+            cambiarPestana('tab-ventas');
         }
 
         function marcarComoPagado(idVenta) {
@@ -543,14 +587,12 @@
             tbodyInv.innerHTML = '';
             tbodyVen.innerHTML = '';
 
-            // Llenar lista campañas
             const camps = [...new Set(inventario.map(i => i.campana || 'General'))];
             document.getElementById('listaCampanas').innerHTML = camps.map(c => `<option value="${c}">`).join('');
 
             let cBodega = 0, iPotencial = 0, sTotal = 0;
             let iTotales = 0, cVendido = 0, uNeta = 0;
 
-            // RENDER INVENTARIO (TARJETAS EN MÓVIL, FILAS EN DESKTOP)
             const invFiltro = inventario.filter(i => {
                 cBodega += (i.precioCosto * i.stock);
                 iPotencial += (i.precioVenta * i.stock);
@@ -607,7 +649,6 @@
                 });
             }
 
-            // RENDER VENTAS (TARJETAS EN MÓVIL, FILAS EN DESKTOP)
             ventas.forEach(v => {
                 iTotales += v.precioCobrado; cVendido += v.precioCosto; uNeta += v.ganancia;
                 let isPagado = (v.estado || 'Pagado') === 'Pagado';
@@ -665,7 +706,6 @@
                 `;
             });
 
-            // Actualizar KPIs
             document.getElementById('kpiStockTotal').innerText = `${sTotal} u.`;
             document.getElementById('kpiCapitalBodega').innerText = `$${cBodega.toFixed(2)}`;
             document.getElementById('kpiIngresoPotencial').innerText = `$${iPotencial.toFixed(2)}`;
@@ -677,7 +717,6 @@
             document.getElementById('contadorVentas').innerText = `${ventas.length}`;
         }
 
-        // --- EXPORTAR / IMPORTAR CSV ---
         function exportarCSV() {
             if (inventario.length === 0 && ventas.length === 0) return alert("⚠️ Sin datos.");
             let csv = "\uFEFF=== SECCION: INVENTARIO EN BODEGA ===\nID,Modelo/Jersey,Categoria,Genero,Campana,Talla,Precio Costo,Precio Venta,Stock Disponible\n";
@@ -729,7 +768,6 @@
             reader.readAsText(file);
         }
 
-        // --- PDF BLINDADO ---
         function descargarPDF() {
             if (inventario.length === 0) return alert("⚠️ No hay inventario registrado.");
             const divImpresion = document.createElement('div');
