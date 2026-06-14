@@ -2,15 +2,18 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bandido Store - Cloud Core v5.0</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bandido Store - Cloud Core v6.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
         body { font-family: 'Inter', sans-serif; }
-        th, td { white-space: nowrap; }
-        /* Animación suave para las pestañas */
+        
+        /* Ocultar barra de scroll en pestañas para diseño limpio en móvil */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
         .tab-content { transition: opacity 0.3s ease-in-out; }
     </style>
     
@@ -31,35 +34,38 @@
 
     <div id="cloudLoader" class="fixed inset-0 bg-[#0b0c10]/90 z-[100] flex flex-col items-center justify-center hidden backdrop-blur-sm">
         <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500 mb-4"></div>
-        <p class="text-yellow-500 font-bold tracking-widest text-sm uppercase">Descargando datos de la nube...</p>
+        <p class="text-yellow-500 font-bold tracking-widest text-sm uppercase">Descargando datos...</p>
     </div>
     
-    <div id="cloudSync" class="fixed bottom-4 right-4 bg-blue-500 text-white text-[10px] font-black uppercase px-3 py-2 rounded-full shadow-lg z-50 flex items-center gap-2 hidden">
-        <div class="animate-spin h-3 w-3 border-2 border-white border-t-transparent rounded-full"></div>
-        Sincronizando...
+    <div id="cloudSync" class="fixed bottom-4 right-4 bg-blue-500 text-white text-[10px] font-black uppercase px-4 py-3 rounded-full shadow-lg z-50 flex items-center gap-2 hidden">
+        <div class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+        Sincronizando
     </div>
 
-    <header class="border-b border-gray-800 bg-[#1f2833]/40 backdrop-blur-md sticky top-0 z-40 py-4 px-6">
+    <header class="border-b border-gray-800 bg-[#1f2833]/40 backdrop-blur-md sticky top-0 z-40 py-4 px-4 sm:px-6">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-3">
-                <div class="text-2xl font-black uppercase italic tracking-tighter text-yellow-500">
-                    BANDIDO <span class="text-white">STORE</span>
+            <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
+                <div class="flex items-center gap-3">
+                    <img src="logo.png" alt="Logo" class="h-8 w-auto rounded object-contain border border-yellow-500/20" onerror="this.style.display='none'">
+                    <div class="text-xl sm:text-2xl font-black uppercase italic tracking-tighter text-yellow-500">
+                        BANDIDO <span class="text-white">STORE</span>
+                    </div>
                 </div>
-                <span class="bg-yellow-500/10 text-yellow-500 text-[10px] font-bold px-2 py-0.5 rounded-full border border-yellow-500/20 ml-2">
-                    CORE v5.0
+                <span class="bg-yellow-500/10 text-yellow-500 text-[10px] font-bold px-2 py-0.5 rounded-full border border-yellow-500/20 md:ml-2">
+                    UX v6.0
                 </span>
             </div>
-            <div class="flex flex-wrap items-center gap-2 justify-center">
-                <button onclick="forzarSincronizacion()" class="bg-blue-500/10 hover:bg-blue-500 text-blue-400 hover:text-white text-xs font-bold uppercase tracking-wider px-3 py-2 rounded-xl border border-blue-500/20 hover:border-blue-500 transition-all flex items-center gap-2">
-                    🔄 Sincronizar
+            <div class="flex w-full md:w-auto overflow-x-auto hide-scrollbar items-center gap-2 justify-start md:justify-center py-1">
+                <button onclick="forzarSincronizacion()" class="whitespace-nowrap bg-blue-500/10 hover:bg-blue-500 text-blue-400 hover:text-white text-xs font-bold uppercase tracking-wider px-4 py-3 md:py-2 rounded-xl border border-blue-500/20 transition-all flex items-center gap-2">
+                    🔄 Sinc
                 </button>
-                <button onclick="descargarPDF()" class="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white text-xs font-bold uppercase tracking-wider px-3 py-2 rounded-xl border border-red-500/20 hover:border-red-500 transition-all flex items-center gap-2">
+                <button onclick="descargarPDF()" class="whitespace-nowrap bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white text-xs font-bold uppercase tracking-wider px-4 py-3 md:py-2 rounded-xl border border-red-500/20 transition-all flex items-center gap-2">
                     📄 PDF
                 </button>
-                <button onclick="exportarCSV()" class="bg-[#1f2833] hover:bg-gray-800 text-xs font-bold uppercase tracking-wider px-3 py-2 rounded-xl border border-gray-700 transition-all flex items-center gap-2">
-                    📥 Exportar CSV
+                <button onclick="exportarCSV()" class="whitespace-nowrap bg-[#1f2833] hover:bg-gray-800 text-xs font-bold uppercase tracking-wider px-4 py-3 md:py-2 rounded-xl border border-gray-700 transition-all flex items-center gap-2">
+                    📥 CSV
                 </button>
-                <label class="bg-yellow-500 hover:bg-yellow-600 text-black text-xs font-black uppercase tracking-wider px-3 py-2 rounded-xl transition-all flex items-center gap-2 cursor-pointer">
+                <label class="whitespace-nowrap bg-yellow-500 hover:bg-yellow-600 text-black text-xs font-black uppercase tracking-wider px-4 py-3 md:py-2 rounded-xl transition-all flex items-center gap-2 cursor-pointer">
                     📤 Importar
                     <input type="file" id="csvFileInput" accept=".csv" class="hidden" onchange="importarCSV(event)">
                 </label>
@@ -67,77 +73,72 @@
         </div>
     </header>
 
-    <nav class="max-w-7xl mx-auto px-4 sm:px-6 mt-6 mb-8 flex space-x-2 sm:space-x-6 border-b border-gray-800 overflow-x-auto">
-        <button onclick="cambiarPestana('tab-dashboard')" id="btn-tab-dashboard" class="pb-3 px-2 sm:px-4 text-yellow-500 border-b-2 border-yellow-500 font-bold uppercase tracking-wider text-xs sm:text-sm whitespace-nowrap transition-colors">
-            📊 Dashboard
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 mt-2 mb-6 flex space-x-4 sm:space-x-8 border-b border-gray-800 overflow-x-auto hide-scrollbar">
+        <button onclick="cambiarPestana('tab-dashboard')" id="btn-tab-dashboard" class="pb-3 px-2 text-yellow-500 border-b-2 border-yellow-500 font-bold uppercase tracking-wider text-sm whitespace-nowrap transition-colors flex items-center gap-2">
+            📊 <span class="hidden sm:inline">Dashboard</span>
         </button>
-        <button onclick="cambiarPestana('tab-inventario')" id="btn-tab-inventario" class="pb-3 px-2 sm:px-4 text-gray-400 hover:text-white border-b-2 border-transparent font-bold uppercase tracking-wider text-xs sm:text-sm whitespace-nowrap transition-colors">
-            📦 Gestión de Inventario
+        <button onclick="cambiarPestana('tab-inventario')" id="btn-tab-inventario" class="pb-3 px-2 text-gray-400 hover:text-white border-b-2 border-transparent font-bold uppercase tracking-wider text-sm whitespace-nowrap transition-colors flex items-center gap-2">
+            📦 <span class="hidden sm:inline">Inventario</span><span class="sm:hidden">Stock</span>
         </button>
-        <button onclick="cambiarPestana('tab-ventas')" id="btn-tab-ventas" class="pb-3 px-2 sm:px-4 text-gray-400 hover:text-white border-b-2 border-transparent font-bold uppercase tracking-wider text-xs sm:text-sm whitespace-nowrap transition-colors">
-            💰 Registro de Ventas
+        <button onclick="cambiarPestana('tab-ventas')" id="btn-tab-ventas" class="pb-3 px-2 text-gray-400 hover:text-white border-b-2 border-transparent font-bold uppercase tracking-wider text-sm whitespace-nowrap transition-colors flex items-center gap-2">
+            💰 <span class="hidden sm:inline">Ventas Realizadas</span><span class="sm:hidden">Ventas</span>
         </button>
     </nav>
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6">
 
         <div id="tab-dashboard" class="tab-content block">
-            <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6 mb-8">
                 <div class="bg-[#151a21] p-6 rounded-2xl border border-gray-800 shadow-lg">
-                    <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Stock Físico (Unidades)</p>
+                    <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Stock Físico</p>
                     <p class="text-3xl font-black text-blue-400" id="kpiStockTotal">0 u.</p>
-                    <span class="text-[10px] text-gray-500 mt-2 block">Suma total de prendas en bodega</span>
                 </div>
                 <div class="bg-[#151a21] p-6 rounded-2xl border border-gray-800 shadow-lg">
-                    <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Capital Invertido (Costo)</p>
+                    <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Capital Invertido</p>
                     <p class="text-3xl font-black text-white" id="kpiCapitalBodega">$0.00</p>
-                    <span class="text-[10px] text-gray-500 mt-2 block">Dinero propio retenido en mercancía</span>
                 </div>
                 <div class="bg-[#151a21] p-6 rounded-2xl border border-blue-500/30 bg-gradient-to-br from-[#151a21] to-blue-500/5 shadow-lg relative overflow-hidden">
-                    <div class="absolute -right-4 -top-4 text-blue-500/10 text-7xl">📈</div>
+                    <div class="absolute -right-2 -top-2 text-blue-500/10 text-8xl">📈</div>
                     <p class="text-blue-400 text-xs font-bold uppercase tracking-wider mb-1">Venta Proyectada</p>
                     <p class="text-3xl font-black text-blue-400" id="kpiIngresoPotencial">$0.00</p>
-                    <span class="text-[10px] text-gray-400 font-medium mt-2 block">Ingreso estimado al liquidar stock</span>
                 </div>
 
-                <div class="bg-[#151a21] p-6 rounded-2xl border border-gray-800 shadow-lg mt-4 sm:mt-0">
-                    <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Ingresos Reales (Caja)</p>
+                <div class="bg-[#151a21] p-6 rounded-2xl border border-gray-800 shadow-lg">
+                    <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Ingresos (Caja Real)</p>
                     <p class="text-3xl font-black text-emerald-400" id="kpiIngresosTotales">$0.00</p>
-                    <span class="text-[10px] text-gray-500 mt-2 block">Dinero total cobrado a clientes</span>
                 </div>
-                <div class="bg-[#151a21] p-6 rounded-2xl border border-gray-800 shadow-lg mt-4 sm:mt-0">
-                    <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Costo de lo Vendido</p>
+                <div class="bg-[#151a21] p-6 rounded-2xl border border-gray-800 shadow-lg">
+                    <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Costo de Ventas</p>
                     <p class="text-3xl font-black text-orange-400" id="kpiCostoVendido">$0.00</p>
-                    <span class="text-[10px] text-gray-500 mt-2 block">Capital recuperado de la inversión</span>
                 </div>
-                <div class="bg-[#151a21] p-6 rounded-2xl border border-yellow-500/30 bg-gradient-to-br from-[#151a21] to-yellow-500/5 shadow-lg relative overflow-hidden mt-4 sm:mt-0">
-                    <div class="absolute -right-4 -top-4 text-yellow-500/10 text-7xl">💰</div>
-                    <p class="text-yellow-500 text-xs font-bold uppercase tracking-wider mb-1">Utilidad Bruta (Ganancia)</p>
+                <div class="bg-[#151a21] p-6 rounded-2xl border border-yellow-500/30 bg-gradient-to-br from-[#151a21] to-yellow-500/5 shadow-lg relative overflow-hidden">
+                    <div class="absolute -right-2 -top-2 text-yellow-500/10 text-8xl">💰</div>
+                    <p class="text-yellow-500 text-xs font-bold uppercase tracking-wider mb-1">Utilidad Bruta</p>
                     <div class="flex items-baseline gap-2">
                         <p class="text-4xl font-black text-yellow-400" id="kpiUtilidadNeta">$0.00</p>
                         <span class="text-lg font-bold text-yellow-600" id="kpiMargen">0.0%</span>
                     </div>
-                    <span class="text-[10px] text-gray-400 font-medium mt-2 block">Ganancia neta y margen operativo</span>
                 </div>
             </section>
         </div>
 
         <div id="tab-inventario" class="tab-content hidden">
-            <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
-                <section class="xl:col-span-1 bg-[#151a21] p-6 rounded-2xl border border-gray-800 h-fit sticky top-24 shadow-lg" id="seccionFormulario">
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
+                
+                <section class="xl:col-span-1 bg-[#151a21] p-5 lg:p-6 rounded-2xl border border-gray-800 h-fit sticky top-24 shadow-lg" id="seccionFormulario">
                     <h2 class="text-lg font-black uppercase italic tracking-tight text-white mb-6 flex items-center gap-2" id="tituloFormulario">
-                        <span>⚡ Ingresar Mercancía</span>
+                        <span>⚡ Ingreso Rápido</span>
                     </h2>
-                    <form id="productForm" onsubmit="guardarOActualizarProducto(event)" class="space-y-5">
+                    <form id="productForm" onsubmit="guardarOActualizarProducto(event)" class="space-y-4 lg:space-y-5">
                         <div>
-                            <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Nombre del Jersey / Modelo</label>
-                            <input type="text" id="modelo" required placeholder="Ej: Real Madrid Retro 1998" class="w-full bg-[#0b0c10] border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-yellow-500 transition-colors text-sm">
+                            <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Modelo del Jersey</label>
+                            <input type="text" id="modelo" required placeholder="Ej: Real Madrid Retro 1998" class="w-full bg-[#0b0c10] border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-yellow-500 text-base md:text-sm">
                         </div>
                         
-                        <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-cols-2 gap-3 lg:gap-4">
                             <div>
                                 <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Categoría</label>
-                                <select id="categoria" class="w-full bg-[#0b0c10] border border-gray-700 rounded-xl px-3 py-3 text-white focus:outline-none focus:border-yellow-500 text-sm">
+                                <select id="categoria" class="w-full bg-[#0b0c10] border border-gray-700 rounded-xl px-3 py-3 text-white focus:outline-none focus:border-yellow-500 text-base md:text-sm">
                                     <option value="Camisetas">Camisetas</option>
                                     <option value="Hoodies">Hoodies</option>
                                     <option value="Retro">Retro</option>
@@ -146,7 +147,7 @@
                             </div>
                             <div>
                                 <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Público</label>
-                                <select id="genero" onchange="actualizarTallas()" class="w-full bg-[#0b0c10] border border-gray-700 rounded-xl px-3 py-3 text-white focus:outline-none focus:border-yellow-500 text-sm">
+                                <select id="genero" onchange="actualizarTallas()" class="w-full bg-[#0b0c10] border border-gray-700 rounded-xl px-3 py-3 text-white focus:outline-none focus:border-yellow-500 text-base md:text-sm">
                                     <option value="Unisex" selected>Unisex</option>
                                     <option value="Hombre">Hombre</option>
                                     <option value="Mujer">Mujer</option>
@@ -155,141 +156,130 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-cols-2 gap-3 lg:gap-4">
                             <div>
-                                <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Campaña / Colección</label>
-                                <input type="text" id="campana" list="listaCampanas" placeholder="Opcional" class="w-full bg-[#0b0c10] border border-gray-700 rounded-xl px-3 py-3 text-white focus:outline-none focus:border-yellow-500 transition-colors text-sm">
+                                <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Campaña</label>
+                                <input type="text" id="campana" list="listaCampanas" placeholder="Opcional" class="w-full bg-[#0b0c10] border border-gray-700 rounded-xl px-3 py-3 text-white focus:outline-none focus:border-yellow-500 text-base md:text-sm">
                                 <datalist id="listaCampanas"></datalist>
                             </div>
                             <div>
                                 <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Talla</label>
-                                <select id="talla" class="w-full bg-[#0b0c10] border border-gray-700 rounded-xl px-3 py-3 text-white focus:outline-none focus:border-yellow-500 text-sm"></select>
+                                <select id="talla" class="w-full bg-[#0b0c10] border border-gray-700 rounded-xl px-3 py-3 text-white focus:outline-none focus:border-yellow-500 text-base md:text-sm"></select>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-3 gap-3">
+                        <div class="grid grid-cols-3 gap-2 lg:gap-3">
                             <div>
-                                <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Costo ($)</label>
-                                <input type="number" id="precioCosto" step="0.01" required placeholder="0.00" class="w-full bg-[#0b0c10] border border-gray-700 rounded-xl px-3 py-3 text-white focus:outline-none focus:border-yellow-500 transition-colors text-sm">
+                                <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Costo</label>
+                                <input type="number" id="precioCosto" step="0.01" required placeholder="$" class="w-full bg-[#0b0c10] border border-gray-700 rounded-xl px-3 py-3 text-white focus:outline-none focus:border-yellow-500 text-base md:text-sm text-center">
                             </div>
                             <div>
-                                <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Venta ($)</label>
-                                <input type="number" id="precioVenta" step="0.01" required placeholder="0.00" class="w-full bg-[#0b0c10] border border-gray-700 rounded-xl px-3 py-3 text-white focus:outline-none focus:border-yellow-500 transition-colors text-sm">
+                                <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Venta</label>
+                                <input type="number" id="precioVenta" step="0.01" required placeholder="$" class="w-full bg-[#0b0c10] border border-gray-700 rounded-xl px-3 py-3 text-white focus:outline-none focus:border-yellow-500 text-base md:text-sm text-center">
                             </div>
                             <div>
                                 <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Stock</label>
-                                <input type="number" id="stock" required placeholder="Cant." class="w-full bg-[#0b0c10] border border-gray-700 rounded-xl px-3 py-3 text-white focus:outline-none focus:border-yellow-500 transition-colors text-sm">
+                                <input type="number" id="stock" required placeholder="U." class="w-full bg-[#0b0c10] border border-gray-700 rounded-xl px-3 py-3 text-white focus:outline-none focus:border-yellow-500 text-base md:text-sm text-center">
                             </div>
                         </div>
                         
-                        <div class="flex gap-2 pt-4">
-                            <button type="submit" id="btnAccionPrincipal" class="flex-1 bg-white hover:bg-gray-200 text-black font-black uppercase italic tracking-tight py-4 rounded-xl transition-all shadow-md transform active:scale-95 text-sm">
-                                💾 Registrar Inventario
+                        <div class="flex gap-3 pt-3 lg:pt-4">
+                            <button type="submit" id="btnAccionPrincipal" class="flex-1 bg-white text-black font-black uppercase italic tracking-tight py-4 rounded-xl shadow-md active:scale-95 text-sm lg:text-base">
+                                💾 Registrar
                             </button>
-                            <button type="button" id="btnCancelarEdicion" onclick="cancelarEdicion()" class="hidden bg-gray-800 hover:bg-gray-700 text-white font-bold uppercase py-4 px-4 rounded-xl transition-all text-xs border border-gray-600">
+                            <button type="button" id="btnCancelarEdicion" onclick="cancelarEdicion()" class="hidden bg-gray-800 text-white font-bold uppercase py-4 px-4 rounded-xl text-xs border border-gray-600">
                                 ❌ Cancelar
                             </button>
                         </div>
                     </form>
                 </section>
 
-                <section class="xl:col-span-2 bg-[#151a21] p-6 rounded-2xl border border-gray-800 shadow-lg">
-                    <div class="flex flex-col sm:flex-row justify-between mb-6 gap-4">
-                        <h2 class="text-lg font-black uppercase italic tracking-tight text-white flex items-center gap-2">
-                            <span>📦 Stock en Bodega</span>
-                            <span class="text-xs font-normal text-gray-400 normal-case italic bg-gray-800 px-2 py-0.5 rounded-md" id="contadorProductos">Modelos: 0</span>
-                        </h2>
-                        
-                        <div class="relative w-full sm:w-72">
-                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">🔍</div>
-                            <input type="text" id="buscadorInventario" oninput="renderizarTodo()" placeholder="Buscar prenda, talla, campaña..." class="w-full bg-[#0b0c10] border border-gray-700 rounded-xl pl-9 pr-4 py-2 text-white focus:outline-none focus:border-yellow-500 text-sm">
+                <section class="xl:col-span-2">
+                    <div class="bg-[#151a21] p-5 lg:p-6 rounded-2xl border border-gray-800 shadow-lg">
+                        <div class="flex flex-col sm:flex-row justify-between mb-4 lg:mb-6 gap-4">
+                            <h2 class="text-lg font-black uppercase italic tracking-tight text-white flex items-center gap-2">
+                                <span>📦 Stock en Bodega</span>
+                                <span class="text-xs font-normal text-gray-400 normal-case italic bg-gray-800 px-2 py-0.5 rounded-md" id="contadorProductos">0</span>
+                            </h2>
+                            <div class="relative w-full sm:w-72">
+                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">🔍</div>
+                                <input type="text" id="buscadorInventario" oninput="renderizarTodo()" placeholder="Buscar prenda..." class="w-full bg-[#0b0c10] border border-gray-700 rounded-xl pl-9 pr-4 py-3 lg:py-2 text-white focus:outline-none focus:border-yellow-500 text-base md:text-sm">
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="overflow-x-auto rounded-xl border border-gray-800 max-h-[600px]">
-                        <table class="w-full text-left border-collapse">
-                            <thead class="sticky top-0 bg-[#0b0c10] border-b border-gray-800 z-10 shadow-sm">
-                                <tr class="text-[10px] uppercase font-bold tracking-wider text-gray-400">
-                                    <th class="p-4">Detalle / Modelo</th>
-                                    <th class="p-4 text-center">Talla</th>
-                                    <th class="p-4 text-center">Campaña</th>
-                                    <th class="p-4 text-right">Costo</th>
-                                    <th class="p-4 text-right">P. Venta</th>
-                                    <th class="p-4 text-center">Stock</th>
-                                    <th class="p-4 text-center text-yellow-500">Acción</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tablaInventario" class="divide-y divide-gray-800/50 text-sm"></tbody>
-                        </table>
+                        <div class="w-full">
+                            <div class="hidden lg:grid grid-cols-8 gap-4 p-4 text-[10px] uppercase font-bold tracking-wider text-gray-400 border-b border-gray-800 bg-[#0b0c10] rounded-t-xl">
+                                <div class="col-span-2">Detalle / Modelo</div>
+                                <div class="text-center">Talla</div>
+                                <div class="text-center">Campaña</div>
+                                <div class="text-right">Costo</div>
+                                <div class="text-right">Venta</div>
+                                <div class="text-center">Stock</div>
+                                <div class="text-center text-yellow-500">Acción</div>
+                            </div>
+                            <div id="tablaInventario" class="flex flex-col mt-4 lg:mt-0 lg:max-h-[600px] lg:overflow-y-auto"></div>
+                        </div>
                     </div>
                 </section>
             </div>
         </div>
 
         <div id="tab-ventas" class="tab-content hidden">
-            <section class="bg-[#151a21] p-6 rounded-2xl border border-gray-800 shadow-lg">
+            <section class="bg-[#151a21] p-5 lg:p-6 rounded-2xl border border-gray-800 shadow-lg">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-lg font-black uppercase italic tracking-tight text-emerald-400 flex items-center gap-2">
                         <span>💰 Historial de Ventas</span>
-                        <span class="text-xs bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full font-bold border border-emerald-500/20" id="contadorVentas">Prendas vendidas: 0</span>
+                        <span class="text-xs bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full font-bold border border-emerald-500/20" id="contadorVentas">0</span>
                     </h2>
                 </div>
                 
-                <div class="overflow-x-auto rounded-xl border border-gray-800 max-h-[650px]">
-                    <table class="w-full text-left border-collapse">
-                        <thead class="sticky top-0 bg-[#0b0c10] border-b border-gray-800 z-10 shadow-sm">
-                            <tr class="text-[10px] uppercase font-bold tracking-wider text-gray-400">
-                                <th class="p-4">Fecha</th>
-                                <th class="p-4">Producto</th>
-                                <th class="p-4 text-center">Campaña</th>
-                                <th class="p-4 text-center">Talla</th>
-                                <th class="p-4">Cliente / Nota</th>
-                                <th class="p-4 text-center">Estado</th>
-                                <th class="p-4 text-right text-emerald-400">P. Cobrado</th>
-                                <th class="p-4 text-right text-yellow-500">Ganancia</th>
-                                <th class="p-4 text-center">Gestión</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tablaVentas" class="divide-y divide-gray-800/50 text-sm"></tbody>
-                    </table>
+                <div class="w-full">
+                    <div class="hidden lg:grid grid-cols-10 gap-2 p-4 text-[10px] uppercase font-bold tracking-wider text-gray-400 border-b border-gray-800 bg-[#0b0c10] rounded-t-xl">
+                        <div>Fecha</div>
+                        <div class="col-span-2">Producto</div>
+                        <div class="text-center">Campaña</div>
+                        <div class="text-center">Talla</div>
+                        <div>Cliente/Nota</div>
+                        <div class="text-center">Estado</div>
+                        <div class="text-right text-emerald-400">Cobrado</div>
+                        <div class="text-right text-yellow-500">Ganancia</div>
+                        <div class="text-center">Gestión</div>
+                    </div>
+                    <div id="tablaVentas" class="flex flex-col mt-4 lg:mt-0 lg:max-h-[650px] lg:overflow-y-auto"></div>
                 </div>
             </section>
         </div>
 
     </main>
 
-    <div id="modalVenta" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 backdrop-blur-sm">
-        <div class="bg-[#151a21] p-6 rounded-2xl border border-gray-700 w-full max-w-md shadow-2xl mx-4 transform transition-all">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-black italic text-white uppercase tracking-tight">Procesar Venta</h3>
-                <button type="button" onclick="cerrarModalVenta()" class="text-gray-500 hover:text-white transition-colors cursor-pointer text-2xl font-bold">&times;</button>
+    <div id="modalVenta" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 backdrop-blur-sm px-4">
+        <div class="bg-[#151a21] p-6 sm:p-8 rounded-3xl border border-gray-700 w-full max-w-md shadow-2xl transform transition-all">
+            <div class="flex justify-between items-start mb-4">
+                <h3 class="text-xl font-black italic text-white uppercase tracking-tight">Procesar Venta</h3>
+                <button type="button" onclick="cerrarModalVenta()" class="text-gray-500 hover:text-white bg-gray-800 hover:bg-gray-700 h-8 w-8 rounded-full flex items-center justify-center font-bold">&times;</button>
             </div>
             
-            <p id="modalVentaProducto" class="text-emerald-400 font-bold mb-4 bg-emerald-500/10 p-3 rounded-xl text-sm border border-emerald-500/20"></p>
+            <p id="modalVentaProducto" class="text-emerald-400 font-bold mb-6 bg-emerald-500/10 p-4 rounded-xl text-sm border border-emerald-500/20 text-center leading-relaxed"></p>
 
-            <form id="formVenta" onsubmit="confirmarVenta(event)" class="space-y-4">
+            <form id="formVenta" onsubmit="confirmarVenta(event)" class="space-y-5">
                 <div>
-                    <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">1. Precio a Cobrar ($)</label>
-                    <input type="number" id="modalPrecio" step="0.01" required class="w-full bg-[#0b0c10] border border-gray-700 rounded-xl px-4 py-3 text-white font-bold focus:outline-none focus:border-emerald-500 transition-colors text-xl">
+                    <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">1. Precio a Cobrar ($)</label>
+                    <input type="number" id="modalPrecio" step="0.01" required class="w-full bg-[#0b0c10] border border-gray-700 rounded-xl px-4 py-4 text-emerald-400 text-center font-black focus:outline-none focus:border-emerald-500 text-2xl">
                 </div>
                 <div>
-                    <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">2. Cliente o Nota (Opcional)</label>
-                    <input type="text" id="modalNota" placeholder="Ej: Juan Perez - Enviar por Servientrega" class="w-full bg-[#0b0c10] border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 transition-colors text-sm">
+                    <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">2. Cliente o Nota (Opcional)</label>
+                    <input type="text" id="modalNota" placeholder="Ej: Juan Perez - Envío" class="w-full bg-[#0b0c10] border border-gray-700 rounded-xl px-4 py-4 text-white focus:outline-none focus:border-emerald-500 text-base md:text-sm">
                 </div>
                 <div>
-                    <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">3. Estado del Pago</label>
-                    <select id="modalEstado" class="w-full bg-[#0b0c10] border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 transition-colors text-sm font-bold">
+                    <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">3. Estado del Pago</label>
+                    <select id="modalEstado" class="w-full bg-[#0b0c10] border border-gray-700 rounded-xl px-4 py-4 text-white focus:outline-none focus:border-emerald-500 text-base md:text-sm font-bold appearance-none">
                         <option value="Pagado">✅ Pago Completado</option>
                         <option value="Pendiente">⏳ Pago Pendiente / Por Cobrar</option>
                     </select>
                 </div>
-                <div class="flex gap-3 pt-4">
-                    <button type="button" onclick="cerrarModalVenta()" class="flex-1 bg-gray-800 hover:bg-gray-700 text-white font-bold uppercase tracking-tight py-4 rounded-xl transition-all cursor-pointer text-sm border border-gray-600">
-                        Cancelar
-                    </button>
-                    <button type="submit" class="flex-[2] bg-emerald-500 hover:bg-emerald-400 text-black font-black uppercase italic tracking-tight py-4 rounded-xl transition-all shadow-md transform active:scale-95 cursor-pointer text-sm">
-                        💰 Confirmar Venta
-                    </button>
+                <div class="flex gap-3 pt-6">
+                    <button type="button" onclick="cerrarModalVenta()" class="flex-1 bg-gray-800 text-white font-bold uppercase tracking-tight py-4 rounded-xl text-sm border border-gray-600">Cancelar</button>
+                    <button type="submit" class="flex-[2] bg-emerald-500 text-black font-black uppercase italic tracking-tight py-4 rounded-xl shadow-md text-base">💰 Confirmar</button>
                 </div>
             </form>
         </div>
@@ -297,7 +287,7 @@
 
     <script>
         // =========================================================
-        // 🚨 URL DE GOOGLE APPS SCRIPT (TU BASE DE DATOS EN LA NUBE)
+        // 🚨 URL DE GOOGLE APPS SCRIPT
         // =========================================================
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz4lOeHPKB6gjfIiihq_W3yvCY46YaHVc0UwEWkfH77LPk_1HnPhDi16TCsFhen9eF7Uw/exec';
 
@@ -314,7 +304,6 @@
             }
         });
 
-        // --- NAVEGACIÓN DE PESTAÑAS (TABS) ---
         function cambiarPestana(pestanaActiva) {
             const pestanas = ['tab-dashboard', 'tab-inventario', 'tab-ventas'];
             pestanas.forEach(p => {
@@ -324,7 +313,6 @@
                 btn.classList.remove('text-yellow-500', 'border-yellow-500');
                 btn.classList.add('text-gray-400', 'border-transparent');
             });
-            
             document.getElementById(pestanaActiva).classList.remove('hidden');
             document.getElementById(pestanaActiva).classList.add('block');
             const btnActivo = document.getElementById('btn-' + pestanaActiva);
@@ -332,14 +320,11 @@
             btnActivo.classList.add('text-yellow-500', 'border-yellow-500');
         }
 
-        // --- SISTEMA CLOUD SYNC ---
         async function cargarDesdeNube() {
             document.getElementById('cloudLoader').classList.remove('hidden');
             try {
-                const urlFuerzaCache = SCRIPT_URL + "?t=" + new Date().getTime();
-                const res = await fetch(urlFuerzaCache);
+                const res = await fetch(SCRIPT_URL + "?t=" + new Date().getTime());
                 const data = await res.json();
-                
                 if(data.inventario && data.inventario.length > 0) inventario = data.inventario;
                 if(data.ventas && data.ventas.length > 0) ventas = data.ventas;
                 
@@ -347,7 +332,7 @@
                 localStorage.setItem('bandido_ventas_historial', JSON.stringify(ventas));
                 renderizarTodo();
             } catch (e) {
-                console.error("Error conectando a la nube:", e);
+                console.error("Error conectando a nube:", e);
             }
             document.getElementById('cloudLoader').classList.add('hidden');
         }
@@ -366,7 +351,6 @@
                 }).then(() => {
                     document.getElementById('cloudSync').classList.add('hidden');
                 }).catch(err => {
-                    console.error("Fallo subida a nube", err);
                     document.getElementById('cloudSync').classList.add('hidden');
                 });
             }
@@ -374,7 +358,6 @@
 
         function forzarSincronizacion() { cargarDesdeNube(); }
 
-        // --- TALLAS DINÁMICAS ---
         function actualizarTallas(tallaSeleccionada = null) {
             const genero = document.getElementById('genero').value;
             const selectTalla = document.getElementById('talla');
@@ -386,21 +369,18 @@
             } else {
                 opciones = ['S', 'M', 'L', 'XL', 'XXL', '3XL'];
             }
-
             opciones.forEach(t => {
                 const opt = document.createElement('option');
                 opt.value = t;
                 opt.innerText = (genero === 'Niño' || genero === 'Niño / Infantil') ? `Talla ${t}` : t;
                 selectTalla.appendChild(opt);
             });
-
             if (tallaSeleccionada) selectTalla.value = tallaSeleccionada;
         }
 
-        // --- GESTIÓN DE INVENTARIO (BUG DE ELIMINAR CORREGIDO CON .toString) ---
         function guardarOActualizarProducto(e) {
             e.preventDefault();
-            const datosFormulario = {
+            const datos = {
                 modelo: document.getElementById('modelo').value.trim(),
                 categoria: document.getElementById('categoria').value,
                 genero: document.getElementById('genero').value,
@@ -412,11 +392,11 @@
             };
 
             if (idEdicionActiva) {
-                const index = inventario.findIndex(item => item.id.toString() === idEdicionActiva.toString());
-                if (index !== -1) inventario[index] = { ...inventario[index], ...datosFormulario };
+                const idx = inventario.findIndex(i => i.id.toString() === idEdicionActiva.toString());
+                if (idx !== -1) inventario[idx] = { ...inventario[idx], ...datos };
                 cancelarEdicion();
             } else {
-                inventario.push({ id: Date.now().toString(), ...datosFormulario });
+                inventario.unshift({ id: Date.now().toString(), ...datos }); // Agrega al inicio para verlo rápido
                 document.getElementById('productForm').reset();
                 document.getElementById('campana').value = '';
                 actualizarTallas(); 
@@ -425,26 +405,27 @@
         }
 
         function prepararEdicion(id) {
-            const producto = inventario.find(item => item.id.toString() === id.toString());
-            if (!producto) return;
+            const prod = inventario.find(i => i.id.toString() === id.toString());
+            if (!prod) return;
             
             idEdicionActiva = id.toString();
-            document.getElementById('modelo').value = producto.modelo;
-            document.getElementById('categoria').value = producto.categoria;
-            document.getElementById('genero').value = producto.genero || 'Unisex';
-            document.getElementById('campana').value = producto.campana || 'General';
-            
-            actualizarTallas(producto.talla);
-            
-            document.getElementById('precioCosto').value = producto.precioCosto;
-            document.getElementById('precioVenta').value = producto.precioVenta;
-            document.getElementById('stock').value = producto.stock;
+            document.getElementById('modelo').value = prod.modelo;
+            document.getElementById('categoria').value = prod.categoria;
+            document.getElementById('genero').value = prod.genero || 'Unisex';
+            document.getElementById('campana').value = prod.campana || 'General';
+            actualizarTallas(prod.talla);
+            document.getElementById('precioCosto').value = prod.precioCosto;
+            document.getElementById('precioVenta').value = prod.precioVenta;
+            document.getElementById('stock').value = prod.stock;
 
             document.getElementById('tituloFormulario').innerHTML = `<span class="text-yellow-500">✏️ Editando Producto</span>`;
-            const btnAccion = document.getElementById('btnAccionPrincipal');
-            btnAccion.innerHTML = '🔄 Guardar Cambios';
-            btnAccion.className = 'flex-1 bg-yellow-500 hover:bg-yellow-400 text-black font-black uppercase italic tracking-tight py-4 rounded-xl transition-all shadow-md transform active:scale-95 cursor-pointer text-sm';
+            const btn = document.getElementById('btnAccionPrincipal');
+            btn.innerHTML = '🔄 Guardar Cambios';
+            btn.className = 'flex-1 bg-yellow-500 text-black font-black uppercase italic py-4 rounded-xl shadow-md text-sm lg:text-base';
             document.getElementById('btnCancelarEdicion').classList.remove('hidden');
+            
+            // En móvil, hacer scroll suave arriba
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function cancelarEdicion() {
@@ -452,29 +433,26 @@
             document.getElementById('productForm').reset();
             actualizarTallas(); 
             document.getElementById('tituloFormulario').innerHTML = `<span>⚡ Ingresar Mercancía</span>`;
-            const btnAccion = document.getElementById('btnAccionPrincipal');
-            btnAccion.innerHTML = '💾 Registrar Inventario';
-            btnAccion.className = 'flex-1 bg-white hover:bg-gray-200 text-black font-black uppercase italic tracking-tight py-4 rounded-xl transition-all shadow-md transform active:scale-95 cursor-pointer text-sm';
+            const btn = document.getElementById('btnAccionPrincipal');
+            btn.innerHTML = '💾 Registrar';
+            btn.className = 'flex-1 bg-white text-black font-black uppercase italic py-4 rounded-xl shadow-md text-sm lg:text-base';
             document.getElementById('btnCancelarEdicion').classList.add('hidden');
         }
 
         function eliminarProducto(id) {
-            if (confirm("🚨 ¿Seguro que deseas eliminar este artículo por completo del inventario?")) {
-                inventario = inventario.filter(item => item.id.toString() !== id.toString());
+            if (confirm("🚨 ¿Eliminar artículo definitivamente?")) {
+                inventario = inventario.filter(i => i.id.toString() !== id.toString());
                 if(idEdicionActiva && idEdicionActiva.toString() === id.toString()) cancelarEdicion();
                 guardarDatos();
             }
         }
 
-        // --- GESTIÓN DE VENTAS Y CARTERA ---
         function abrirModalVenta(id) {
-            const prod = inventario.find(item => item.id.toString() === id.toString());
-            if (!prod || prod.stock <= 0) {
-                alert("❌ No queda stock disponible en bodega para este modelo.");
-                return;
-            }
+            const prod = inventario.find(i => i.id.toString() === id.toString());
+            if (!prod || prod.stock <= 0) return alert("❌ No hay stock disponible.");
+            
             idProductoParaVender = id.toString();
-            document.getElementById('modalVentaProducto').innerText = `👕 ${prod.modelo} (Talla: ${prod.talla} - ${prod.genero || 'Unisex'}) | Campaña: ${prod.campana || 'General'}`;
+            document.getElementById('modalVentaProducto').innerText = `${prod.modelo}\nTalla: ${prod.talla} | Campaña: ${prod.campana || 'General'}`;
             document.getElementById('modalPrecio').value = prod.precioVenta;
             document.getElementById('modalNota').value = '';
             document.getElementById('modalEstado').value = 'Pagado';
@@ -482,6 +460,7 @@
             const modal = document.getElementById('modalVenta');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
+            
             setTimeout(() => document.getElementById('modalPrecio').focus(), 100);
         }
 
@@ -490,25 +469,21 @@
             modal.classList.add('hidden');
             modal.classList.remove('flex');
             idProductoParaVender = null;
-            document.getElementById('formVenta').reset();
         }
 
         function confirmarVenta(e) {
             e.preventDefault();
-            const prodIndex = inventario.findIndex(item => item.id.toString() === idProductoParaVender.toString());
-            if (prodIndex === -1) return;
+            const idx = inventario.findIndex(i => i.id.toString() === idProductoParaVender);
+            if (idx === -1) return;
 
-            const prod = inventario[prodIndex];
+            const prod = inventario[idx];
             const precioCobrado = parseFloat(document.getElementById('modalPrecio').value);
-            const nota = document.getElementById('modalNota').value.trim() || 'Venta de mostrador';
+            const nota = document.getElementById('modalNota').value.trim();
             const estado = document.getElementById('modalEstado').value;
 
-            if (isNaN(precioCobrado) || precioCobrado < 0) {
-                alert("❌ Ingresa un precio válido.");
-                return;
-            }
+            if (isNaN(precioCobrado) || precioCobrado < 0) return alert("❌ Precio inválido.");
 
-            ventas.push({
+            ventas.unshift({ // Agrega al inicio para verla rápido en la tabla
                 idVenta: Date.now().toString(),
                 fecha: new Date().toLocaleString('es-ES', { year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' }),
                 modelo: prod.modelo,
@@ -526,209 +501,235 @@
             prod.stock--; 
             guardarDatos();
             cerrarModalVenta();
-            
-            const buscador = document.getElementById('buscadorInventario');
-            if(buscador && buscador.value !== '') { buscador.value = ''; renderizarTodo(); }
+            cambiarPestana('tab-ventas'); // Lleva al usuario a ver su venta
         }
 
         function marcarComoPagado(idVenta) {
-            const ventaIndex = ventas.findIndex(v => v.idVenta.toString() === idVenta.toString());
-            if (ventaIndex === -1) return;
-            const venta = ventas[ventaIndex];
-            if (confirm(`💰 ¿Confirmas que recibiste el pago pendiente de $${venta.precioCobrado.toFixed(2)} por "${venta.modelo}"?`)) {
-                ventas[ventaIndex].estado = 'Pagado';
+            const idx = ventas.findIndex(v => v.idVenta.toString() === idVenta.toString());
+            if (idx === -1) return;
+            if (confirm(`💰 ¿Recibiste el pago pendiente de $${ventas[idx].precioCobrado.toFixed(2)}?`)) {
+                ventas[idx].estado = 'Pagado';
                 guardarDatos();
             }
         }
 
         function eliminarVenta(idVenta) {
-            if (confirm("🔄 ¿Deseas anular esta venta? La prenda regresará al stock físico.")) {
-                const ventaIndex = ventas.findIndex(v => v.idVenta.toString() === idVenta.toString());
-                if (ventaIndex === -1) return;
+            if (confirm("🔄 ¿Anular venta y devolver stock?")) {
+                const idx = ventas.findIndex(v => v.idVenta.toString() === idVenta.toString());
+                if (idx === -1) return;
 
-                const ventaAnulada = ventas[ventaIndex];
-                const prodIndex = inventario.findIndex(item => 
-                    item.modelo === ventaAnulada.modelo && 
-                    item.talla === ventaAnulada.talla && 
-                    item.precioCosto === ventaAnulada.precioCosto
-                );
+                const v = ventas[idx];
+                const pIdx = inventario.findIndex(i => i.modelo === v.modelo && i.talla === v.talla && i.precioCosto === v.precioCosto);
                 
-                if (prodIndex !== -1) {
-                    inventario[prodIndex].stock++;
-                } else {
-                    inventario.push({
-                        id: Date.now().toString(),
-                        modelo: ventaAnulada.modelo,
-                        categoria: ventaAnulada.categoria,
-                        genero: ventaAnulada.genero || 'Unisex',
-                        campana: ventaAnulada.campana || 'General',
-                        talla: ventaAnulada.talla,
-                        precioCosto: ventaAnulada.precioCosto,
-                        precioVenta: ventaAnulada.precioCobrado,
-                        stock: 1
+                if (pIdx !== -1) inventario[pIdx].stock++;
+                else {
+                    inventario.unshift({
+                        id: Date.now().toString(), modelo: v.modelo, categoria: v.categoria,
+                        genero: v.genero || 'Unisex', campana: v.campana || 'General',
+                        talla: v.talla, precioCosto: v.precioCosto, precioVenta: v.precioCobrado, stock: 1
                     });
                 }
-                ventas.splice(ventaIndex, 1);
+                ventas.splice(idx, 1);
                 guardarDatos();
             }
         }
 
-        // --- RENDERIZADO VISUAL ---
+        // --- RENDERIZADO UX RESPONSIVE ---
         function renderizarTodo() {
             const tbodyInv = document.getElementById('tablaInventario');
             const tbodyVen = document.getElementById('tablaVentas');
-            const inputBuscador = document.getElementById('buscadorInventario');
+            const term = (document.getElementById('buscadorInventario')?.value || '').toLowerCase().trim();
             
             tbodyInv.innerHTML = '';
             tbodyVen.innerHTML = '';
 
-            const campanasUnicas = [...new Set(inventario.map(i => i.campana || 'General'))];
-            document.getElementById('listaCampanas').innerHTML = campanasUnicas.map(c => `<option value="${c}">`).join('');
+            // Llenar lista campañas
+            const camps = [...new Set(inventario.map(i => i.campana || 'General'))];
+            document.getElementById('listaCampanas').innerHTML = camps.map(c => `<option value="${c}">`).join('');
 
-            let capitalBodega = 0, ingresoPotencial = 0, stockTotal = 0;
-            let ingresosTotales = 0, costoVendido = 0, utilidadNeta = 0;
+            let cBodega = 0, iPotencial = 0, sTotal = 0;
+            let iTotales = 0, cVendido = 0, uNeta = 0;
 
-            const terminoBusqueda = inputBuscador ? inputBuscador.value.toLowerCase().trim() : '';
-
-            // CALCULO INVENTARIO Y BODEGA
-            inventario.forEach(item => {
-                capitalBodega += (item.precioCosto * item.stock);
-                ingresoPotencial += (item.precioVenta * item.stock);
-                stockTotal += item.stock;
+            // RENDER INVENTARIO (TARJETAS EN MÓVIL, FILAS EN DESKTOP)
+            const invFiltro = inventario.filter(i => {
+                cBodega += (i.precioCosto * i.stock);
+                iPotencial += (i.precioVenta * i.stock);
+                sTotal += i.stock;
+                if(term === '') return true;
+                return `${i.modelo} ${i.categoria} ${i.talla} ${i.genero||''} ${i.campana||''}`.toLowerCase().includes(term);
             });
 
-            const inventarioFiltrado = inventario.filter(item => {
-                if (terminoBusqueda === '') return true;
-                const txt = `${item.modelo} ${item.categoria} ${item.talla} ${item.genero || ''} ${item.campana || ''}`.toLowerCase();
-                return txt.includes(terminoBusqueda);
-            });
-
-            if (inventarioFiltrado.length === 0 && inventario.length > 0) {
-                tbodyInv.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-500 italic">No se encontraron resultados</td></tr>`;
+            if(invFiltro.length === 0 && inventario.length > 0) {
+                tbodyInv.innerHTML = `<div class="p-8 text-center text-gray-500 italic border-t border-gray-800">No se encontraron prendas</div>`;
             } else {
-                inventarioFiltrado.forEach(item => {
-                    let badgeClass = item.stock === 0 ? "bg-red-500/10 text-red-400 border-red-500/20 animate-pulse" : (item.stock <= 3 ? "bg-orange-500/10 text-orange-400 border-orange-500/20" : "bg-emerald-500/10 text-emerald-400 border-emerald-500/20");
+                invFiltro.forEach(i => {
+                    let stClass = i.stock === 0 ? "text-red-400 bg-red-500/10 border-red-500/20" : (i.stock <= 3 ? "text-orange-400 bg-orange-500/10 border-orange-500/20" : "text-emerald-400 bg-emerald-500/10 border-emerald-500/20");
+                    
                     tbodyInv.innerHTML += `
-                        <tr class="hover:bg-gray-800/30 transition-colors border-b border-gray-800/50">
-                            <td class="p-4"><p class="font-bold text-white">${item.modelo}</p><p class="text-[10px] text-gray-500">${item.categoria} • ${item.genero || 'Unisex'}</p></td>
-                            <td class="p-4 text-center font-bold text-gray-300">${item.talla}</td>
-                            <td class="p-4 text-center text-xs"><span class="bg-gray-800 px-2 py-1 rounded text-gray-300">${item.campana || 'General'}</span></td>
-                            <td class="p-4 text-right text-gray-400">$${item.precioCosto.toFixed(2)}</td>
-                            <td class="p-4 text-right text-white font-medium">$${item.precioVenta.toFixed(2)}</td>
-                            <td class="p-4 text-center"><span class="px-2.5 py-1 rounded-md text-xs font-bold border ${badgeClass}">${item.stock}</span></td>
-                            <td class="p-4 text-center flex gap-1.5 justify-center mt-1">
-                                <button onclick="abrirModalVenta('${item.id}')" class="bg-emerald-500 text-black font-black px-2 py-1.5 rounded-lg active:scale-95 shadow-md" title="Vender">💰</button>
-                                <button onclick="prepararEdicion('${item.id}')" class="bg-gray-700 hover:bg-yellow-500 hover:text-black text-white font-black px-2 py-1.5 rounded-lg active:scale-95 shadow-md" title="Editar">✏️</button>
-                                <button onclick="eliminarProducto('${item.id}')" class="text-gray-500 hover:text-red-400 hover:bg-red-500/10 px-2 py-1.5 rounded-lg" title="Borrar">🗑️</button>
-                            </td>
-                        </tr>
+                        <div class="bg-gray-800/20 lg:bg-transparent p-4 lg:p-0 rounded-2xl lg:rounded-none border lg:border-none border-gray-700 lg:border-b lg:border-gray-800/50 flex flex-col lg:grid lg:grid-cols-8 lg:items-center gap-3 lg:gap-4 hover:bg-gray-800/40 transition-colors mb-4 lg:mb-0">
+                            <div class="lg:col-span-2 lg:py-4 lg:pl-4 flex justify-between items-start">
+                                <div>
+                                    <p class="font-bold text-white text-base lg:text-sm">${i.modelo}</p>
+                                    <p class="text-xs text-gray-500 mt-0.5">${i.categoria} • ${i.genero || 'Unisex'}</p>
+                                </div>
+                                <span class="lg:hidden bg-gray-800 px-2 py-1 rounded text-gray-300 text-[10px]">${i.campana || 'General'}</span>
+                            </div>
+                            
+                            <div class="hidden lg:block text-center font-bold text-gray-300">${i.talla}</div>
+                            <div class="hidden lg:flex justify-center"><span class="bg-gray-800 px-2 py-1 rounded text-gray-300 text-xs">${i.campana || 'General'}</span></div>
+                            
+                            <div class="flex justify-between items-center lg:hidden">
+                                <span class="text-xs font-bold text-gray-500 uppercase">Talla:</span>
+                                <span class="font-bold text-white text-lg">${i.talla}</span>
+                            </div>
+
+                            <div class="flex justify-between items-center lg:block lg:text-right">
+                                <span class="lg:hidden text-xs font-bold text-gray-500 uppercase">Precio:</span>
+                                <div class="flex items-center gap-2 lg:block">
+                                    <span class="text-gray-400 text-xs line-through lg:no-underline lg:block">$${i.precioCosto.toFixed(2)}</span>
+                                    <span class="text-emerald-400 lg:text-white font-black lg:font-medium lg:block text-lg lg:text-sm">$${i.precioVenta.toFixed(2)}</span>
+                                </div>
+                            </div>
+                            <div class="hidden lg:block text-right text-white font-medium">$${i.precioVenta.toFixed(2)}</div>
+
+                            <div class="flex justify-between items-center lg:justify-center border-t border-gray-700/50 lg:border-none pt-3 lg:pt-0">
+                                <span class="lg:hidden text-xs font-bold text-gray-500 uppercase">Stock:</span>
+                                <span class="px-3 py-1 rounded-lg text-sm lg:text-xs font-black border ${stClass}">${i.stock} u.</span>
+                            </div>
+
+                            <div class="grid grid-cols-3 lg:flex lg:justify-center gap-2 mt-2 lg:mt-0 lg:py-2 lg:pr-2">
+                                <button onclick="abrirModalVenta('${i.id}')" class="bg-emerald-500 text-black font-black py-2.5 lg:py-1.5 lg:px-2.5 rounded-xl lg:rounded-lg shadow-md flex justify-center items-center">💰<span class="lg:hidden ml-2 text-xs">Vender</span></button>
+                                <button onclick="prepararEdicion('${i.id}')" class="bg-gray-700 text-white font-black py-2.5 lg:py-1.5 lg:px-2.5 rounded-xl lg:rounded-lg shadow-md flex justify-center items-center">✏️</button>
+                                <button onclick="eliminarProducto('${i.id}')" class="bg-red-500/10 text-red-400 py-2.5 lg:py-1.5 lg:px-2.5 rounded-xl lg:rounded-lg flex justify-center items-center">🗑️</button>
+                            </div>
+                        </div>
                     `;
                 });
             }
 
-            // CALCULO VENTAS
-            ventas.forEach(venta => {
-                ingresosTotales += venta.precioCobrado;
-                costoVendido += venta.precioCosto;
-                utilidadNeta += venta.ganancia;
-
-                let isPagado = (venta.estado || 'Pagado') === 'Pagado';
-                let badgeEstado = isPagado 
-                    ? '<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-1 rounded-md text-[10px] font-bold">✅ Pagado</span>' 
-                    : '<span class="bg-orange-500/10 text-orange-400 border border-orange-500/20 px-2 py-1 rounded-md text-[10px] font-bold animate-pulse">⏳ Pendiente</span>';
-                let btnCobrar = !isPagado ? `<button onclick="marcarComoPagado('${venta.idVenta}')" class="bg-emerald-500 text-black font-black text-[10px] px-2 py-1.5 rounded-md shadow-md hover:bg-emerald-400">💲 Cobrar</button>` : '';
+            // RENDER VENTAS (TARJETAS EN MÓVIL, FILAS EN DESKTOP)
+            ventas.forEach(v => {
+                iTotales += v.precioCobrado; cVendido += v.precioCosto; uNeta += v.ganancia;
+                let isPagado = (v.estado || 'Pagado') === 'Pagado';
+                let bEst = isPagado ? '<span class="bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded-md text-[10px] font-bold border border-emerald-500/20">✅ Pagado</span>' : '<span class="bg-orange-500/10 text-orange-400 px-2 py-1 rounded-md text-[10px] font-bold border border-orange-500/20 animate-pulse">⏳ Pendiente</span>';
+                let bCob = !isPagado ? `<button onclick="marcarComoPagado('${v.idVenta}')" class="bg-emerald-500 text-black font-black text-xs py-3 lg:py-1.5 lg:px-2 rounded-xl lg:rounded-md shadow-md">💲 Cobrar</button>` : '';
 
                 tbodyVen.innerHTML += `
-                    <tr class="hover:bg-gray-800/20 transition-colors border-l-2 ${isPagado ? 'border-emerald-500/30' : 'border-orange-500/50'} border-b border-gray-800/50">
-                        <td class="p-4 text-xs text-gray-400">${venta.fecha.split(',')[0]}</td>
-                        <td class="p-4 font-bold text-white">${venta.modelo} <span class="block text-[10px] text-gray-500 font-normal">${venta.genero || 'Unisex'}</span></td>
-                        <td class="p-4 text-center text-xs"><span class="bg-gray-800 px-2 py-1 rounded text-gray-300">${venta.campana || 'General'}</span></td>
-                        <td class="p-4 text-center text-gray-300 font-bold">${venta.talla}</td>
-                        <td class="p-4 text-xs text-blue-300">${venta.nota || '<span class="text-gray-600 italic">Sin nota</span>'}</td>
-                        <td class="p-4 text-center">${badgeEstado}</td>
-                        <td class="p-4 text-right text-emerald-400 font-bold">$${venta.precioCobrado.toFixed(2)}</td>
-                        <td class="p-4 text-right text-yellow-400 font-black">$${venta.ganancia.toFixed(2)}</td>
-                        <td class="p-4 text-center flex gap-1.5 justify-center mt-2">
-                            ${btnCobrar}
-                            <button onclick="eliminarVenta('${venta.idVenta}')" class="text-gray-600 hover:text-red-400 text-xs px-2 py-1 rounded-md hover:bg-red-500/10" title="Borrar Venta">🗑️</button>
-                        </td>
-                    </tr>
+                    <div class="bg-gray-800/20 lg:bg-transparent p-4 lg:p-0 rounded-2xl lg:rounded-none border-l-4 ${isPagado ? 'border-emerald-500' : 'border-orange-500'} lg:border-l-2 lg:border-b lg:border-gray-800/50 flex flex-col lg:grid lg:grid-cols-10 lg:items-center gap-3 hover:bg-gray-800/40 transition-colors mb-4 lg:mb-0 lg:py-2">
+                        
+                        <div class="flex justify-between items-center lg:hidden">
+                            <span class="text-xs text-gray-400">${v.fecha.split(',')[0]}</span>
+                            ${bEst}
+                        </div>
+
+                        <div class="hidden lg:block text-xs text-gray-400 pl-4">${v.fecha.split(',')[0]}</div>
+                        
+                        <div class="lg:col-span-2">
+                            <p class="font-bold text-white text-base lg:text-sm">${v.modelo}</p>
+                            <p class="text-[10px] text-gray-500 mt-0.5">${v.genero || 'Unisex'}</p>
+                        </div>
+
+                        <div class="flex justify-between lg:hidden text-xs">
+                            <span class="text-gray-400">Talla: <strong class="text-white text-sm ml-1">${v.talla}</strong></span>
+                            <span class="text-gray-400">Camp: <strong class="text-white">${v.campana || 'General'}</strong></span>
+                        </div>
+
+                        <div class="hidden lg:flex justify-center"><span class="bg-gray-800 px-2 py-1 rounded text-gray-300 text-[10px]">${v.campana || 'General'}</span></div>
+                        <div class="hidden lg:block text-center font-bold text-gray-300">${v.talla}</div>
+
+                        <div class="text-xs text-blue-300 bg-blue-900/20 lg:bg-transparent p-3 lg:p-0 rounded-lg lg:rounded-none">
+                            <span class="lg:hidden text-gray-500 font-bold uppercase block mb-1">Nota del cliente:</span>
+                            ${v.nota || '<i class="text-gray-600">Sin nota</i>'}
+                        </div>
+
+                        <div class="hidden lg:flex justify-center">${bEst}</div>
+
+                        <div class="flex justify-between lg:contents border-t border-gray-700/50 lg:border-none pt-3 lg:pt-0 mt-1 lg:mt-0">
+                            <div class="lg:text-right">
+                                <span class="lg:hidden text-[10px] text-gray-500 uppercase block mb-0.5">Cobrado</span>
+                                <span class="text-emerald-400 font-bold text-lg lg:text-sm">$${v.precioCobrado.toFixed(2)}</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="lg:hidden text-[10px] text-gray-500 uppercase block mb-0.5">Ganancia</span>
+                                <span class="text-yellow-400 font-black text-lg lg:text-sm">$${v.ganancia.toFixed(2)}</span>
+                            </div>
+                        </div>
+
+                        <div class="grid ${!isPagado ? 'grid-cols-2' : 'grid-cols-1'} lg:flex lg:justify-center gap-2 mt-2 lg:mt-0 lg:pr-2">
+                            ${bCob}
+                            <button onclick="eliminarVenta('${v.idVenta}')" class="bg-red-500/10 text-red-400 py-3 lg:py-1.5 lg:px-2 rounded-xl lg:rounded-md flex justify-center items-center">
+                                🗑️ <span class="lg:hidden ml-2 text-xs font-bold">Anular</span>
+                            </button>
+                        </div>
+                    </div>
                 `;
             });
 
-            document.getElementById('kpiStockTotal').innerText = `${stockTotal} u.`;
-            document.getElementById('kpiCapitalBodega').innerText = `$${capitalBodega.toFixed(2)}`;
-            document.getElementById('kpiIngresoPotencial').innerText = `$${ingresoPotencial.toFixed(2)}`;
-            document.getElementById('kpiIngresosTotales').innerText = `$${ingresosTotales.toFixed(2)}`;
-            document.getElementById('kpiCostoVendido').innerText = `$${costoVendido.toFixed(2)}`;
-            document.getElementById('kpiUtilidadNeta').innerText = `$${utilidadNeta.toFixed(2)}`;
-            document.getElementById('kpiMargen').innerText = `${(ingresosTotales > 0 ? (utilidadNeta / ingresosTotales) * 100 : 0).toFixed(1)}%`;
-            
-            document.getElementById('contadorProductos').innerText = terminoBusqueda !== '' ? `Mostrando ${inventarioFiltrado.length} de ${inventario.length}` : `Modelos: ${inventario.length}`;
-            document.getElementById('contadorVentas').innerText = `Ventas: ${ventas.length}`;
+            // Actualizar KPIs
+            document.getElementById('kpiStockTotal').innerText = `${sTotal} u.`;
+            document.getElementById('kpiCapitalBodega').innerText = `$${cBodega.toFixed(2)}`;
+            document.getElementById('kpiIngresoPotencial').innerText = `$${iPotencial.toFixed(2)}`;
+            document.getElementById('kpiIngresosTotales').innerText = `$${iTotales.toFixed(2)}`;
+            document.getElementById('kpiCostoVendido').innerText = `$${cVendido.toFixed(2)}`;
+            document.getElementById('kpiUtilidadNeta').innerText = `$${uNeta.toFixed(2)}`;
+            document.getElementById('kpiMargen').innerText = `${(iTotales > 0 ? (uNeta / iTotales) * 100 : 0).toFixed(1)}%`;
+            document.getElementById('contadorProductos').innerText = term ? `Filtro: ${invFiltro.length}` : `${inventario.length}`;
+            document.getElementById('contadorVentas').innerText = `${ventas.length}`;
         }
 
-        // --- EXPORTACIÓN CSV ---
+        // --- EXPORTAR / IMPORTAR CSV ---
         function exportarCSV() {
-            if (inventario.length === 0 && ventas.length === 0) return alert("⚠️ No tienes datos cargados para exportar.");
-            let csvContent = "\uFEFF"; 
-            csvContent += "=== SECCION: INVENTARIO EN BODEGA ===\nID,Modelo/Jersey,Categoria,Genero,Campana,Talla,Precio Costo,Precio Venta,Stock Disponible\n";
-            inventario.forEach(i => { csvContent += `"${i.id}","${i.modelo}","${i.categoria}","${i.genero||'Unisex'}","${i.campana||'General'}","${i.talla}",${i.precioCosto},${i.precioVenta},${i.stock}\n`; });
-            csvContent += "\n\n=== SECCION: HISTORIAL DE VENTAS ===\nID Venta,Fecha Venta,Modelo/Jersey,Categoria,Genero,Campana,Talla,Precio Costo,Precio Cobrado,Ganancia Real,Cliente/Nota,Estado Pago\n";
-            ventas.forEach(v => { csvContent += `"${v.idVenta}","${v.fecha}","${v.modelo}","${v.categoria}","${v.genero||'Unisex'}","${v.campana||'General'}","${v.talla}",${v.precioCosto},${v.precioCobrado},${v.ganancia},"${v.nota ? v.nota.replace(/"/g,'""') : ''}","${v.estado||'Pagado'}"\n`; });
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            if (inventario.length === 0 && ventas.length === 0) return alert("⚠️ Sin datos.");
+            let csv = "\uFEFF=== SECCION: INVENTARIO EN BODEGA ===\nID,Modelo/Jersey,Categoria,Genero,Campana,Talla,Precio Costo,Precio Venta,Stock Disponible\n";
+            inventario.forEach(i => csv += `"${i.id}","${i.modelo}","${i.categoria}","${i.genero||'Unisex'}","${i.campana||'General'}","${i.talla}",${i.precioCosto},${i.precioVenta},${i.stock}\n`);
+            csv += "\n\n=== SECCION: HISTORIAL DE VENTAS ===\nID Venta,Fecha Venta,Modelo/Jersey,Categoria,Genero,Campana,Talla,Precio Costo,Precio Cobrado,Ganancia Real,Cliente/Nota,Estado Pago\n";
+            ventas.forEach(v => csv += `"${v.idVenta}","${v.fecha}","${v.modelo}","${v.categoria}","${v.genero||'Unisex'}","${v.campana||'General'}","${v.talla}",${v.precioCosto},${v.precioCobrado},${v.ganancia},"${v.nota?v.nota.replace(/"/g,'""'):''}","${v.estado||'Pagado'}"\n`);
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
-            link.setAttribute("href", url);
-            link.setAttribute("download", `Respaldo_Bandido_${new Date().toLocaleDateString().replace(/\//g,'-')}.csv`);
+            link.href = url; link.download = `Bandido_${new Date().toLocaleDateString().replace(/\//g,'-')}.csv`;
             document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url); 
         }
 
-        // --- IMPORTACIÓN CSV (100% COMPATIBLE HACIA ATRÁS) ---
         function importarCSV(event) {
             const file = event.target.files[0];
             if (!file) return;
             const reader = new FileReader();
             reader.onload = function(e) {
-                const text = e.target.result;
-                const lines = text.split("\n");
-                let modo = "", nuevoInventario = [], nuevasVentas = [];
-                
+                const lines = e.target.result.split("\n");
+                let modo = "", nInv = [], nVen = [];
                 for (let line of lines) {
                     line = line.trim();
                     if (!line) continue;
-                    if (line.includes("=== SECCION: INVENTARIO EN BODEGA ===")) { modo = "INVENTARIO"; continue; }
-                    if (line.includes("=== SECCION: HISTORIAL DE VENTAS ===")) { modo = "VENTAS"; continue; }
-                    if (line.startsWith("ID,") || line.startsWith("ID Venta,")) continue;
+                    if (line.includes("INVENTARIO EN BODEGA")) { modo = "INV"; continue; }
+                    if (line.includes("HISTORIAL DE VENTAS")) { modo = "VEN"; continue; }
+                    if (line.startsWith("ID")) continue;
                     
-                    const campos = line.match(/(".*?"|[^,\s]+)(?=\s*,|\s*$)/g);
-                    if (!campos || campos.length < 6) continue;
-                    const limpiar = str => str ? str.replace(/^"|"$/g, '').trim() : "";
+                    const c = line.match(/(".*?"|[^,\s]+)(?=\s*,|\s*$)/g);
+                    if (!c || c.length < 6) continue;
+                    const lim = s => s ? s.replace(/^"|"$/g, '').trim() : "";
                     
-                    if (modo === "INVENTARIO") {
-                        let id = limpiar(campos[0]), modelo = limpiar(campos[1]), categoria = limpiar(campos[2]);
-                        if (campos.length >= 9) nuevoInventario.push({ id, modelo, categoria, genero: limpiar(campos[3]), campana: limpiar(campos[4]), talla: limpiar(campos[5]), precioCosto: parseFloat(campos[6]), precioVenta: parseFloat(campos[7]), stock: parseInt(campos[8]) });
-                        else if (campos.length === 8) nuevoInventario.push({ id, modelo, categoria, genero: limpiar(campos[3]), campana: "General", talla: limpiar(campos[4]), precioCosto: parseFloat(campos[5]), precioVenta: parseFloat(campos[6]), stock: parseInt(campos[7]) });
-                        else if (campos.length === 7) nuevoInventario.push({ id, modelo, categoria, genero: "Unisex", campana: "General", talla: limpiar(campos[3]), precioCosto: parseFloat(campos[4]), precioVenta: parseFloat(campos[5]), stock: parseInt(campos[6]) });
-                    } else if (modo === "VENTAS") {
-                        let idVenta = limpiar(campos[0]), fecha = limpiar(campos[1]), modelo = limpiar(campos[2]), categoria = limpiar(campos[3]);
-                        if (campos.length >= 12) nuevasVentas.push({ idVenta, fecha, modelo, categoria, genero: limpiar(campos[4]), campana: limpiar(campos[5]), talla: limpiar(campos[6]), precioCosto: parseFloat(campos[7]), precioCobrado: parseFloat(campos[8]), ganancia: parseFloat(campos[9]), nota: limpiar(campos[10]), estado: limpiar(campos[11]) });
-                        else if (campos.length === 11) nuevasVentas.push({ idVenta, fecha, modelo, categoria, genero: limpiar(campos[4]), campana: "General", talla: limpiar(campos[5]), precioCosto: parseFloat(campos[6]), precioCobrado: parseFloat(campos[7]), ganancia: parseFloat(campos[8]), nota: limpiar(campos[9]), estado: limpiar(campos[10]) });
-                        else nuevasVentas.push({ idVenta, fecha, modelo, categoria, genero: "Unisex", campana: "General", talla: limpiar(campos[4]), precioCosto: parseFloat(campos[5]), precioCobrado: parseFloat(campos[6]), ganancia: parseFloat(campos[7]), nota: campos.length >= 10 ? limpiar(campos[8]) : "Importado", estado: campos.length >= 10 ? limpiar(campos[9]) : "Pagado" });
+                    if (modo === "INV") {
+                        if (c.length >= 9) nInv.push({ id:lim(c[0]), modelo:lim(c[1]), categoria:lim(c[2]), genero:lim(c[3]), campana:lim(c[4]), talla:lim(c[5]), precioCosto:parseFloat(c[6]), precioVenta:parseFloat(c[7]), stock:parseInt(c[8]) });
+                        else if (c.length === 8) nInv.push({ id:lim(c[0]), modelo:lim(c[1]), categoria:lim(c[2]), genero:lim(c[3]), campana:"General", talla:lim(c[4]), precioCosto:parseFloat(c[5]), precioVenta:parseFloat(c[6]), stock:parseInt(c[7]) });
+                        else nInv.push({ id:lim(c[0]), modelo:lim(c[1]), categoria:lim(c[2]), genero:"Unisex", campana:"General", talla:lim(c[3]), precioCosto:parseFloat(c[4]), precioVenta:parseFloat(c[5]), stock:parseInt(c[6]) });
+                    } else if (modo === "VEN") {
+                        if (c.length >= 12) nVen.push({ idVenta:lim(c[0]), fecha:lim(c[1]), modelo:lim(c[2]), categoria:lim(c[3]), genero:lim(c[4]), campana:lim(c[5]), talla:lim(c[6]), precioCosto:parseFloat(c[7]), precioCobrado:parseFloat(c[8]), ganancia:parseFloat(c[9]), nota:lim(c[10]), estado:lim(c[11]) });
+                        else if (c.length === 11) nVen.push({ idVenta:lim(c[0]), fecha:lim(c[1]), modelo:lim(c[2]), categoria:lim(c[3]), genero:lim(c[4]), campana:"General", talla:lim(c[5]), precioCosto:parseFloat(c[6]), precioCobrado:parseFloat(c[7]), ganancia:parseFloat(c[8]), nota:lim(c[9]), estado:lim(c[10]) });
+                        else nVen.push({ idVenta:lim(c[0]), fecha:lim(c[1]), modelo:lim(c[2]), categoria:lim(c[3]), genero:"Unisex", campana:"General", talla:lim(c[4]), precioCosto:parseFloat(c[5]), precioCobrado:parseFloat(c[6]), ganancia:parseFloat(c[7]), nota:c.length>=10?lim(c[8]):"", estado:c.length>=10?lim(c[9]):"Pagado" });
                     }
                 }
-                if (nuevoInventario.length > 0 || nuevasVentas.length > 0) {
-                    if (confirm(`📊 Detectados ${nuevoInventario.length} artículos y ${nuevasVentas.length} ventas.\n¿Sobreescribir datos actuales?`)) {
-                        inventario = nuevoInventario; ventas = nuevasVentas; guardarDatos();
-                        const buscador = document.getElementById('buscadorInventario'); if (buscador) buscador.value = '';
-                        renderizarTodo(); alert("✅ Sincronizado con éxito.");
+                if (nInv.length > 0 || nVen.length > 0) {
+                    if (confirm(`📊 Detectados ${nInv.length} artículos y ${nVen.length} ventas.\n¿Sobreescribir datos actuales?`)) {
+                        inventario = nInv; ventas = nVen; guardarDatos();
+                        alert("✅ Sincronizado con éxito.");
                     }
                 } else alert("❌ CSV no compatible.");
             };
             reader.readAsText(file);
         }
 
-        // --- PDF BLINDADO (Sin imagen, solo tipografía) ---
+        // --- PDF BLINDADO ---
         function descargarPDF() {
             if (inventario.length === 0) return alert("⚠️ No hay inventario registrado.");
             const divImpresion = document.createElement('div');
@@ -737,18 +738,16 @@
 
             let htmlContent = `
                 <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #000; padding-bottom:10px; margin-bottom:20px;">
-                    <div>
-                        <h1 style="margin:0; font-size:26px; font-weight:900; font-style:italic; text-transform:uppercase;">BANDIDO STORE</h1>
-                    </div>
+                    <div><h1 style="margin:0; font-size:26px; font-weight:900; font-style:italic; text-transform:uppercase;">BANDIDO STORE</h1></div>
                     <div style="text-align:right;">
-                        <p style="margin:0; font-size:12px; font-weight:bold; text-transform:uppercase; color:#666;">Reporte Oficial de Inventario</p>
+                        <p style="margin:0; font-size:12px; font-weight:bold; text-transform:uppercase; color:#666;">Reporte de Inventario</p>
                         <p style="margin:0; font-size:10px; color:#888;">${fecha}</p>
                     </div>
                 </div>
                 <table style="width:100%; border-collapse:collapse; font-size:11px; text-align:left;">
                     <thead>
                         <tr style="background-color:#f3f4f6; border-bottom:2px solid #d1d5db; text-transform:uppercase; font-size:9px; color:#374151;">
-                            <th style="padding:6px;">Modelo</th><th style="padding:6px;">Categoría</th><th style="padding:6px; text-align:center;">Talla</th><th style="padding:6px; text-align:right;">Costo</th><th style="padding:6px; text-align:right;">P. Venta</th><th style="padding:6px; text-align:center;">Stock</th>
+                            <th style="padding:6px;">Modelo / Campaña</th><th style="padding:6px; text-align:center;">Talla</th><th style="padding:6px; text-align:right;">Costo</th><th style="padding:6px; text-align:right;">P. Venta</th><th style="padding:6px; text-align:center;">Stock</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -758,8 +757,7 @@
                 tStock += item.stock; tCosto += (item.precioCosto * item.stock); tVenta += (item.precioVenta * item.stock);
                 htmlContent += `
                     <tr style="border-bottom:1px solid #e5e7eb;">
-                        <td style="padding:6px; font-weight:bold;">${item.modelo}</td>
-                        <td style="padding:6px; color:#6b7280;">${item.categoria} - ${item.genero||'Unisex'}</td>
+                        <td style="padding:6px;"><strong>${item.modelo}</strong><br><span style="font-size:9px; color:#666;">${item.categoria} - ${item.genero||'Unisex'} | ${item.campana||'General'}</span></td>
                         <td style="padding:6px; text-align:center; font-weight:bold;">${item.talla}</td>
                         <td style="padding:6px; text-align:right;">$${item.precioCosto.toFixed(2)}</td>
                         <td style="padding:6px; text-align:right;">$${item.precioVenta.toFixed(2)}</td>
@@ -771,7 +769,7 @@
                 </table>
                 <div style="margin-top:25px; display:flex; justify-content:flex-end;">
                     <div style="background-color:#f9fafb; padding:12px; border-radius:8px; border:1px solid #e5e7eb; width:220px;">
-                        <p style="margin:0 0 5px 0; font-size:10px; text-transform:uppercase; font-weight:bold; color:#6b7280;">Resumen Total en Bodega</p>
+                        <p style="margin:0 0 5px 0; font-size:10px; text-transform:uppercase; font-weight:bold; color:#6b7280;">Resumen en Bodega</p>
                         <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span style="font-size:11px; font-weight:bold;">Prendas Totales:</span><span style="font-size:11px; font-weight:bold;">${tStock} u.</span></div>
                         <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span style="font-size:11px; font-weight:bold;">Inversión Retenida:</span><span style="font-size:11px; font-weight:bold;">$${tCosto.toFixed(2)}</span></div>
                         <div style="display:flex; justify-content:space-between; padding-top:5px; border-top:1px solid #d1d5db;"><span style="font-size:11px; font-weight:bold;">Venta Potencial:</span><span style="font-size:12px; font-weight:black; color:#059669;">$${tVenta.toFixed(2)}</span></div>
@@ -780,7 +778,7 @@
             `;
             divImpresion.innerHTML = htmlContent;
             html2pdf().set({
-                margin:[15,15,15,15], filename:`Inventario_BandidoStore_${new Date().toLocaleDateString().replace(/\//g,'-')}.pdf`,
+                margin:[15,15,15,15], filename:`Inventario_${new Date().toLocaleDateString().replace(/\//g,'-')}.pdf`,
                 image:{type:'jpeg', quality:0.98}, html2canvas:{scale:2, useCORS:true}, jsPDF:{unit:'mm', format:'a4', orientation:'portrait'}
             }).from(divImpresion).save();
         }
