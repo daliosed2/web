@@ -3,17 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bandido Store - Cloud Core v7.0</title>
+    <title>Bandido Store - Cloud Core v7.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
         body { font-family: 'Inter', sans-serif; }
-        
-        /* Ocultar barra de scroll en pestañas para diseño limpio en móvil */
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
         .tab-content { transition: opacity 0.3s ease-in-out; }
     </style>
     
@@ -32,14 +29,15 @@
 </head>
 <body class="bg-[#0b0c10] text-[#eee] min-h-screen pb-12 relative">
 
-    <div id="cloudLoader" class="fixed inset-0 bg-[#0b0c10]/90 z-[100] flex flex-col items-center justify-center hidden backdrop-blur-sm">
+    <div id="cloudLoader" class="fixed inset-0 bg-[#0b0c10]/95 z-[100] flex flex-col items-center justify-center hidden backdrop-blur-md">
         <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500 mb-4"></div>
-        <p class="text-yellow-500 font-bold tracking-widest text-sm uppercase">Descargando datos...</p>
+        <p class="text-yellow-500 font-bold tracking-widest text-sm uppercase">Sincronizando Base de Datos...</p>
+        <p class="text-gray-500 text-xs mt-2 text-center px-4">Por favor espera, no cierres la aplicación.</p>
     </div>
     
     <div id="cloudSync" class="fixed bottom-4 right-4 bg-blue-500 text-white text-[10px] font-black uppercase px-4 py-3 rounded-full shadow-lg z-50 flex items-center gap-2 hidden">
         <div class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
-        Sincronizando
+        Guardando en Nube
     </div>
 
     <header class="border-b border-gray-800 bg-[#1f2833]/40 backdrop-blur-md sticky top-0 z-40 py-4 px-4 sm:px-6">
@@ -52,7 +50,7 @@
                     </div>
                 </div>
                 <span class="bg-yellow-500/10 text-yellow-500 text-[10px] font-bold px-2 py-0.5 rounded-full border border-yellow-500/20 md:ml-2">
-                    UX v7.0
+                    UX v7.1
                 </span>
             </div>
             <div class="flex w-full md:w-auto overflow-x-auto hide-scrollbar items-center gap-2 justify-start md:justify-center py-1">
@@ -98,11 +96,10 @@
                     <p class="text-3xl font-black text-white" id="kpiCapitalBodega">$0.00</p>
                 </div>
                 <div class="bg-[#151a21] p-6 rounded-2xl border border-blue-500/30 bg-gradient-to-br from-[#151a21] to-blue-500/5 shadow-lg relative overflow-hidden">
-                    <div class="absolute -right-2 -top-2 text-blue-500/10 text-8xl"></div>
+                    <div class="absolute -right-2 -top-2 text-blue-500/10 text-8xl">📈</div>
                     <p class="text-blue-400 text-xs font-bold uppercase tracking-wider mb-1">Venta Proyectada</p>
                     <p class="text-3xl font-black text-blue-400" id="kpiIngresoPotencial">$0.00</p>
                 </div>
-
                 <div class="bg-[#151a21] p-6 rounded-2xl border border-gray-800 shadow-lg">
                     <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Ingresos (Caja Real)</p>
                     <p class="text-3xl font-black text-emerald-400" id="kpiIngresosTotales">$0.00</p>
@@ -112,7 +109,7 @@
                     <p class="text-3xl font-black text-orange-400" id="kpiCostoVendido">$0.00</p>
                 </div>
                 <div class="bg-[#151a21] p-6 rounded-2xl border border-yellow-500/30 bg-gradient-to-br from-[#151a21] to-yellow-500/5 shadow-lg relative overflow-hidden">
-                    <div class="absolute -right-2 -top-2 text-yellow-500/10 text-8xl"></div>
+                    <div class="absolute -right-2 -top-2 text-yellow-500/10 text-8xl">💰</div>
                     <p class="text-yellow-500 text-xs font-bold uppercase tracking-wider mb-1">Utilidad Bruta</p>
                     <div class="flex items-baseline gap-2">
                         <p class="text-4xl font-black text-yellow-400" id="kpiUtilidadNeta">$0.00</p>
@@ -256,7 +253,6 @@
                 </div>
             </section>
         </div>
-
     </main>
 
     <div id="modalVenta" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 backdrop-blur-sm px-4">
@@ -302,12 +298,17 @@
         let ventas = JSON.parse(localStorage.getItem('bandido_ventas_historial')) || [];
         let idEdicionActiva = null;
         let idProductoParaVender = null;
+        
+        // 🛡️ EL CANDADO DE SINCRONIZACIÓN (Evita el borrado por "Condición de Carrera")
+        let nubeSincronizada = false;
 
         document.addEventListener('DOMContentLoaded', () => {
             actualizarTallas();
             renderizarTodo();
             if(SCRIPT_URL && SCRIPT_URL !== '') {
                 cargarDesdeNube();
+            } else {
+                nubeSincronizada = true; // Si no hay URL, permite operar en local.
             }
         });
 
@@ -327,7 +328,6 @@
             btnActivo.classList.add('text-yellow-500', 'border-yellow-500');
         }
 
-        // Función para ocultar/mostrar formulario en móvil
         function toggleFormulario() {
             const form = document.getElementById('seccionFormulario');
             const icono = document.getElementById('iconoToggle');
@@ -356,8 +356,11 @@
                 localStorage.setItem('bandido_inventario', JSON.stringify(inventario));
                 localStorage.setItem('bandido_ventas_historial', JSON.stringify(ventas));
                 renderizarTodo();
+                
+                nubeSincronizada = true; // ✅ CANDADO ABIERTO: NUBE Y CELULAR ESTÁN SINCRONIZADOS
             } catch (e) {
                 console.error("Error conectando a nube:", e);
+                alert("⚠️ Error de conexión con la nube. Asegúrate de tener internet. Trabajarás en modo local.");
             }
             document.getElementById('cloudLoader').classList.add('hidden');
         }
@@ -368,6 +371,12 @@
             renderizarTodo();
 
             if(SCRIPT_URL && SCRIPT_URL !== '') {
+                // 🛡️ SISTEMA DE BLOQUEO DE ESCRITURA
+                if(!nubeSincronizada && inventario.length > 0) {
+                    console.warn("Nube no sincronizada. Se evita el envío para no sobreescribir datos.");
+                    return;
+                }
+
                 document.getElementById('cloudSync').classList.remove('hidden');
                 fetch(SCRIPT_URL, {
                     method: 'POST',
@@ -426,7 +435,6 @@
                 document.getElementById('campana').value = '';
                 actualizarTallas(); 
                 
-                // Ocultar formulario en móvil después de guardar
                 if (window.innerWidth < 1280) {
                     document.getElementById('seccionFormulario').classList.add('hidden');
                     document.getElementById('iconoToggle').innerText = '➕';
@@ -456,7 +464,6 @@
             btn.className = 'flex-1 bg-yellow-500 text-black font-black uppercase italic py-4 rounded-xl shadow-md text-sm lg:text-base';
             document.getElementById('btnCancelarEdicion').classList.remove('hidden');
             
-            // Asegurar que el formulario sea visible en móvil y scrollear
             const form = document.getElementById('seccionFormulario');
             form.classList.remove('hidden');
             if(window.innerWidth < 1280) {
@@ -578,7 +585,7 @@
             }
         }
 
-        // --- RENDERIZADO UX RESPONSIVE ---
+        // --- RENDERIZADO VISUAL ---
         function renderizarTodo() {
             const tbodyInv = document.getElementById('tablaInventario');
             const tbodyVen = document.getElementById('tablaVentas');
@@ -713,6 +720,7 @@
             document.getElementById('kpiCostoVendido').innerText = `$${cVendido.toFixed(2)}`;
             document.getElementById('kpiUtilidadNeta').innerText = `$${uNeta.toFixed(2)}`;
             document.getElementById('kpiMargen').innerText = `${(iTotales > 0 ? (uNeta / iTotales) * 100 : 0).toFixed(1)}%`;
+            
             document.getElementById('contadorProductos').innerText = term ? `Filtro: ${invFiltro.length}` : `${inventario.length}`;
             document.getElementById('contadorVentas').innerText = `${ventas.length}`;
         }
@@ -762,6 +770,7 @@
                     if (confirm(`📊 Detectados ${nInv.length} artículos y ${nVen.length} ventas.\n¿Sobreescribir datos actuales?`)) {
                         inventario = nInv; ventas = nVen; guardarDatos();
                         alert("✅ Sincronizado con éxito.");
+                        nubeSincronizada = true; // Permite guardar si se sobreescribió localmente
                     }
                 } else alert("❌ CSV no compatible.");
             };
