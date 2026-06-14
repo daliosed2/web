@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bandido Store - Cloud Core v4.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        th, td { white-space: nowrap; }
+    </style>
+    
+    <script>
+        const acceso = sessionStorage.getItem('acceso_bandido');
+        if (acceso !== 'concedido') {
+            const password = prompt("🏴‍☠️ BANDIDO STORE CLOUD\nAcceso Restringido. Ingrese credencial maestra:");
+            if (password === "Quito2026") {
+                sessionStorage.setItem('acceso_bandido', 'concedido');
+            } else {
+                document.write("<div style='background:#0b0c10; height:100vh; display:flex; justify-content:center; align-items:center;'><h1 style='color:#ef4444; font-family:sans-serif;'>ACCESO DENEGADO</h1></div>");
+                window.stop();
+            }
+        }
+    </script>
+</head>
+<body class="bg-[#0b0c10] text-[#eee] min-h-screen pb-12 relative">
+
+    <div id="cloudLoader" class="fixed inset-0 bg-[#0b0c10]/90 z-[100] flex flex-col items-center justify-center hidden backdrop-blur-sm">
+        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500 mb-4"></div>
+        <p class="text-yellow-500 font-bold tracking-widest text-sm uppercase">Descargando datos de la nube...</p>
+    </div>
+    
+    <div id="cloudSync" class="fixed bottom-4 right-4 bg-blue-500 text-white text-[10px] font-black uppercase px-3 py-2 rounded-full shadow-lg z-50 flex items-center gap-2 hidden">
+        <div class="animate-spin h-3 w-3 border-2 border-white border-t-transparent rounded-full"></div>
+        Sincronizando...
+    </div>
+
+    <header class="border-b border-gray-800 bg-[#1f2833]/40 backdrop-blur-md sticky top-0 z-40 py-4 px-6 mb-8">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <img src="data:image/jpeg;base64,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" alt="Logo Bandido Store" class="h-10 w-auto rounded object-contain border border-yellow-500/20">
+                <div class="text-2xl font-black uppercase italic tracking-tighter text-yellow-500">
+                    BANDIDO <span class="text-white">STORE</span>
+                </div>
+                <span class="bg-yellow-500/10 text-yellow-500 text-[10px] font-bold px-2 py-0.5 rounded-full border border-yellow-500/20 ml-2 hidden sm:inline-block">
+                    CLOUD CORE v4.0
+                </span>
+            </div>
+            <div class="flex flex-wrap items-center gap-2 justify-center">
+                <button onclick="forzarSincronizacion()" class="bg-blue-500/10 hover:bg-blue-500 text-blue-400 hover:text-white text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-xl border border-blue-500/20 hover:border-blue-500 transition-all flex items-center gap-2 cursor-pointer shadow-md">
+                    🔄 Sincronizar
+                </button>
+                <button onclick="descargarPDF()" class="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-xl border border-red-500/20 hover:border-red-500 transition-all flex items-center gap-2 cursor-pointer shadow-md">
+                    📄 PDF
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6">
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+            <div class="bg-[#151a21] p-5 rounded-2xl border border-gray-800/80 shadow-lg">
+                <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Stock Físico (Unidades)</p>
+                <p class="text-2xl font-black text-blue-400" id="kpiStockTotal">0 u.</p>
+                <span class="text-[10px] text-gray-500">Suma total de prendas en bodega</span>
+            </div>
+            <div class="bg-[#151a21] p-5 rounded-2xl border border-gray-800/80 shadow-lg">
+                <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Capital Invertido (Costo)</p>
+                <p class="text-2xl font-black text-white" id="kpiCapitalBodega">$0.00</p>
+                <span class="text-[10px] text-gray-500">Dinero propio retenido en mercancía</span>
+            </div>
+            <div class="bg-[#151a21] p-5 rounded-2xl border border-blue-500/30 bg-gradient-to-br from-[#151a21] to-blue-500/5 shadow-lg relative overflow-hidden">
+                <div class="absolute -right-4 -top-4 text-blue-500/10 text-6xl">📈</div>
+                <p class="text-blue-400 text-xs font-bold uppercase tracking-wider mb-1">Venta Proyectada (Potencial)</p>
+                <p class="text-2xl font-black text-blue-400" id="kpiIngresoPotencial">$0.00</p>
+                <span class="text-[10px] text-gray-400 font-medium">Ingreso estimado si se vende todo el stock</span>
+            </div>
+            <div class="bg-[#151a21] p-5 rounded-2xl border border-gray-800/80 shadow-lg">
+                <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Ingresos Totales (Caja Real)</p>
+                <p class="text-2xl font-black text-emerald-400" id="kpiIngresosTotales">$0.00</p>
+                <span class="text-[10px] text-gray-500">Suma total del dinero cobrado</span>
+            </div>
+            <div class="bg-[#151a21] p-5 rounded-2xl border border-gray-800/80 shadow-lg">
+                <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Costo de lo Vendido</p>
+                <p class="text-2xl font-black text-orange-400" id="kpiCostoVendido">$0.00</p>
+                <span class="text-[10px] text-gray-500">Capital recuperado de la inversión inicial</span>
+            </div>
+            <div class="bg-[#151a21] p-5 rounded-2xl border border-yellow-500/30 bg-gradient-to-br from-[#151a21] to-yellow-500/5 shadow-lg relative overflow-hidden">
+                <div class="absolute -right-4 -top-4 text-yellow-500/10 text-6xl">💰</div>
+                <p class="text-yellow-500 text-xs font-bold uppercase tracking-wider mb-1">Utilidad Bruta (Ganancia)</p>
+                <div class="flex items-baseline gap-2">
+                    <p class="text-3xl font-black text-yellow-400" id="kpiUtilidadNeta">$0.00</p>
+                    <span class="text-sm font-bold text-yellow-600" id="kpiMargen">0.0%</span>
+                </div>
+                <span class="text-[10px] text-gray-400 font-medium">Ganancia neta real y margen sobre ventas</span>
+            </div>
+        </section>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+            <section class="lg:col-span-1 bg-[#151a21] p-6 rounded-2xl border border-gray-800 h-fit sticky top-24 shadow-lg" id="seccionFormulario">
+                <h2 class="text-lg font-black uppercase italic tracking-tight text-white mb-4 flex items-center gap-2" id="tituloFormulario">
+                    <span>⚡ Ingresar Mercancía</span>
+                </h2>
+                <form id="productForm" onsubmit="guardarOActualizarProducto(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Nombre del Jersey / Modelo</label>
+                        <input type="text" id="modelo" required placeholder="Ej: Real Madrid Retro 1998" class="w-full bg-[#0b0c10] border border-gray-700 rounded-xl px-4 py-2.5 text-white placeholder-gray-600 focus:outline-none focus:border-yellow-500 transition-colors text-sm">
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Categoría</label>
+                            <select id="categoria" class="w-full bg-[#0b0c10] border border-gray-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-yellow-500 text-sm">
+                                <option value="Camisetas">Camisetas</option>
+                                <option value="Hoodies">Hoodies</option>
+                                <option value="Retro">Retro</option>
+                                <option value="Fashions">Fashions</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Público</label>
+                            <select id="genero" onchange="actualizarTallas()" class="w-full bg-[#0b0c10] border border-gray-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-yellow-500 text-sm">
+                                <option value="Unisex" selected>Unisex</option>
+                                <option value="Hombre">Hombre</option>
+                                <option value="Mujer">Mujer</option>
+                                <option value="Niño">Niño / Infantil</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Campaña / Colección</label>
+                            <input type="text" id="campana" list="listaCampanas" placeholder="Ej: Mundial 2026" class="w-full bg-[#0b0c10] border border-gray-700 rounded-xl px-3 py-2.5 text-white placeholder-gray-600 focus:outline-none focus:border-yellow-500 transition-colors text-sm">
+                            <datalist id="listaCampanas"></datalist>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Talla</label>
+                            <select id="talla" class="w-full bg-[#0b0c10] border border-gray-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-yellow-500 text-sm"></select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Costo ($)</label>
+                            <input type="number" id="precioCosto" step="0.01" required placeholder="0.00" class="w-full bg-[#0b0c10] border border-gray-700 rounded-xl px-3 py-2.5 text-white placeholder-gray-600 focus:outline-none focus:border-yellow-500 transition-colors text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Venta ($)</label>
+                            <input type="number" id="precioVenta" step="0.01" required placeholder="0.00" class="w-full bg-[#0b0c10] border border-gray-700 rounded-xl px-3 py-2.5 text-white placeholder-gray-600 focus:outline-none focus:border-yellow-500 transition-colors text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Stock</label>
+                            <input type="number" id="stock" required placeholder="Cant." class="w-full bg-[#0b0c10] border border-gray-700 rounded-xl px-3 py-2.5 text-white placeholder-gray-600 focus:outline-none focus:border-yellow-500 transition-colors text-sm">
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-2 pt-2">
+                        <button type="submit" id="btnAccionPrincipal" class="flex-1 bg-white hover:bg-gray-200 text-black font-black uppercase italic tracking-tight py-3 rounded-xl transition-all shadow-md transform active:scale-95 cursor-pointer text-sm">
+                            💾 Registrar Inventario
+                        </button>
+                        <button type="button" id="btnCancelarEdicion" onclick="cancelarEdicion()" class="hidden bg-gray-800 hover:bg-gray-700 text-white font-bold uppercase tracking-tight py-3 px-4 rounded-xl transition-all cursor-pointer text-xs border border-gray-600">
+                            ❌ Cancelar
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="lg:col-span-2 bg-[#151a21] p-6 rounded-2xl border border-gray-800 shadow-lg">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-4">
+                    <h2 class="text-lg font-black uppercase italic tracking-tight text-white flex items-center gap-2">
+                        <span>📦 Stock en Bodega</span>
+                        <span class="text-xs font-normal text-gray-400 normal-case italic bg-gray-800 px-2 py-0.5 rounded-md" id="contadorProductos">Modelos: 0</span>
+                    </h2>
+                    
+                    <div class="relative w-full sm:w-64">
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">🔍</div>
+                        <input type="text" id="buscadorInventario" oninput="renderizarTodo()" placeholder="Buscar prenda, talla, campaña..." class="w-full bg-[#0b0c10] border border-gray-700 rounded-xl pl-9 pr-4 py-2 text-white placeholder-gray-600 focus:outline-none focus:border-yellow-500 transition-colors text-sm">
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto rounded-xl border border-gray-800 max-h-[600px] overflow-y-auto w-full">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="sticky top-0 bg-[#0b0c10] border-b border-gray-800 z-10 shadow-sm">
+                            <tr class="text-[10px] uppercase font-bold tracking-wider text-gray-400">
+                                <th class="p-4">Detalle / Modelo</th>
+                                <th class="p-4 text-center">Talla</th>
+                                <th class="p-4 text-center">Campaña</th>
+                                <th class="p-4 text-right">Costo</th>
+                                <th class="p-4 text-right">P. Venta</th>
+                                <th class="p-4 text-center">Stock</th>
+                                <th class="p-4 text-center text-yellow-500">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaInventario" class="divide-y divide-gray-800/50 text-sm"></tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <section class="bg-[#151a21] p-6 rounded-2xl border border-gray-800 shadow-lg">
+            <h2 class="text-lg font-black uppercase italic tracking-tight text-emerald-400 mb-4 flex items-center justify-between">
+                <span>💰 Historial de Ventas</span>
+                <span class="text-xs bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full font-bold border border-emerald-500/20" id="contadorVentas">Prendas vendidas: 0</span>
+            </h2>
+            <div class="overflow-x-auto rounded-xl border border-gray-800 max-h-[500px] overflow-y-auto w-full">
+                <table class="w-full text-left border-collapse">
+                    <thead class="sticky top-0 bg-[#0b0c10] border-b border-gray-800 z-10 shadow-sm">
+                        <tr class="text-[10px] uppercase font-bold tracking-wider text-gray-400">
+                            <th class="p-4">Fecha</th>
+                            <th class="p-4">Producto</th>
+                            <th class="p-4 text-center">Campaña</th>
+                            <th class="p-4 text-center">Talla</th>
+                            <th class="p-4">Cliente / Nota</th>
+                            <th class="p-4 text-center">Estado</th>
+                            <th class="p-4 text-right text-emerald-400">P. Cobrado</th>
+                            <th class="p-4 text-right text-yellow-500">Ganancia</th>
+                            <th class="p-4 text-center">Gestión</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaVentas" class="divide-y divide-gray-800/50 text-sm"></tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <div id="modalVenta" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 backdrop-blur-sm">
+        <div class="bg-[#151a21] p-6 rounded-2xl border border-gray-700 w-full max-w-md shadow-2xl mx-4 transform transition-all">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-black italic text-white uppercase tracking-tight">Procesar Venta</h3>
+                <button type="button" onclick="cerrarModalVenta()" class="text-gray-500 hover:text-white transition-colors cursor-pointer text-xl">×</button>
+            </div>
+            
+            <p id="modalVentaProducto" class="text-emerald-400 font-bold mb-4 bg-emerald-500/10 p-3 rounded-xl text-sm border border-emerald-500/20"></p>
+
+            <form id="formVenta" onsubmit="confirmarVenta(event)" class="space-y-4">
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">1. Precio a Cobrar ($)</label>
+                    <input type="number" id="modalPrecio" step="0.01" required class="w-full bg-[#0b0c10] border border-gray-700 rounded-xl px-4 py-3 text-white font-bold focus:outline-none focus:border-emerald-500 transition-colors text-lg">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">2. Cliente o Nota (Opcional)</label>
+                    <input type="text" id="modalNota" placeholder="Ej: Juan Perez - Enviar por Servientrega" class="w-full bg-[#0b0c10] border border-gray-700 rounded-xl px-4 py-2.5 text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500 transition-colors text-sm">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">3. Estado del Pago</label>
+                    <select id="modalEstado" class="w-full bg-[#0b0c10] border border-gray-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500 transition-colors text-sm">
+                        <option value="Pagado">✅ Pago Completado</option>
+                        <option value="Pendiente">⏳ Pago Pendiente / Por Cobrar</option>
+                    </select>
+                </div>
+                <div class="flex gap-3 pt-4">
+                    <button type="button" onclick="cerrarModalVenta()" class="flex-1 bg-gray-800 hover:bg-gray-700 text-white font-bold uppercase tracking-tight py-3 rounded-xl transition-all cursor-pointer text-sm border border-gray-600">Cancelar</button>
+                    <button type="submit" class="flex-[2] bg-emerald-500 hover:bg-emerald-400 text-black font-black uppercase italic tracking-tight py-3 rounded-xl transition-all shadow-md transform active:scale-95 cursor-pointer text-sm">💰 Confirmar Venta</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // =========================================================
+        // 🚨 URL DE GOOGLE APPS SCRIPT (TU BASE DE DATOS EN LA NUBE)
+        // REEMPLAZA EL TEXTO DE ABAJO CON TU ENLACE /EXEC REAL
+        // =========================================================
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyceoj0JEpYl4HTT7NB9QlYGKYXfLG6OXc3U4uAXj5XiEqSiwRsBnO3qGNTwmE6K2EATA/exec'; 
+
+        let inventario = JSON.parse(localStorage.getItem('bandido_inventario')) || [];
+        let ventas = JSON.parse(localStorage.getItem('bandido_ventas_historial')) || [];
+        let idEdicionActiva = null;
+        let idProductoParaVender = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            actualizarTallas();
+            renderizarTodo();
+            // Inicia la sincronización de descarga al abrir la app
+            if(SCRIPT_URL && SCRIPT_URL !== 'PEGA_AQUI_TU_URL_DE_GOOGLE_APPS_SCRIPT') {
+                cargarDesdeNube();
+            }
+        });
+
+        // --- SISTEMA CLOUD SYNC ---
+        async function cargarDesdeNube() {
+            document.getElementById('cloudLoader').classList.remove('hidden');
+            try {
+                const res = await fetch(SCRIPT_URL);
+                const data = await res.json();
+                
+                if(data.inventario && data.inventario.length > 0) inventario = data.inventario;
+                if(data.ventas && data.ventas.length > 0) ventas = data.ventas;
+                
+                // Actualiza caché local
+                localStorage.setItem('bandido_inventario', JSON.stringify(inventario));
+                localStorage.setItem('bandido_ventas_historial', JSON.stringify(ventas));
+                renderizarTodo();
+            } catch (e) {
+                console.error("Error conectando a la nube. Operando con caché local.", e);
+            }
+            document.getElementById('cloudLoader').classList.add('hidden');
+        }
+
+        function guardarDatos() {
+            // Guarda en navegador (rápido, sin lag para ti)
+            localStorage.setItem('bandido_inventario', JSON.stringify(inventario));
+            localStorage.setItem('bandido_ventas_historial', JSON.stringify(ventas));
+            renderizarTodo();
+
+            // Sube silenciosamente a Google Sheets
+            if(SCRIPT_URL && SCRIPT_URL !== 'PEGA_AQUI_TU_URL_DE_GOOGLE_APPS_SCRIPT') {
+                document.getElementById('cloudSync').classList.remove('hidden');
+                fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ inventario: inventario, ventas: ventas })
+                }).then(() => {
+                    document.getElementById('cloudSync').classList.add('hidden');
+                }).catch(err => {
+                    console.error("Fallo subida a nube", err);
+                    document.getElementById('cloudSync').classList.add('hidden');
+                });
+            }
+        }
+
+        function forzarSincronizacion() {
+            cargarDesdeNube();
+        }
+
+        // --- LÓGICAS DE FORMULARIO ---
+        function actualizarTallas(tallaSeleccionada = null) {
+            const genero = document.getElementById('genero').value;
+            const selectTalla = document.getElementById('talla');
+            selectTalla.innerHTML = '';
+            let opciones = genero === 'Niño' ? ['0', '1', '2', '4', '6', '8', '10', '12', '14', '16'] : ['S', 'M', 'L', 'XL', 'XXL', '3XL'];
+            opciones.forEach(t => {
+                const opt = document.createElement('option');
+                opt.value = t;
+                opt.innerText = genero === 'Niño' ? `Talla ${t}` : t;
+                selectTalla.appendChild(opt);
+            });
+            if (tallaSeleccionada) selectTalla.value = tallaSeleccionada;
+        }
+
+        function guardarOActualizarProducto(e) {
+            e.preventDefault();
+            const datosFormulario = {
+                modelo: document.getElementById('modelo').value.trim(),
+                categoria: document.getElementById('categoria').value,
+                genero: document.getElementById('genero').value,
+                campana: document.getElementById('campana').value.trim() || 'General',
+                talla: document.getElementById('talla').value,
+                precioCosto: parseFloat(document.getElementById('precioCosto').value),
+                precioVenta: parseFloat(document.getElementById('precioVenta').value),
+                stock: parseInt(document.getElementById('stock').value)
+            };
+
+            if (idEdicionActiva) {
+                const index = inventario.findIndex(item => item.id === idEdicionActiva);
+                if (index !== -1) inventario[index] = { ...inventario[index], ...datosFormulario };
+                cancelarEdicion();
+            } else {
+                inventario.push({ id: Date.now().toString(), ...datosFormulario });
+                document.getElementById('productForm').reset();
+                document.getElementById('campana').value = '';
+                actualizarTallas(); 
+            }
+            guardarDatos();
+        }
+
+        function prepararEdicion(id) {
+            const producto = inventario.find(item => item.id === id);
+            if (!producto) return;
+            idEdicionActiva = id;
+            document.getElementById('modelo').value = producto.modelo;
+            document.getElementById('categoria').value = producto.categoria;
+            document.getElementById('genero').value = producto.genero || 'Unisex';
+            document.getElementById('campana').value = producto.campana || 'General';
+            actualizarTallas(producto.talla);
+            document.getElementById('precioCosto').value = producto.precioCosto;
+            document.getElementById('precioVenta').value = producto.precioVenta;
+            document.getElementById('stock').value = producto.stock;
+            document.getElementById('tituloFormulario').innerHTML = `<span class="text-yellow-500">✏️ Editando Producto</span>`;
+            
+            const btnAccion = document.getElementById('btnAccionPrincipal');
+            btnAccion.innerHTML = '🔄 Guardar Cambios';
+            btnAccion.className = 'flex-1 bg-yellow-500 hover:bg-yellow-400 text-black font-black uppercase italic tracking-tight py-3 rounded-xl transition-all shadow-md transform active:scale-95 cursor-pointer text-sm';
+            document.getElementById('btnCancelarEdicion').classList.remove('hidden');
+            document.getElementById('seccionFormulario').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function cancelarEdicion() {
+            idEdicionActiva = null;
+            document.getElementById('productForm').reset();
+            actualizarTallas(); 
+            document.getElementById('tituloFormulario').innerHTML = `<span>⚡ Ingresar Mercancía</span>`;
+            const btnAccion = document.getElementById('btnAccionPrincipal');
+            btnAccion.innerHTML = '💾 Registrar Inventario';
+            btnAccion.className = 'flex-1 bg-white hover:bg-gray-200 text-black font-black uppercase italic tracking-tight py-3 rounded-xl transition-all shadow-md transform active:scale-95 cursor-pointer text-sm';
+            document.getElementById('btnCancelarEdicion').classList.add('hidden');
+        }
+
+        function eliminarProducto(id) {
+            if (confirm("🚨 ¿Seguro que deseas eliminar este artículo por completo del inventario?")) {
+                inventario = inventario.filter(item => item.id !== id);
+                if(idEdicionActiva === id) cancelarEdicion();
+                guardarDatos();
+            }
+        }
+
+        // --- SISTEMA DE VENTAS ---
+        function abrirModalVenta(id) {
+            const prod = inventario.find(item => item.id === id);
+            if (!prod || prod.stock <= 0) {
+                alert("❌ No queda stock disponible en bodega para este modelo.");
+                return;
+            }
+            idProductoParaVender = id;
+            document.getElementById('modalVentaProducto').innerText = `👕 ${prod.modelo} (Talla: ${prod.talla} - ${prod.genero || 'Unisex'}) | Campaña: ${prod.campana || 'General'}`;
+            document.getElementById('modalPrecio').value = prod.precioVenta;
+            document.getElementById('modalNota').value = '';
+            document.getElementById('modalEstado').value = 'Pagado';
+            
+            const modal = document.getElementById('modalVenta');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => document.getElementById('modalPrecio').focus(), 100);
+        }
+
+        function cerrarModalVenta() {
+            const modal = document.getElementById('modalVenta');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            idProductoParaVender = null;
+            document.getElementById('formVenta').reset();
+        }
+
+        function confirmarVenta(e) {
+            e.preventDefault();
+            const prodIndex = inventario.findIndex(item => item.id === idProductoParaVender);
+            if (prodIndex === -1) return;
+
+            const prod = inventario[prodIndex];
+            const precioCobrado = parseFloat(document.getElementById('modalPrecio').value);
+            const nota = document.getElementById('modalNota').value.trim() || 'Venta de mostrador';
+            const estado = document.getElementById('modalEstado').value;
+
+            if (isNaN(precioCobrado) || precioCobrado < 0) {
+                alert("❌ Ingresa un precio válido.");
+                return;
+            }
+
+            ventas.push({
+                idVenta: Date.now().toString(),
+                fecha: new Date().toLocaleString(),
+                modelo: prod.modelo,
+                categoria: prod.categoria,
+                genero: prod.genero || 'Unisex',
+                campana: prod.campana || 'General',
+                talla: prod.talla,
+                precioCosto: prod.precioCosto,
+                precioCobrado: precioCobrado,
+                ganancia: precioCobrado - prod.precioCosto,
+                nota: nota,
+                estado: estado
+            });
+
+            prod.stock--; 
+            guardarDatos();
+            cerrarModalVenta();
+            
+            const buscador = document.getElementById('buscadorInventario');
+            if(buscador && buscador.value !== '') { buscador.value = ''; renderizarTodo(); }
+        }
+
+        function marcarComoPagado(idVenta) {
+            const ventaIndex = ventas.findIndex(v => v.idVenta === idVenta);
+            if (ventaIndex === -1) return;
+            const venta = ventas[ventaIndex];
+            if (confirm(`💰 ¿Confirmas que recibiste el pago de $${venta.precioCobrado.toFixed(2)} por "${venta.modelo}"?`)) {
+                ventas[ventaIndex].estado = 'Pagado';
+                guardarDatos();
+            }
+        }
+
+        function eliminarVenta(idVenta) {
+            if (confirm("🔄 ¿Deseas anular esta venta? La prenda regresará al stock físico.")) {
+                const ventaIndex = ventas.findIndex(v => v.idVenta === idVenta);
+                if (ventaIndex === -1) return;
+
+                const ventaAnulada = ventas[ventaIndex];
+                const prodIndex = inventario.findIndex(item => 
+                    item.modelo === ventaAnulada.modelo && item.talla === ventaAnulada.talla && item.precioCosto === ventaAnulada.precioCosto
+                );
+                
+                if (prodIndex !== -1) {
+                    inventario[prodIndex].stock++;
+                } else {
+                    inventario.push({
+                        id: Date.now().toString(),
+                        modelo: ventaAnulada.modelo,
+                        categoria: ventaAnulada.categoria,
+                        genero: ventaAnulada.genero || 'Unisex',
+                        campana: ventaAnulada.campana || 'General',
+                        talla: ventaAnulada.talla,
+                        precioCosto: ventaAnulada.precioCosto,
+                        precioVenta: ventaAnulada.precioCobrado,
+                        stock: 1
+                    });
+                }
+                ventas.splice(ventaIndex, 1);
+                guardarDatos();
+            }
+        }
+
+        // --- RENDERIZADO VISUAL ---
+        function renderizarTodo() {
+            const tbodyInv = document.getElementById('tablaInventario');
+            const tbodyVen = document.getElementById('tablaVentas');
+            const inputBuscador = document.getElementById('buscadorInventario');
+            tbodyInv.innerHTML = '';
+            tbodyVen.innerHTML = '';
+
+            const campanasUnicas = [...new Set(inventario.map(i => i.campana || 'General'))];
+            document.getElementById('listaCampanas').innerHTML = campanasUnicas.map(c => `<option value="${c}">`).join('');
+
+            let capitalBodega = 0, ingresoPotencial = 0, stockTotal = 0;
+            let ingresosTotales = 0, costoVendido = 0, utilidadNeta = 0;
+
+            const terminoBusqueda = inputBuscador ? inputBuscador.value.toLowerCase().trim() : '';
+
+            inventario.forEach(item => {
+                capitalBodega += (item.precioCosto * item.stock);
+                ingresoPotencial += (item.precioVenta * item.stock);
+                stockTotal += item.stock;
+            });
+
+            const inventarioFiltrado = inventario.filter(item => {
+                if (terminoBusqueda === '') return true;
+                const txt = `${item.modelo} ${item.categoria} ${item.talla} ${item.genero || ''} ${item.campana || ''}`.toLowerCase();
+                return txt.includes(terminoBusqueda);
+            });
+
+            if (inventarioFiltrado.length === 0 && inventario.length > 0) {
+                tbodyInv.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-500 italic">No se encontraron resultados</td></tr>`;
+            } else {
+                inventarioFiltrado.forEach(item => {
+                    let badgeClass = item.stock === 0 ? "bg-red-500/10 text-red-400 border-red-500/20 animate-pulse" : (item.stock <= 3 ? "bg-orange-500/10 text-orange-400 border-orange-500/20" : "bg-emerald-500/10 text-emerald-400 border-emerald-500/20");
+                    tbodyInv.innerHTML += `
+                        <tr class="hover:bg-gray-800/30 transition-colors">
+                            <td class="p-4"><p class="font-bold text-white">${item.modelo}</p><p class="text-xs text-gray-500">${item.categoria} • ${item.genero || 'Unisex'}</p></td>
+                            <td class="p-4 text-center font-bold text-gray-300">${item.talla}</td>
+                            <td class="p-4 text-center text-xs"><span class="bg-gray-800 px-2 py-1 rounded text-gray-300">${item.campana || 'General'}</span></td>
+                            <td class="p-4 text-right text-gray-400">$${item.precioCosto.toFixed(2)}</td>
+                            <td class="p-4 text-right text-white font-medium">$${item.precioVenta.toFixed(2)}</td>
+                            <td class="p-4 text-center"><span class="px-2.5 py-1 rounded-md text-xs font-bold border ${badgeClass}">${item.stock} u.</span></td>
+                            <td class="p-4 text-center flex gap-1.5 justify-center">
+                                <button onclick="abrirModalVenta('${item.id}')" class="bg-emerald-500 text-black font-black px-2 py-1.5 rounded-lg active:scale-95 shadow-md">💰</button>
+                                <button onclick="prepararEdicion('${item.id}')" class="bg-gray-700 text-white font-black px-2 py-1.5 rounded-lg active:scale-95 shadow-md">✏️</button>
+                                <button onclick="eliminarProducto('${item.id}')" class="text-gray-500 hover:text-red-400 hover:bg-red-500/10 px-2 py-1.5 rounded-lg">🗑️</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+
+            ventas.forEach(venta => {
+                ingresosTotales += venta.precioCobrado;
+                costoVendido += venta.precioCosto;
+                utilidadNeta += venta.ganancia;
+
+                let isPagado = (venta.estado || 'Pagado') === 'Pagado';
+                let badgeEstado = isPagado 
+                    ? '<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-1 rounded-md text-[10px] font-bold">✅ Pagado</span>' 
+                    : '<span class="bg-orange-500/10 text-orange-400 border border-orange-500/20 px-2 py-1 rounded-md text-[10px] font-bold animate-pulse">⏳ Pendiente</span>';
+                let btnCobrar = !isPagado ? `<button onclick="marcarComoPagado('${venta.idVenta}')" class="bg-emerald-500 text-black font-black text-[11px] px-2 py-1 rounded-md shadow-md">💲 Cobrar</button>` : '';
+
+                tbodyVen.innerHTML += `
+                    <tr class="hover:bg-gray-800/20 transition-colors border-l-2 ${isPagado ? 'border-emerald-500/30' : 'border-orange-500/50'}">
+                        <td class="p-4 text-xs text-gray-400">${venta.fecha.split(',')[0]}</td>
+                        <td class="p-4 font-bold text-white">${venta.modelo} <span class="block text-[10px] text-gray-500 font-normal">${venta.genero || 'Unisex'}</span></td>
+                        <td class="p-4 text-center text-xs"><span class="bg-gray-800 px-2 py-1 rounded text-gray-300">${venta.campana || 'General'}</span></td>
+                        <td class="p-4 text-center text-gray-300 font-bold">${venta.talla}</td>
+                        <td class="p-4 text-xs text-blue-300">${venta.nota || '<span class="text-gray-600 italic">Sin nota</span>'}</td>
+                        <td class="p-4 text-center">${badgeEstado}</td>
+                        <td class="p-4 text-right text-emerald-400 font-bold">$${venta.precioCobrado.toFixed(2)}</td>
+                        <td class="p-4 text-right text-yellow-400 font-black">$${venta.ganancia.toFixed(2)}</td>
+                        <td class="p-4 text-center flex gap-1.5 justify-center">
+                            ${btnCobrar}
+                            <button onclick="eliminarVenta('${venta.idVenta}')" class="text-gray-600 hover:text-red-400 text-xs px-2 py-1 rounded-md hover:bg-red-500/10">🗑️</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('kpiStockTotal').innerText = `${stockTotal} u.`;
+            document.getElementById('kpiCapitalBodega').innerText = `$${capitalBodega.toFixed(2)}`;
+            document.getElementById('kpiIngresoPotencial').innerText = `$${ingresoPotencial.toFixed(2)}`;
+            document.getElementById('kpiIngresosTotales').innerText = `$${ingresosTotales.toFixed(2)}`;
+            document.getElementById('kpiCostoVendido').innerText = `$${costoVendido.toFixed(2)}`;
+            document.getElementById('kpiUtilidadNeta').innerText = `$${utilidadNeta.toFixed(2)}`;
+            document.getElementById('kpiMargen').innerText = `${(ingresosTotales > 0 ? (utilidadNeta / ingresosTotales) * 100 : 0).toFixed(1)}%`;
+            document.getElementById('contadorProductos').innerText = `Modelos: ${inventario.length}`;
+            document.getElementById('contadorVentas').innerText = `Ventas: ${ventas.length}`;
+        }
+
+        // --- PDF Y CSV (Mantienen integridad) ---
+        function descargarPDF() {
+            if (inventario.length === 0) return alert("⚠️ No hay inventario registrado.");
+            const divImpresion = document.createElement('div');
+            divImpresion.style = 'padding:20px; font-family:Inter,sans-serif; color:#000; background-color:#fff; width:100%;';
+            const fecha = new Date().toLocaleDateString('es-ES', { year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' });
+
+            let htmlContent = `
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #000; padding-bottom:10px; margin-bottom:20px;">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <img src="data:image/jpeg;base64,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" style="height:50px; border-radius:4px;">
+                        <h1 style="margin:0; font-size:24px; font-weight:900; font-style:italic; text-transform:uppercase;">BANDIDO STORE</h1>
+                    </div>
+                    <div style="text-align:right;">
+                        <p style="margin:0; font-size:12px; font-weight:bold; text-transform:uppercase; color:#666;">Reporte Oficial de Inventario</p>
+                        <p style="margin:0; font-size:10px; color:#888;">${fecha}</p>
+                    </div>
+                </div>
+                <table style="width:100%; border-collapse:collapse; font-size:11px; text-align:left;">
+                    <thead>
+                        <tr style="background-color:#f3f4f6; border-bottom:2px solid #d1d5db; text-transform:uppercase; font-size:9px; color:#374151;">
+                            <th style="padding:6px;">Modelo</th><th style="padding:6px;">Categoría</th><th style="padding:6px; text-align:center;">Talla</th><th style="padding:6px; text-align:right;">Costo</th><th style="padding:6px; text-align:right;">P. Venta</th><th style="padding:6px; text-align:center;">Stock</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            let tStock = 0, tCosto = 0, tVenta = 0;
+            inventario.filter(i => i.stock > 0).forEach(item => {
+                tStock += item.stock; tCosto += (item.precioCosto * item.stock); tVenta += (item.precioVenta * item.stock);
+                htmlContent += `
+                    <tr style="border-bottom:1px solid #e5e7eb;">
+                        <td style="padding:6px; font-weight:bold;">${item.modelo}</td>
+                        <td style="padding:6px; color:#6b7280;">${item.categoria} - ${item.genero||'Unisex'}</td>
+                        <td style="padding:6px; text-align:center; font-weight:bold;">${item.talla}</td>
+                        <td style="padding:6px; text-align:right;">$${item.precioCosto.toFixed(2)}</td>
+                        <td style="padding:6px; text-align:right;">$${item.precioVenta.toFixed(2)}</td>
+                        <td style="padding:6px; text-align:center; font-weight:bold;">${item.stock} u.</td>
+                    </tr>`;
+            });
+            htmlContent += `
+                    </tbody>
+                </table>
+                <div style="margin-top:25px; display:flex; justify-content:flex-end;">
+                    <div style="background-color:#f9fafb; padding:12px; border-radius:8px; border:1px solid #e5e7eb; width:220px;">
+                        <p style="margin:0 0 5px 0; font-size:10px; text-transform:uppercase; font-weight:bold; color:#6b7280;">Resumen Total en Bodega</p>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span style="font-size:11px; font-weight:bold;">Prendas Totales:</span><span style="font-size:11px; font-weight:bold;">${tStock} u.</span></div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span style="font-size:11px; font-weight:bold;">Inversión Retenida:</span><span style="font-size:11px; font-weight:bold;">$${tCosto.toFixed(2)}</span></div>
+                        <div style="display:flex; justify-content:space-between; padding-top:5px; border-top:1px solid #d1d5db;"><span style="font-size:11px; font-weight:bold;">Venta Potencial:</span><span style="font-size:12px; font-weight:black; color:#059669;">$${tVenta.toFixed(2)}</span></div>
+                    </div>
+                </div>
+            `;
+            divImpresion.innerHTML = htmlContent;
+            html2pdf().set({
+                margin:[15,15,15,15], filename:`Inventario_BandidoStore_${new Date().toLocaleDateString().replace(/\//g,'-')}.pdf`,
+                image:{type:'jpeg', quality:0.98}, html2canvas:{scale:2, useCORS:true}, jsPDF:{unit:'mm', format:'a4', orientation:'portrait'}
+            }).from(divImpresion).save();
+        }
+    </script>
+</body>
+</html>
