@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bandido Store - Cloud Core v8.0 (Filtros Avanzados)</title>
+    <title>Bandido Store - Cloud Core v9.0 (Catálogo JPG & Medidas)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
         body { font-family: 'Inter', sans-serif; }
@@ -50,12 +51,15 @@
                     </div>
                 </div>
                 <span class="bg-yellow-500/10 text-yellow-500 text-[10px] font-bold px-2 py-0.5 rounded-full border border-yellow-500/20 md:ml-2">
-                    UX v8.0
+                    UX v9.0
                 </span>
             </div>
             <div class="flex w-full md:w-auto overflow-x-auto hide-scrollbar items-center gap-2 justify-start md:justify-center py-1">
                 <button onclick="forzarSincronizacion()" class="whitespace-nowrap bg-blue-500/10 hover:bg-blue-500 text-blue-400 hover:text-white text-xs font-bold uppercase tracking-wider px-4 py-3 md:py-2 rounded-xl border border-blue-500/20 transition-all flex items-center gap-2">
                     🔄 Sinc
+                </button>
+                <button onclick="descargarJPG()" class="whitespace-nowrap bg-emerald-500/10 hover:bg-emerald-500 text-emerald-500 hover:text-white text-xs font-bold uppercase tracking-wider px-4 py-3 md:py-2 rounded-xl border border-emerald-500/20 transition-all flex items-center gap-2">
+                    🖼️ JPG
                 </button>
                 <button onclick="descargarPDF()" class="whitespace-nowrap bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white text-xs font-bold uppercase tracking-wider px-4 py-3 md:py-2 rounded-xl border border-red-500/20 transition-all flex items-center gap-2">
                     📄 PDF
@@ -96,7 +100,7 @@
                     <p class="text-3xl font-black text-white" id="kpiCapitalBodega">$0.00</p>
                 </div>
                 <div class="bg-[#151a21] p-6 rounded-2xl border border-blue-500/30 bg-gradient-to-br from-[#151a21] to-blue-500/5 shadow-lg relative overflow-hidden">
-                    <div class="absolute -right-2 -top-2 text-blue-500/10 text-8xl"></div>
+                    <div class="absolute -right-2 -top-2 text-blue-500/10 text-8xl">📈</div>
                     <p class="text-blue-400 text-xs font-bold uppercase tracking-wider mb-1">Venta Proyectada</p>
                     <p class="text-3xl font-black text-blue-400" id="kpiIngresoPotencial">$0.00</p>
                 </div>
@@ -109,7 +113,7 @@
                     <p class="text-3xl font-black text-orange-400" id="kpiCostoVendido">$0.00</p>
                 </div>
                 <div class="bg-[#151a21] p-6 rounded-2xl border border-yellow-500/30 bg-gradient-to-br from-[#151a21] to-yellow-500/5 shadow-lg relative overflow-hidden">
-                    <div class="absolute -right-2 -top-2 text-yellow-500/10 text-8xl"></div>
+                    <div class="absolute -right-2 -top-2 text-yellow-500/10 text-8xl">💰</div>
                     <p class="text-yellow-500 text-xs font-bold uppercase tracking-wider mb-1">Utilidad Bruta</p>
                     <div class="flex items-baseline gap-2">
                         <p class="text-4xl font-black text-yellow-400" id="kpiUtilidadNeta">$0.00</p>
@@ -172,6 +176,17 @@
                             </div>
                         </div>
 
+                        <div class="grid grid-cols-2 gap-3 lg:gap-4">
+                            <div>
+                                <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">↔️ Axila a Axila (cm)</label>
+                                <input type="number" id="medidaAxila" step="0.1" placeholder="Opcional" class="w-full bg-[#0b0c10] border border-gray-700 rounded-xl px-3 py-3 text-white focus:outline-none focus:border-yellow-500 text-base md:text-sm text-center">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">↕️ Hombro a Base (cm)</label>
+                                <input type="number" id="medidaLargo" step="0.1" placeholder="Opcional" class="w-full bg-[#0b0c10] border border-gray-700 rounded-xl px-3 py-3 text-white focus:outline-none focus:border-yellow-500 text-base md:text-sm text-center">
+                            </div>
+                        </div>
+
                         <div class="grid grid-cols-3 gap-2 lg:gap-3">
                             <div>
                                 <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Costo</label>
@@ -228,7 +243,7 @@
                         <div class="w-full">
                             <div class="hidden lg:grid grid-cols-8 gap-4 p-4 text-[10px] uppercase font-bold tracking-wider text-gray-400 border-b border-gray-800 bg-[#0b0c10] rounded-t-xl">
                                 <div class="col-span-2">Detalle / Modelo</div>
-                                <div class="text-center">Talla</div>
+                                <div class="text-center">Talla/Medidas</div>
                                 <div class="text-center">Campaña</div>
                                 <div class="text-right">Costo</div>
                                 <div class="text-right">Venta</div>
@@ -304,9 +319,9 @@
 
     <script>
         // =========================================================
-        // 🚨 URL DE GOOGLE APPS SCRIPT
+        // 🚨 MANTÉN TU MISMA URL AQUÍ
         // =========================================================
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwIYmkpEZJLpd7-vjMegieOcQvdRvCfdUJ7Srl9TXxJWXc9DWzfzJnP4RzAAtLC03PxLQ/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxeU7lz91vqdgPj_UD3zJmJ659aWr01My3VBybA0F6vduWD347z3hx2rduBLhBsZ6Zeww/exec';
 
         let inventario = JSON.parse(localStorage.getItem('bandido_inventario')) || [];
         let ventas = JSON.parse(localStorage.getItem('bandido_ventas_historial')) || [];
@@ -373,7 +388,7 @@
                 nubeSincronizada = true; 
             } catch (e) {
                 console.error("Error conectando a nube:", e);
-                alert("⚠️ Error de conexión con la nube. Asegúrate de tener internet. Trabajarás en modo local.");
+                alert("⚠️ Error de conexión con la nube. Asegúrate de tener internet.");
             }
             document.getElementById('cloudLoader').classList.add('hidden');
         }
@@ -385,7 +400,7 @@
 
             if(SCRIPT_URL && SCRIPT_URL !== '') {
                 if(!nubeSincronizada && inventario.length > 0) {
-                    console.warn("Nube no sincronizada. Se evita el envío para no sobreescribir datos.");
+                    console.warn("Nube no sincronizada. Se evita envío.");
                     return;
                 }
                 document.getElementById('cloudSync').classList.remove('hidden');
@@ -431,6 +446,8 @@
                 genero: document.getElementById('genero').value,
                 campana: document.getElementById('campana').value.trim() || 'General',
                 talla: document.getElementById('talla').value,
+                axila: parseFloat(document.getElementById('medidaAxila').value) || '',
+                largo: parseFloat(document.getElementById('medidaLargo').value) || '',
                 precioCosto: parseFloat(document.getElementById('precioCosto').value),
                 precioVenta: parseFloat(document.getElementById('precioVenta').value),
                 stock: parseInt(document.getElementById('stock').value)
@@ -465,6 +482,8 @@
             document.getElementById('genero').value = prod.genero || 'Unisex';
             document.getElementById('campana').value = prod.campana || 'General';
             actualizarTallas(prod.talla);
+            document.getElementById('medidaAxila').value = prod.axila || '';
+            document.getElementById('medidaLargo').value = prod.largo || '';
             document.getElementById('precioCosto').value = prod.precioCosto;
             document.getElementById('precioVenta').value = prod.precioVenta;
             document.getElementById('stock').value = prod.stock;
@@ -596,12 +615,10 @@
             }
         }
 
-        // --- RENDERIZADO VISUAL Y FILTROS ---
         function renderizarTodo() {
             const tbodyInv = document.getElementById('tablaInventario');
             const tbodyVen = document.getElementById('tablaVentas');
             
-            // Valores de los filtros
             const term = (document.getElementById('buscadorInventario')?.value || '').toLowerCase().trim();
             const fStock = document.getElementById('filtroStock')?.value || 'ALL';
             const fTalla = document.getElementById('filtroTalla')?.value || 'ALL';
@@ -609,11 +626,9 @@
             tbodyInv.innerHTML = '';
             tbodyVen.innerHTML = '';
 
-            // Dinamizar listas desplegables (Campañas y Tallas)
             const camps = [...new Set(inventario.map(i => i.campana || 'General'))];
             document.getElementById('listaCampanas').innerHTML = camps.map(c => `<option value="${c}">`).join('');
             
-            // Poblar Filtro de Tallas dinámicamente según lo que haya en bodega
             const tallasUnicas = [...new Set(inventario.map(i => i.talla))].sort();
             const selectTallaFiltro = document.getElementById('filtroTalla');
             if (selectTallaFiltro) {
@@ -622,17 +637,14 @@
                 selectTallaFiltro.value = tallasUnicas.includes(valorActualTalla) ? valorActualTalla : 'ALL';
             }
 
-            // Variables de KPI Globales (Se calculan sobre TODA la bodega, no solo lo filtrado)
             let cBodega = 0, iPotencial = 0, sTotal = 0;
             let iTotales = 0, cVendido = 0, uNeta = 0;
 
             const invFiltro = inventario.filter(i => {
-                // Sumamos KPIs generales
                 cBodega += (i.precioCosto * i.stock);
                 iPotencial += (i.precioVenta * i.stock);
                 sTotal += i.stock;
                 
-                // Aplicamos Lógica de Filtros Múltiples
                 let matchText = true;
                 let matchStock = true;
                 let matchTalla = true;
@@ -652,6 +664,7 @@
             } else {
                 invFiltro.forEach(i => {
                     let stClass = i.stock === 0 ? "text-red-400 bg-red-500/10 border-red-500/20" : (i.stock <= 3 ? "text-orange-400 bg-orange-500/10 border-orange-500/20" : "text-emerald-400 bg-emerald-500/10 border-emerald-500/20");
+                    let txtMedidas = (i.axila || i.largo) ? `<p class="text-[10px] text-gray-500 mt-1">↔️ ${i.axila||'-'}cm | ↕️ ${i.largo||'-'}cm</p>` : '';
                     
                     tbodyInv.innerHTML += `
                         <div class="bg-gray-800/20 lg:bg-transparent p-4 lg:p-0 rounded-2xl lg:rounded-none border lg:border-none border-gray-700 lg:border-b lg:border-gray-800/50 flex flex-col lg:grid lg:grid-cols-8 lg:items-center gap-3 lg:gap-4 hover:bg-gray-800/40 transition-colors mb-4 lg:mb-0">
@@ -663,12 +676,18 @@
                                 <span class="lg:hidden bg-gray-800 px-2 py-1 rounded text-gray-300 text-[10px]">${i.campana || 'General'}</span>
                             </div>
                             
-                            <div class="hidden lg:block text-center font-bold text-gray-300">${i.talla}</div>
+                            <div class="hidden lg:flex flex-col items-center justify-center font-bold text-gray-300">
+                                <span>${i.talla}</span>
+                                ${(i.axila || i.largo) ? `<span class="text-[9px] text-gray-500 font-normal">↔️${i.axila||'-'} ↕️${i.largo||'-'}</span>` : ''}
+                            </div>
                             <div class="hidden lg:flex justify-center"><span class="bg-gray-800 px-2 py-1 rounded text-gray-300 text-xs">${i.campana || 'General'}</span></div>
                             
-                            <div class="flex justify-between items-center lg:hidden">
-                                <span class="text-xs font-bold text-gray-500 uppercase">Talla:</span>
-                                <span class="font-bold text-white text-lg">${i.talla}</span>
+                            <div class="flex flex-col lg:hidden">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs font-bold text-gray-500 uppercase">Talla:</span>
+                                    <span class="font-bold text-white text-lg">${i.talla}</span>
+                                </div>
+                                ${txtMedidas}
                             </div>
 
                             <div class="flex justify-between items-center lg:block lg:text-right">
@@ -764,10 +783,72 @@
             document.getElementById('contadorVentas').innerText = `${ventas.length}`;
         }
 
+        // ==========================================
+        // NUEVA FUNCIÓN: EXPORTAR A JPG
+        // ==========================================
+        function descargarJPG() {
+            const stockDisponible = inventario.filter(i => i.stock > 0);
+            if (stockDisponible.length === 0) return alert("⚠️ No hay prendas en stock para generar el catálogo.");
+            
+            document.getElementById('cloudLoader').querySelector('p').innerText = "GENERANDO IMAGEN...";
+            document.getElementById('cloudLoader').classList.remove('hidden');
+
+            const container = document.createElement('div');
+            container.style.position = 'absolute';
+            container.style.left = '-9999px';
+            container.style.width = '800px'; 
+            container.style.backgroundColor = '#0b0c10'; 
+            container.style.color = '#eee';
+            container.style.padding = '30px';
+            container.style.fontFamily = 'Inter, sans-serif';
+
+            let htmlContent = `
+                <div style="text-align:center; margin-bottom:30px; border-bottom: 2px solid #eab308; padding-bottom: 15px;">
+                    <h1 style="color:#eab308; font-size:32px; font-weight:900; font-style:italic; margin:0; text-transform:uppercase;">BANDIDO STORE</h1>
+                    <p style="color:#9ca3af; font-size:16px; margin:5px 0 0 0; font-weight:bold;">Catálogo de Disponibilidad Inmediata</p>
+                </div>
+                <div style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: space-between;">
+            `;
+
+            stockDisponible.forEach(item => {
+                let medidas = (item.axila || item.largo) ? `<div style="margin-top:10px; padding-top:10px; border-top:1px solid #374151; color:#9ca3af; font-size:12px; display:flex; justify-content:center; gap:15px;"><span>↔️ Axila: ${item.axila||'-'}cm</span><span>↕️ Largo: ${item.largo||'-'}cm</span></div>` : '';
+                htmlContent += `
+                    <div style="background:#151a21; border: 1px solid #1f2937; border-radius: 16px; padding: 20px; width: calc(50% - 10px); box-sizing: border-box; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+                        <h3 style="margin:0 0 5px 0; font-size:18px; color:#fff; font-weight:800;">${item.modelo}</h3>
+                        <p style="margin:0; font-size:13px; color:#9ca3af; text-transform:uppercase; font-weight:bold;">${item.categoria} • ${item.genero || 'Unisex'}</p>
+                        <div style="display:flex; justify-content:space-between; margin-top:15px; align-items:center;">
+                            <span style="background:#1f2937; padding:6px 12px; border-radius:8px; font-weight:900; font-size:15px; color:#fff;">Talla: ${item.talla}</span>
+                            <span style="color:#10b981; font-weight:900; font-size:22px;">$${item.precioVenta.toFixed(2)}</span>
+                        </div>
+                        ${medidas}
+                    </div>
+                `;
+            });
+
+            htmlContent += `</div><div style="margin-top:30px; text-align:center; color:#4b5563; font-size:12px; font-weight:bold;">Generado automáticamente el ${new Date().toLocaleDateString('es-ES')}</div>`;
+            container.innerHTML = htmlContent;
+            document.body.appendChild(container);
+
+            setTimeout(() => {
+                html2canvas(container, { backgroundColor: '#0b0c10', scale: 2, useCORS: true }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = `Bandido_Catalogo_${new Date().toLocaleDateString().replace(/\//g,'-')}.jpg`;
+                    link.href = canvas.toDataURL('image/jpeg', 0.9);
+                    link.click();
+                    document.body.removeChild(container);
+                    document.getElementById('cloudLoader').classList.add('hidden');
+                    document.getElementById('cloudLoader').querySelector('p').innerText = "Sincronizando Base de Datos...";
+                });
+            }, 500); // Pequeño delay para asegurar renderizado de fuente
+        }
+
+        // ==========================================
+        // EXPORTACIÓN A CSV Y PDF ACTUALIZADOS
+        // ==========================================
         function exportarCSV() {
             if (inventario.length === 0 && ventas.length === 0) return alert("⚠️ Sin datos.");
-            let csv = "\uFEFF=== SECCION: INVENTARIO EN BODEGA ===\nID,Modelo/Jersey,Categoria,Genero,Campana,Talla,Precio Costo,Precio Venta,Stock Disponible\n";
-            inventario.forEach(i => csv += `"${i.id}","${i.modelo}","${i.categoria}","${i.genero||'Unisex'}","${i.campana||'General'}","${i.talla}",${i.precioCosto},${i.precioVenta},${i.stock}\n`);
+            let csv = "\uFEFF=== SECCION: INVENTARIO EN BODEGA ===\nID,Modelo/Jersey,Categoria,Genero,Campana,Talla,Axila(cm),Largo(cm),Precio Costo,Precio Venta,Stock Disponible\n";
+            inventario.forEach(i => csv += `"${i.id}","${i.modelo}","${i.categoria}","${i.genero||'Unisex'}","${i.campana||'General'}","${i.talla}","${i.axila||''}","${i.largo||''}",${i.precioCosto},${i.precioVenta},${i.stock}\n`);
             csv += "\n\n=== SECCION: HISTORIAL DE VENTAS ===\nID Venta,Fecha Venta,Modelo/Jersey,Categoria,Genero,Campana,Talla,Precio Costo,Precio Cobrado,Ganancia Real,Cliente/Nota,Estado Pago\n";
             ventas.forEach(v => csv += `"${v.idVenta}","${v.fecha}","${v.modelo}","${v.categoria}","${v.genero||'Unisex'}","${v.campana||'General'}","${v.talla}",${v.precioCosto},${v.precioCobrado},${v.ganancia},"${v.nota?v.nota.replace(/"/g,'""'):''}","${v.estado||'Pagado'}"\n`);
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -796,9 +877,10 @@
                     const lim = s => s ? s.replace(/^"|"$/g, '').trim() : "";
                     
                     if (modo === "INV") {
-                        if (c.length >= 9) nInv.push({ id:lim(c[0]), modelo:lim(c[1]), categoria:lim(c[2]), genero:lim(c[3]), campana:lim(c[4]), talla:lim(c[5]), precioCosto:parseFloat(c[6]), precioVenta:parseFloat(c[7]), stock:parseInt(c[8]) });
-                        else if (c.length === 8) nInv.push({ id:lim(c[0]), modelo:lim(c[1]), categoria:lim(c[2]), genero:lim(c[3]), campana:"General", talla:lim(c[4]), precioCosto:parseFloat(c[5]), precioVenta:parseFloat(c[6]), stock:parseInt(c[7]) });
-                        else nInv.push({ id:lim(c[0]), modelo:lim(c[1]), categoria:lim(c[2]), genero:"Unisex", campana:"General", talla:lim(c[3]), precioCosto:parseFloat(c[4]), precioVenta:parseFloat(c[5]), stock:parseInt(c[6]) });
+                        // Compatibilidad con CSV de 11 columnas (nuevo) o menores (viejo)
+                        if (c.length >= 11) nInv.push({ id:lim(c[0]), modelo:lim(c[1]), categoria:lim(c[2]), genero:lim(c[3]), campana:lim(c[4]), talla:lim(c[5]), axila:lim(c[6])?parseFloat(lim(c[6])):0, largo:lim(c[7])?parseFloat(lim(c[7])):0, precioCosto:parseFloat(c[8]), precioVenta:parseFloat(c[9]), stock:parseInt(c[10]) });
+                        else if (c.length >= 9) nInv.push({ id:lim(c[0]), modelo:lim(c[1]), categoria:lim(c[2]), genero:lim(c[3]), campana:lim(c[4]), talla:lim(c[5]), axila:0, largo:0, precioCosto:parseFloat(c[6]), precioVenta:parseFloat(c[7]), stock:parseInt(c[8]) });
+                        else nInv.push({ id:lim(c[0]), modelo:lim(c[1]), categoria:lim(c[2]), genero:"Unisex", campana:"General", talla:lim(c[3]), axila:0, largo:0, precioCosto:parseFloat(c[4]), precioVenta:parseFloat(c[5]), stock:parseInt(c[6]) });
                     } else if (modo === "VEN") {
                         if (c.length >= 12) nVen.push({ idVenta:lim(c[0]), fecha:lim(c[1]), modelo:lim(c[2]), categoria:lim(c[3]), genero:lim(c[4]), campana:lim(c[5]), talla:lim(c[6]), precioCosto:parseFloat(c[7]), precioCobrado:parseFloat(c[8]), ganancia:parseFloat(c[9]), nota:lim(c[10]), estado:lim(c[11]) });
                         else if (c.length === 11) nVen.push({ idVenta:lim(c[0]), fecha:lim(c[1]), modelo:lim(c[2]), categoria:lim(c[3]), genero:lim(c[4]), campana:"General", talla:lim(c[5]), precioCosto:parseFloat(c[6]), precioCobrado:parseFloat(c[7]), ganancia:parseFloat(c[8]), nota:lim(c[9]), estado:lim(c[10]) });
@@ -833,7 +915,7 @@
                 <table style="width:100%; border-collapse:collapse; font-size:11px; text-align:left;">
                     <thead>
                         <tr style="background-color:#f3f4f6; border-bottom:2px solid #d1d5db; text-transform:uppercase; font-size:9px; color:#374151;">
-                            <th style="padding:6px;">Modelo / Campaña</th><th style="padding:6px; text-align:center;">Talla</th><th style="padding:6px; text-align:right;">Costo</th><th style="padding:6px; text-align:right;">P. Venta</th><th style="padding:6px; text-align:center;">Stock</th>
+                            <th style="padding:6px;">Modelo / Campaña</th><th style="padding:6px; text-align:center;">Talla / Medidas</th><th style="padding:6px; text-align:right;">Costo</th><th style="padding:6px; text-align:right;">P. Venta</th><th style="padding:6px; text-align:center;">Stock</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -841,10 +923,11 @@
             let tStock = 0, tCosto = 0, tVenta = 0;
             inventario.filter(i => i.stock > 0).forEach(item => {
                 tStock += item.stock; tCosto += (item.precioCosto * item.stock); tVenta += (item.precioVenta * item.stock);
+                let meds = (item.axila||item.largo) ? `<br><span style="font-size:8px; color:#666;">↔️ ${item.axila||'-'}cm ↕️ ${item.largo||'-'}cm</span>` : '';
                 htmlContent += `
                     <tr style="border-bottom:1px solid #e5e7eb;">
                         <td style="padding:6px;"><strong>${item.modelo}</strong><br><span style="font-size:9px; color:#666;">${item.categoria} - ${item.genero||'Unisex'} | ${item.campana||'General'}</span></td>
-                        <td style="padding:6px; text-align:center; font-weight:bold;">${item.talla}</td>
+                        <td style="padding:6px; text-align:center;"><strong>${item.talla}</strong>${meds}</td>
                         <td style="padding:6px; text-align:right;">$${item.precioCosto.toFixed(2)}</td>
                         <td style="padding:6px; text-align:right;">$${item.precioVenta.toFixed(2)}</td>
                         <td style="padding:6px; text-align:center; font-weight:bold;">${item.stock} u.</td>
