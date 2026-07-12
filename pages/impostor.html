@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Impostor - Juego</title>
 
+    <!-- Google Analytics (GA4) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-TPRYYR8VJP"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -24,15 +25,48 @@
   </head>
 
   <body class="bg-slate-950">
-    <div id="root"></div>
+    <!-- Feedback visual de carga para evitar la pantalla negra inicial -->
+    <div id="root">
+      <div class="min-h-screen flex items-center justify-center text-slate-500 font-mono text-sm animate-pulse">
+        Cargando juego...
+      </div>
+    </div>
 
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- CDNs Optimizados vía Cloudflare para mayor estabilidad -->
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.6/babel.min.js"></script>
 
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-    <script type="text/babel" data-presets="env,react">
+    <!-- Solo preset 'react' para que el navegador ejecute JS nativo más rápido -->
+    <script type="text/babel" data-presets="react">
       const { useState, useEffect, useRef } = React;
+
+      // =========================
+      // ERROR BOUNDARY (Capa de Control)
+      // =========================
+      class ErrorBoundary extends React.Component {
+        constructor(props) {
+          super(props);
+          this.state = { hasError: false, errorMessage: '' };
+        }
+        static getDerivedStateFromError(error) {
+          return { hasError: true, errorMessage: error.toString() };
+        }
+        render() {
+          if (this.state.hasError) {
+            return (
+              <div className="min-h-screen p-8 text-white font-mono text-sm flex flex-col justify-center max-w-md mx-auto">
+                <h2 className="text-red-500 font-bold mb-4 uppercase tracking-widest text-lg">⚠️ Error del Sistema</h2>
+                <p className="bg-red-500/10 border border-red-500/20 p-4 rounded-xl text-red-300">
+                  {this.state.errorMessage}
+                </p>
+                <p className="mt-6 text-slate-500 text-xs">Por favor, recarga la página.</p>
+              </div>
+            );
+          }
+          return this.props.children;
+        }
+      }
 
       // =========================
       // UTILIDADES STORAGE SEGURO
@@ -184,10 +218,14 @@
       // =========================
       function randInt(max) {
         if (max <= 0) return 0;
-        if (window.crypto && crypto.getRandomValues) {
-          const arr = new Uint32Array(1);
-          crypto.getRandomValues(arr);
-          return arr[0] % max;
+        try {
+          if (window.crypto && window.crypto.getRandomValues) {
+            const arr = new Uint32Array(1);
+            window.crypto.getRandomValues(arr);
+            return arr[0] % max;
+          }
+        } catch (e) {
+          // Fallback seguro si la API de crypto está bloqueada
         }
         return Math.floor(Math.random() * max);
       }
@@ -264,8 +302,7 @@
       // UI COMPONENTS
       // =========================
       function Button({ onClick, children, variant='primary', className='', disabled=false }) {
-        const base =
-          "w-full py-3 px-4 rounded-xl font-bold transition-all transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg";
+        const base = "w-full py-3 px-4 rounded-xl font-bold transition-all transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg";
 
         const variants = {
           primary: "bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-500/30",
@@ -320,7 +357,7 @@
             } else {
               revealedRef.current = true;
               setRevealed(true);
-              if (navigator.vibrate) navigator.vibrate(50);
+              try { if (navigator.vibrate) navigator.vibrate(50); } catch(err) {}
             }
           };
 
@@ -434,9 +471,7 @@
         useEffect(() => {
           const saved = safeGetItem('impostorPlayers');
           if (saved) {
-            try {
-              setPlayers(JSON.parse(saved));
-            } catch (e) {}
+            try { setPlayers(JSON.parse(saved)); } catch (e) {}
           }
 
           const savedMode = safeGetItem('impostorFamilyMode');
@@ -597,7 +632,7 @@
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <button onClick={decImpostors} className="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 text-white font-black active:scale-95">−</button>
+                    <button onClick={decImpostors} className="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 text-white font-black active:scale-95">-</button>
                     <div className="min-w-[44px] text-center font-black text-xl text-white">{impostorCount}</div>
                     <button
                       onClick={incImpostors}
@@ -618,7 +653,7 @@
                     <span className="text-lg">📘</span>
                     <span className="font-bold text-slate-200">{showTutorial ? 'Ocultar tutorial' : 'Ver tutorial'}</span>
                   </div>
-                  <span className="text-slate-400 text-xl">{showTutorial ? '−' : '+'}</span>
+                  <span className="text-slate-400 text-xl">{showTutorial ? '-' : '+'}</span>
                 </button>
 
                 {showTutorial && (
@@ -842,7 +877,14 @@
         );
       }
 
-      ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+      // Montaje de React 18 con ErrorBoundary
+      const rootElement = document.getElementById('root');
+      const root = ReactDOM.createRoot(rootElement);
+      root.render(
+        <ErrorBoundary>
+          <App />
+        </ErrorBoundary>
+      );
     </script>
   </body>
 </html>
