@@ -3,50 +3,70 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>David Martínez</title>
+  <title>David Martínez — Marketing, IA y Datos</title>
+  <meta name="description" content="David Martínez — analista, creador digital y consultor en IA y datos desde Quito, Ecuador." />
+  <link rel="canonical" href="https://davidfernandomartinez.com/" />
+  <meta property="og:title" content="David Martínez — Marketing, IA y Datos" />
+  <meta property="og:description" content="Analista, creador digital y consultor en IA y datos." />
+  <meta property="og:url" content="https://davidfernandomartinez.com/" />
+  <meta property="og:image" content="https://davidfernandomartinez.com/assets/images/David-9.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <script defer src="script.js"></script>
-  <script src="https://kit.fontawesome.com/a2e0c6c35e.js" crossorigin="anonymous"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "David Martínez",
+    "url": "https://davidfernandomartinez.com/",
+    "sameAs": [
+      "https://www.linkedin.com/in/david-martinez-53168a8b",
+      "https://www.instagram.com/davidfrnand0/",
+      "https://www.youtube.com/channel/UCj7otWSXYo-abuG9rDjkl0g"
+    ],
+    "jobTitle": "Analista · Marketing · IA y Datos",
+    "address": {"@type": "PostalAddress", "addressLocality": "Quito", "addressCountry": "Ecuador"}
+  }
+  </script>
 </head>
 <body>
-  <button id="toggle-mode">🌓</button>
-  <main class="container">
-    <img src="https://via.placeholder.com/100" alt="David Martínez" class="avatar" />
-    <h1>David Martínez</h1>
-    <p class="role">Emprendedor + IA & Datos</p>
+  <button id="toggle-mode" aria-label="Activar modo oscuro" type="button">🌓</button>
 
-    <section>
-      <h2 class="label">/about</h2>
+  <main class="container" id="inicio">
+    <img src="assets/images/David-9.jpg" alt="David Martínez" class="avatar" />
+    <h1>David Martínez</h1>
+    <p class="role">Marketing + IA &amp; Datos</p>
+
+    <section aria-labelledby="about-title">
+      <h2 class="label" id="about-title">/about</h2>
       <p>Soy un analista y creador digital enfocado en construir soluciones útiles usando IA y tecnología.</p>
       <p>Creo en el poder de las ideas simples y comparto contenido para ayudar a emprendedores y profesionales.</p>
     </section>
 
-    <section>
-      <h2 class="label">/socials</h2>
+    <section aria-labelledby="socials-title">
+      <h2 class="label" id="socials-title">/socials</h2>
       <div class="socials">
-        <a href="https://x.com/todovaaestarbien" target="_blank"><i class="fab fa-x-twitter"></i></a>
-        <a href="https://www.youtube.com/@todovaaestarbien" target="_blank"><i class="fab fa-youtube"></i></a>
-        <a href="https://linkedin.com/in/davidmartinezec" target="_blank"><i class="fab fa-linkedin"></i></a>
+        <a href="mailto:davidfernandomartinezmontes@gmail.com" class="contact-button">Contáctame</a>
+        <a href="https://www.instagram.com/davidfrnand0/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+          <i class="fa-brands fa-instagram" aria-hidden="true"></i>
+        </a>
+        <a href="https://www.youtube.com/channel/UCj7otWSXYo-abuG9rDjkl0g" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+          <i class="fab fa-youtube" aria-hidden="true"></i>
+        </a>
+        <a href="https://www.linkedin.com/in/david-martinez-53168a8b" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+          <i class="fab fa-linkedin" aria-hidden="true"></i>
+        </a>
       </div>
     </section>
 
-    <section>
-      <h2 class="label">/projects</h2>
+    <section aria-labelledby="projects-title">
+      <h2 class="label" id="projects-title">/projects</h2>
       <div class="cards">
-        <a href="#" class="card">Ecuametrics</a>
-        <a href="#" class="card">Todovaaestarbien</a>
-        <a href="#" class="card">Curso Pan de Jamón</a>
-        <a href="#" class="card">App para emprendedores</a>
+        <a href="https://bandidostores.com" class="card">Bandido Store</a>
+        <a href="pages/proyectos.html" class="card">Proyectos</a>
+        <a href="pages/benchmark.html" class="card">Blog</a>
       </div>
-    </section>
-
-    <section>
-      <h2 class="label">/newsletter</h2>
-      <form action="https://formspree.io/f/mwkglrwz" method="POST" class="newsletter">
-        <p>Suscríbete para recibir tips semanales sobre IA y emprendimiento directamente en tu correo.</p>
-        <input type="email" name="email" placeholder="Tu correo electrónico" required />
-        <button type="submit">Suscribirme</button>
-      </form>
     </section>
   </main>
 </body>
