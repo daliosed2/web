@@ -467,6 +467,11 @@
 
         const [isFamilyMode, setIsFamilyMode] = useState(false);
         const [impostorCount, setImpostorCount] = useState(1);
+        const [debateMinutes, setDebateMinutes] = useState(3);
+        const [secondsLeft, setSecondsLeft] = useState(180);
+        const [timerRunning, setTimerRunning] = useState(false);
+        const [voteIndex, setVoteIndex] = useState(0);
+        const [votes, setVotes] = useState([]);
 
         useEffect(() => {
           const saved = safeGetItem('impostorPlayers');
@@ -495,6 +500,16 @@
         useEffect(() => {
           safeSetItem('impostorImpostorCount', String(impostorCount));
         }, [impostorCount]);
+
+        useEffect(() => {
+          if (phase !== 'debate' || !timerRunning || secondsLeft <= 0) return;
+          const tick = setInterval(() => setSecondsLeft(s => Math.max(0, s - 1)), 1000);
+          return () => clearInterval(tick);
+        }, [phase, timerRunning, secondsLeft]);
+
+        useEffect(() => {
+          if (secondsLeft === 0) setTimerRunning(false);
+        }, [secondsLeft]);
 
         const activeCategories = buildCategories(isFamilyMode);
 
@@ -561,6 +576,10 @@
           });
 
           setCurrentRevealIndex(0);
+          setSecondsLeft(debateMinutes * 60);
+          setTimerRunning(false);
+          setVoteIndex(0);
+          setVotes([]);
           setPhase('reveal');
         };
 
@@ -585,7 +604,12 @@
           else chooseStarter();
         };
 
+        const startVoting = () => { setTimerRunning(false); setVoteIndex(0); setVotes([]); setPhase('voting'); };
+        const castVote = (targetId) => { setVotes(v => v.concat([targetId])); if (voteIndex < players.length - 1) setVoteIndex(i => i + 1); else setPhase('result'); };
+        const formatTime = (total) => `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
+
         const startNewGame = () => {
+          setTimerRunning(false);
           setPhase('setup');
           setGameData(prev => ({ ...prev, playerRoles: [], word: '', starterName: '', impostorIds: [] }));
         };
@@ -622,6 +646,16 @@
                 >
                   <span className={`absolute top-1 w-6 h-6 rounded-full bg-white transition-all ${isFamilyMode ? 'left-7' : 'left-1'}`} />
                 </button>
+              </div>
+
+              <div className="mb-4 bg-slate-900 border border-slate-800 rounded-2xl p-4">
+                <div className="font-bold text-slate-200">Debate con cronómetro</div>
+                <div className="text-xs text-slate-500 mt-1 mb-3">El tiempo se controla dentro del juego y luego activa la votación secreta.</div>
+                <div className="flex gap-2">
+                  {[2,3,5,8].map(m => (
+                    <button key={m} onClick={() => setDebateMinutes(m)} className={`flex-1 py-2 rounded-xl text-sm font-black border ${debateMinutes === m ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-slate-800 border-slate-700 text-slate-400'}`}>{m} min</button>
+                  ))}
+                </div>
               </div>
 
               <div className="mb-6 bg-slate-900 border border-slate-800 rounded-2xl p-4">
@@ -826,9 +860,48 @@
                 Hagan una pregunta a {gameData.starterName} y que comience el debate.
               </p>
 
-              <Button onClick={() => setPhase('result')}>
-                👁 Revelar impostores y palabra
+              <Button onClick={() => { setSecondsLeft(debateMinutes * 60); setTimerRunning(true); setPhase('debate'); }}>
+                ⏱ Iniciar debate
               </Button>
+            </div>
+          );
+        }
+
+        // DEBATE PREMIUM
+        if (phase === 'debate') {
+          const ended = secondsLeft === 0;
+          return (
+            <div className="min-h-screen text-slate-100 p-6 flex flex-col items-center justify-center max-w-md mx-auto text-center">
+              <div className="text-xs uppercase tracking-[0.25em] font-black text-indigo-300 mb-4">Debate en curso</div>
+              <div className={`text-7xl font-black tabular-nums mb-4 ${ended ? 'text-red-400' : 'text-white'}`}>{formatTime(secondsLeft)}</div>
+              <p className="text-slate-400 max-w-xs mb-10">Cada jugador da pistas sin revelar la palabra. Defiendan su caso, detecten contradicciones y voten al final.</p>
+              <div className="w-full space-y-3">
+                <Button onClick={() => setTimerRunning(v => !v)}>{timerRunning ? '⏸ Pausar debate' : (ended ? '▶️ Tiempo extra' : '▶️ Continuar debate')}</Button>
+                {ended && <Button variant="success" onClick={() => { setSecondsLeft(debateMinutes * 60); setTimerRunning(true); }}>+ Reiniciar tiempo</Button>}
+                <Button variant="danger" onClick={startVoting}>🗳 Abrir votación secreta</Button>
+              </div>
+            </div>
+          );
+        }
+
+        // VOTACIÓN SECRETA
+        if (phase === 'voting') {
+          const voter = players[voteIndex];
+          return (
+            <div className="min-h-screen text-slate-100 p-6 flex flex-col max-w-md mx-auto">
+              <div className="text-center mt-8">
+                <div className="text-xs uppercase tracking-widest text-indigo-300 font-black">Votación secreta</div>
+                <h2 className="text-3xl font-black mt-3">Turno de {voter.name}</h2>
+                <p className="text-slate-500 text-sm mt-2">Pasa el teléfono. Elige a quien sospechas y luego entrégalo al siguiente.</p>
+              </div>
+              <div className="flex-1 flex flex-col justify-center gap-3 py-8">
+                {players.filter(p => p.id !== voter.id).map(p => (
+                  <button key={p.id} onClick={() => castVote(p.id)} className="w-full bg-slate-900 hover:bg-indigo-600 border border-slate-700 hover:border-indigo-400 rounded-2xl px-5 py-4 text-left font-black transition-all active:scale-[0.98]">
+                    🗳 {p.name}
+                  </button>
+                ))}
+              </div>
+              <div className="text-center text-slate-500 text-sm">Voto {voteIndex + 1} de {players.length}</div>
             </div>
           );
         }
@@ -839,6 +912,9 @@
           .map(p => p.name);
 
         const title = impostorNames.length > 1 ? 'Los Impostores eran' : 'El Impostor era';
+        const tally = votes.reduce((acc, id) => ({ ...acc, [id]: (acc[id] || 0) + 1 }), {});
+        const votedId = Object.keys(tally).sort((a, b) => tally[b] - tally[a])[0];
+        const votedName = players.find(p => String(p.id) === String(votedId))?.name;
 
         return (
           <div className="min-h-screen text-slate-100 p-6 flex flex-col max-w-md mx-auto">
@@ -848,6 +924,13 @@
                 <div className="bg-slate-900 border-2 border-slate-800 rounded-2xl p-6 relative overflow-hidden">
                   <span className="text-3xl font-black text-white relative z-10">{gameData.word}</span>
                   <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/10 to-transparent"></div>
+                </div>
+              </div>
+
+              <div className="text-center w-full">
+                <h2 className="text-emerald-400/80 text-sm font-bold uppercase tracking-widest mb-2">Voto del grupo</h2>
+                <div className="bg-emerald-500/10 border-2 border-emerald-500/20 rounded-2xl p-5">
+                  <span className="text-emerald-200 font-black">{votedName ? `El grupo señaló a ${votedName}` : 'No hubo votación'}</span>
                 </div>
               </div>
 
