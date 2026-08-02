@@ -1118,7 +1118,13 @@ window.onload = function() {
 
 document.addEventListener('keydown', (e) => {
     if (!document.getElementById('game-screen').classList.contains('active')) return;
-    if (e.key.toLowerCase() === 'p') {\n        Game.togglePause();\n    }\n    if (e.key === 'Escape') {\n        Game.exitToMenu();\n    }\n    if (e.key === 'Enter') {
+    if (e.key.toLowerCase() === 'p') {
+        Game.togglePause();
+    }
+    if (e.key === 'Escape') {
+        Game.exitToMenu();
+    }
+    if (e.key === 'Enter') {
         // Allow manual skip if impatient
         if (document.getElementById('explanation-panel').classList.contains('show')) {
              if (State.autoNextTimeout) clearTimeout(State.autoNextTimeout);
