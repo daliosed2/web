@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>After Dark · Juego +18</title>
+<meta name="description" content="After Dark: juego social para adultos basado en consentimiento.">
+<style>
+:root{--bg:#100a12;--panel:#211522;--panel2:#2f1b30;--pink:#ff4f91;--violet:#a855f7;--gold:#f6c76d;--text:#fff;--muted:#c8b7c9;--line:#70445f}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 50% -10%,#612744 0,#100a12 52%);color:var(--text);font-family:Inter,system-ui,sans-serif;padding:18px}
+.app{width:min(100%,520px);margin:auto;background:#170d1bdf;border:1px solid var(--line);border-radius:28px;padding:24px;box-shadow:0 25px 90px #0009;backdrop-filter:blur(16px)}
+.brand{text-align:center;color:var(--gold);font-size:11px;letter-spacing:3px;text-transform:uppercase}.brand span{color:#fff;letter-spacing:0;text-transform:none}
+h1{text-align:center;font-size:44px;letter-spacing:-2px;margin:24px 0 4px}.subtitle{text-align:center;color:var(--muted);margin:0 0 26px}
+.panel{background:linear-gradient(145deg,#3b1e36,#211522);border:1px solid #8e506e;border-radius:22px;padding:20px;margin:16px 0}.eyebrow{color:var(--pink);font-size:11px;font-weight:900;letter-spacing:2px;text-transform:uppercase}.prompt{font-size:25px;line-height:1.24;font-weight:800;margin:14px 0 24px}
+button,select,input{font:inherit}button{width:100%;border:0;border-radius:14px;padding:14px;font-weight:850;cursor:pointer;color:#fff}.primary{background:linear-gradient(90deg,var(--pink),var(--violet))}.secondary{background:#342239;border:1px solid var(--line);margin-top:10px}.ghost{background:transparent;color:var(--muted);border:1px solid #52354e;margin-top:10px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field{display:flex;flex-direction:column;gap:7px;color:var(--muted);font-size:12px;font-weight:700}.field input,.field select{background:#160d19;color:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;outline:none}.chips{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}.chip{border:1px solid var(--line);border-radius:99px;padding:8px 11px;color:#ead8e8;font-size:11px}.stats{display:flex;justify-content:space-between;gap:8px;margin:14px 0}.stat{flex:1;background:#180d1b;border:1px solid #4c3048;border-radius:13px;padding:10px;text-align:center}.stat small{display:block;color:var(--muted);font-size:10px}.stat strong{display:block;color:var(--gold);font-size:20px;margin-top:3px}.notice{font-size:12px;color:var(--muted);line-height:1.55;text-align:center}.hidden{display:none!important}.footer{text-align:center;color:#806d80;font-size:10px;margin-top:18px}.check{display:flex;gap:10px;align-items:flex-start;color:var(--muted);font-size:12px;line-height:1.4;margin:14px 0}.check input{accent-color:var(--pink);margin-top:3px}.back{background:none;color:var(--muted);font-size:12px;padding:9px}.level{display:flex;justify-content:space-between;align-items:center;gap:10px}.level select{background:#180d1b;color:#fff;border:1px solid var(--line);border-radius:10px;padding:8px;font-size:12px}
+@media(max-width:420px){body{padding:10px}.app{padding:18px}h1{font-size:38px}.prompt{font-size:22px}}
+</style>
+</head>
+<body>
+<main class="app">
+  <div class="brand">davidfernandomartinez.com <span>· presenta</span></div>
+  <section id="setup">
+    <h1>After Dark</h1>
+    <p class="subtitle">Un juego social para adultos. La intensidad la deciden ustedes.</p>
+    <div class="chips"><span class="chip">+18</span><span class="chip">Consentimiento</span><span class="chip">Privado</span><span class="chip">Sin presión</span></div>
+    <div class="panel">
+      <div class="grid">
+        <label class="field">Modo
+          <select id="mode"><option value="couple">Pareja</option><option value="group">Grupo adulto</option></select>
+        </label>
+        <label class="field">Intensidad
+          <select id="intensity"><option value="flirt">Coqueteo</option><option value="bold">Atrevido</option><option value="hot">🔥 Intenso</option></select>
+        </label>
+      </div>
+      <label class="check"><input id="consent" type="checkbox"> Todas las personas participantes son mayores de 18 años y aceptan que cualquiera puede pasar una carta, pausar o salir sin dar explicaciones.</label>
+      <button class="primary" onclick="begin()">Comenzar partida</button>
+    </div>
+    <p class="notice">No se guardan nombres, respuestas ni historial. Este prototipo funciona localmente en el navegador.</p>
+  </section>
+
+  <section id="game" class="hidden">
+    <div class="level"><div><div class="eyebrow" id="levelLabel">Nivel atrevido</div><div class="subtitle" style="margin:5px 0 0">Carta <span id="cardNo">1</span></div></div><button class="ghost" style="width:auto;margin:0;padding:9px 12px" onclick="togglePause()" id="pauseBtn">⏸ Pausar</button></div>
+    <div class="stats"><div class="stat"><small>Prendas retiradas</small><strong id="clothes">0</strong></div><div class="stat"><small>Cartas completadas</small><strong id="done">0</strong></div><div class="stat"><small>Pasadas</small><strong id="passed">0</strong></div></div>
+    <div class="panel"><div class="eyebrow" id="type">Reto</div><div class="prompt" id="prompt"></div><button class="primary" onclick="completeCard()">Hecho · siguiente carta</button><button class="secondary" onclick="passCard()">Pasar esta carta</button></div>
+    <button class="back" onclick="endGame()">Salir de la partida</button>
+  </section>
+
+  <section id="paused" class="hidden">
+    <h1 style="font-size:32px">Partida en pausa</h1><p class="subtitle">Tómense el tiempo que necesiten.</p><button class="primary" onclick="togglePause()">▶️ Continuar</button><button class="back" onclick="endGame()">Salir</button>
+  </section>
+  <section id="end" class="hidden">
+    <h1 style="font-size:34px">Noche terminada</h1><p class="subtitle">Gracias por jugar con respeto.</p><div class="panel"><div class="stats"><div class="stat"><small>Completadas</small><strong id="finalDone">0</strong></div><div class="stat"><small>Pasadas</small><strong id="finalPassed">0</strong></div><div class="stat"><small>Prendas</small><strong id="finalClothes">0</strong></div></div><p class="notice">Recuerden: cualquier persona puede cambiar de opinión en cualquier momento.</p></div><button class="primary" onclick="resetGame()">Jugar otra vez</button>
+  </section>
+  <div class="footer">After Dark · Prototipo privado · No publicado</div>
+</main>
+<script>
+const cards={
+ flirt:[
+  ['Pregunta','¿Qué detalle pequeño te parece irresistible en alguien?'],
+  ['Confesión','Cuenta una primera impresión que nunca olvidaste.'],
+  ['Reto','Mantengan la mirada durante 15 segundos y sonrían.'],
+  ['Elección','Elige: una pregunta íntima o quitarte una prenda.']
+ ],
+ bold:[
+  ['Reto','Quítate una prenda o responde: ¿qué te atrae primero de alguien?'],
+  ['Elección','Elige: quitarte una prenda, dar un beso o contar una fantasía romántica.'],
+  ['Confesión','Describe una situación que te parezca especialmente excitante, sin entrar en detalles explícitos.'],
+  ['Reto','Deja que tu pareja elija una prenda que puedes quitarte. Pasar siempre está permitido.'],
+  ['Pregunta','¿Qué tipo de contacto te parece más sensual?']
+ ],
+ hot:[
+  ['Reto','Quítate una prenda o responde con honestidad: ¿qué deseo te cuesta contar?'],
+  ['Elección','Elige entre quitarte una prenda, un beso prolongado o una confesión íntima.'],
+  ['Confesión','Comparte una fantasía adulta de forma general y acuerden si quieren explorarla.'],
+  ['Reto','Quien quiera puede quitarse una prenda; quien no, elige una pregunta para otra persona.'],
+  ['Pausa','Todos confirman que quieren continuar antes de revelar la siguiente carta.']
+ ]};
+let deck=[],index=0,done=0,passed=0,clothes=0,paused=false;
+const $=id=>document.getElementById(id);
+function begin(){if(!$('consent').checked){alert('Primero confirmen que todas las personas son mayores de 18 años y consienten jugar.');return}const level=$('intensity').value;deck=[...cards[level]].sort(()=>Math.random()-.5);index=0;done=0;passed=0;clothes=0;paused=false;$('levelLabel').textContent='Nivel '+$('intensity').selectedOptions[0].textContent;$('setup').classList.add('hidden');$('end').classList.add('hidden');$('paused').classList.add('hidden');$('game').classList.remove('hidden');render()}
+function render(){if(!deck.length)return;$('cardNo').textContent=index+1;$('type').textContent=deck[index][0];$('prompt').textContent=deck[index][1];$('done').textContent=done;$('passed').textContent=passed;$('clothes').textContent=clothes}
+function next(){index=(index+1)%deck.length;render()}
+function completeCard(){done++;if(/prenda|quitarte una prenda|quitarse una prenda/i.test(deck[index][1]))clothes++;next()}
+function passCard(){passed++;next()}
+function togglePause(){if($('game').classList.contains('hidden'))return;paused=!paused;$('game').classList.toggle('hidden',paused);$('paused').classList.toggle('hidden',!paused)}
+function endGame(){$('game').classList.add('hidden');$('paused').classList.add('hidden');$('end').classList.remove('hidden');$('finalDone').textContent=done;$('finalPassed').textContent=passed;$('finalClothes').textContent=clothes}
+function resetGame(){$('end').classList.add('hidden');$('setup').classList.remove('hidden')}
+</script>
+</body>
+</html>
