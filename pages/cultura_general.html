@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, ">
     <title>Trivia Rush - Neon Edition</title>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-TPRYYR8VJP"></script>
 <script>
@@ -376,6 +376,10 @@
             <div><span id="lives-display">❤️❤️❤️</span></div>
             <div>🔥 <span id="streak-display">0</span>x</div>
             <div class="score-box">💎 <span id="score-display">0</span></div>
+        </div>
+        <div style="display:flex; gap:8px; margin:-5px 0 12px; justify-content:flex-end;">
+            <button type="button" class="btn" id="pause-game" onclick="Game.togglePause()" style="padding:8px 12px; font-size:0.8rem; justify-content:center;">⏸ Pausar</button>
+            <button type="button" class="btn" onclick="Game.exitToMenu()" style="padding:8px 12px; font-size:0.8rem; justify-content:center;">🚪 Salir</button>
         </div>
 
         <div class="timer-bar-bg">
@@ -812,7 +816,7 @@ const Game = {
         clearInterval(State.timerInterval);
         
         State.timerInterval = setInterval(() => {
-            if (State.isFrozen) return;
+            if (State.isFrozen || State.paused) return;
 
             State.timer -= 0.1;
             UI.updateTimer(State.timer, State.maxTime);
@@ -871,6 +875,24 @@ const Game = {
             State.gameOverTimeout = setTimeout(() => this.endGame(false), 2500); 
         } else {
             State.autoNextTimeout = setTimeout(() => this.nextQuestion(), 2500);
+        }
+    },
+
+    togglePause: function() {
+        if (State.answered || State.mode === 'practice') return;
+        State.paused = !State.paused;
+        const btn = document.getElementById('pause-game');
+        if (btn) btn.innerText = State.paused ? '▶️ Continuar' : '⏸ Pausar';
+        document.getElementById('q-text').style.opacity = State.paused ? '0.35' : '1';
+        document.getElementById('options-container').style.pointerEvents = State.paused ? 'none' : 'auto';
+    },
+
+    exitToMenu: function() {
+        if (confirm('¿Salir de la partida? Perderás el progreso actual.')) {
+            clearInterval(State.timerInterval);
+            if (State.autoNextTimeout) clearTimeout(State.autoNextTimeout);
+            State.paused = false;
+            UI.showScreen('menu-screen');
         }
     },
 
@@ -1096,7 +1118,7 @@ window.onload = function() {
 
 document.addEventListener('keydown', (e) => {
     if (!document.getElementById('game-screen').classList.contains('active')) return;
-    if (e.key === 'Enter') {
+    if (e.key.toLowerCase() === 'p') {\n        Game.togglePause();\n    }\n    if (e.key === 'Escape') {\n        Game.exitToMenu();\n    }\n    if (e.key === 'Enter') {
         // Allow manual skip if impatient
         if (document.getElementById('explanation-panel').classList.contains('show')) {
              if (State.autoNextTimeout) clearTimeout(State.autoNextTimeout);
