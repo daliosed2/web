@@ -347,7 +347,7 @@
         <div class="menu-grid">
             <button class="btn btn-primary" onclick="Game.start('classic')">
                 <span>🎮 Clásico</span>
-                <small>12 Preguntas</small>
+                <small>15 Preguntas</small>
             </button>
             <button class="btn" onclick="Game.start('daily')">
                 <span>📅 Reto Diario</span>
@@ -355,7 +355,7 @@
             </button>
             <button class="btn" onclick="Game.start('practice')">
                 <span>🎓 Práctica</span>
-                <small>Sin estrés</small>
+                <small>Sin estrés · 30 preguntas</small>
             </button>
         </div>
 
@@ -628,6 +628,48 @@ const QUESTIONS_DB = [
     { cat: "Literatura", q: "¿Quién escribió 'Moby Dick'?", a: ["Melville", "Hemingway", "Poe", "Twain"], correct: 0, explain: "La ballena blanca.", diff: 3 },
     { cat: "Cine", q: "¿Película muda de 2011 ganadora Óscar?", a: ["The Artist", "Hugo", "Midnight in Paris", "War Horse"], correct: 0, explain: "Francesa.", diff: 3 },
     { cat: "Historia", q: "¿Zar asesinado en 1918?", a: ["Nicolás II", "Alejandro II", "Pedro I", "Iván IV"], correct: 0, explain: "Fin de los Romanov.", diff: 3 }
+    { cat: "Latinoamérica", q: "¿Cuál es la capital de Ecuador?", a: ["Quito", "Guayaquil", "Cuenca", "Loja"], correct: 0, explain: "Quito está en la región andina.", diff: 1 },
+    { cat: "Latinoamérica", q: "¿En qué país se encuentra Machu Picchu?", a: ["Perú", "Bolivia", "Chile", "Colombia"], correct: 0, explain: "Es una ciudadela inca.", diff: 1 },
+    { cat: "Ciencia", q: "¿Qué vitamina produce el cuerpo con la luz solar?", a: ["Vitamina D", "Vitamina C", "Vitamina B12", "Vitamina K"], correct: 0, explain: "La piel participa en su síntesis.", diff: 1 },
+    { cat: "Ciencia", q: "¿Qué órgano filtra principalmente la sangre?", a: ["Riñones", "Pulmones", "Corazón", "Estómago"], correct: 0, explain: "También regulan líquidos y sales.", diff: 1 },
+    { cat: "Naturaleza", q: "¿Cuál es el árbol más alto conocido?", a: ["Secuoya", "Roble", "Baobab", "Pino"], correct: 0, explain: "Las secuoyas costeras pueden superar los 100 metros.", diff: 2 },
+    { cat: "Naturaleza", q: "¿Cómo se llama el proceso por el que una oruga se convierte en mariposa?", a: ["Metamorfosis", "Fotosíntesis", "Migración", "Polinización"], correct: 0, explain: "Es un cambio completo de forma.", diff: 1 },
+    { cat: "Economía", q: "¿Qué mide la inflación?", a: ["El aumento general de precios", "El número de empleos", "La producción agrícola", "El valor de una moneda"], correct: 0, explain: "Se observa mediante índices de precios.", diff: 2 },
+    { cat: "Economía", q: "¿Qué es el PIB?", a: ["Producto Interno Bruto", "Precio Internacional Básico", "Plan de Inversión Bancaria", "Patrimonio Industrial Base"], correct: 0, explain: "Mide el valor de bienes y servicios producidos.", diff: 1 },
+    { cat: "Cultura", q: "¿Qué idioma tiene más hablantes nativos?", a: ["Chino mandarín", "Inglés", "Español", "Árabe"], correct: 0, explain: "El mandarín lidera por hablantes nativos.", diff: 2 },
+    { cat: "Cultura", q: "¿Qué instrumento tiene teclas, cuerdas y martillos?", a: ["Piano", "Flauta", "Trompeta", "Arpa"], correct: 0, explain: "Los martillos golpean sus cuerdas.", diff: 1 },
+    { cat: "Tecnología", q: "¿Qué significa GPS?", a: ["Sistema de Posicionamiento Global", "Señal Privada Global", "Sistema de Protocolo Gráfico", "Guía de Posición Satelital"], correct: 0, explain: "Usa satélites para calcular ubicación.", diff: 1 },
+    { cat: "Tecnología", q: "¿Qué es el phishing?", a: ["Un engaño para robar datos", "Un lenguaje de programación", "Una red inalámbrica", "Un tipo de batería"], correct: 0, explain: "Suele llegar por mensajes o páginas falsas.", diff: 2 },
+    { cat: "Matemáticas", q: "¿Cuánto es el 15% de 200?", a: ["30", "15", "20", "40"], correct: 0, explain: "0,15 × 200 = 30.", diff: 1 },
+    { cat: "Matemáticas", q: "¿Cómo se llama un polígono de ocho lados?", a: ["Octágono", "Heptágono", "Nonágono", "Decágono"], correct: 0, explain: "Tiene ocho lados y ocho ángulos.", diff: 1 },
+    { cat: "Historia", q: "¿Qué civilización construyó Chichén Itzá?", a: ["Maya", "Inca", "Romana", "Persa"], correct: 0, explain: "Está en la península de Yucatán.", diff: 1 },
+    { cat: "Historia", q: "¿Qué ruta conectaba China con el Mediterráneo?", a: ["Ruta de la Seda", "Ruta del Ámbar", "Camino Real", "Vía Apia"], correct: 0, explain: "Era una red de rutas comerciales.", diff: 2 },
+    { cat: "Geografía", q: "¿Cuál es el lago más profundo del mundo?", a: ["Baikal", "Titicaca", "Victoria", "Superior"], correct: 0, explain: "Está en Siberia.", diff: 2 },
+    { cat: "Geografía", q: "¿Qué país tiene forma de hexágono en muchos mapas escolares?", a: ["Francia", "Portugal", "Italia", "Noruega"], correct: 0, explain: "Es un apodo geográfico de Francia.", diff: 1 },
+    { cat: "Deportes", q: "¿Cuántos puntos vale un triple en baloncesto?", a: ["3", "2", "1", "4"], correct: 0, explain: "El lanzamiento se hace fuera del arco.", diff: 1 },
+    { cat: "Deportes", q: "¿En qué deporte se usa un puck?", a: ["Hockey sobre hielo", "Rugby", "Cricket", "Waterpolo"], correct: 0, explain: "Es el disco que se desliza sobre el hielo.", diff: 1 },
+    { cat: "Cine", q: "¿Qué película popularizó la frase 'Que la Fuerza te acompañe'?", a: ["Star Wars", "Matrix", "Avatar", "Alien"], correct: 0, explain: "Es una saga de ciencia ficción.", diff: 1 },
+    { cat: "Cine", q: "¿Qué director creó 'El viaje de Chihiro'?", a: ["Hayao Miyazaki", "Satoshi Kon", "Akira Kurosawa", "Makoto Shinkai"], correct: 0, explain: "Es una obra de Studio Ghibli.", diff: 2 },
+    { cat: "Literatura", q: "¿Quién escribió 'Don Quijote de la Mancha'?", a: ["Miguel de Cervantes", "Lope de Vega", "Quevedo", "Góngora"], correct: 0, explain: "Es una de las grandes novelas en español.", diff: 1 },
+    { cat: "Literatura", q: "¿Qué género es 'Frankenstein'?", a: ["Novela gótica", "Comedia", "Ensayo", "Poesía épica"], correct: 0, explain: "Fue escrita por Mary Shelley.", diff: 2 },
+    { cat: "Arte", q: "¿Qué técnica usa pequeños puntos de color?", a: ["Puntillismo", "Fresco", "Grabado", "Collage"], correct: 0, explain: "Los puntos se mezclan visualmente a distancia.", diff: 2 },
+    { cat: "Arte", q: "¿Qué arquitecta diseñó el Centro Heydar Aliyev?", a: ["Zaha Hadid", "Frida Kahlo", "Georgia O'Keeffe", "Louise Bourgeois"], correct: 0, explain: "Fue reconocida por sus formas fluidas.", diff: 3 },
+    { cat: "Música", q: "¿Qué familia incluye violín y violonchelo?", a: ["Cuerdas", "Vientos", "Percusión", "Electrónicos"], correct: 0, explain: "Se tocan con arco o pizzicato.", diff: 1 },
+    { cat: "Música", q: "¿Qué significa cantar 'a capela'?", a: ["Sin acompañamiento instrumental", "En voz muy alta", "En otro idioma", "Con coro"], correct: 0, explain: "Las voces llevan toda la música.", diff: 2 },
+    { cat: "Gaming", q: "¿Qué compañía creó la consola PlayStation?", a: ["Sony", "Nintendo", "Sega", "Microsoft"], correct: 0, explain: "La primera PlayStation llegó en 1994.", diff: 1 },
+    { cat: "Gaming", q: "¿En qué juego aparece el modo Battle Royale?", a: ["Fortnite", "The Sims", "Tetris", "Pac-Man"], correct: 0, explain: "Es uno de sus modos más conocidos.", diff: 1 },
+    { cat: "Anime", q: "¿Cómo se llama el barco de One Piece?", a: ["Going Merry", "Thousand Sunny", "Red Force", "Moby Dick"], correct: 0, explain: "Fue el primer gran barco de los Sombrero de Paja.", diff: 2 },
+    { cat: "Anime", q: "¿Qué criatura acompaña a Ash en Pokémon?", a: ["Pikachu", "Eevee", "Mew", "Charizard"], correct: 0, explain: "Es su compañero más icónico.", diff: 1 },
+    { cat: "Idiomas", q: "¿Qué alfabeto usa principalmente el ruso?", a: ["Cirილico", "Griego", "Latino", "Árabe"], correct: 0, explain: "La opción correcta es cirílico.", diff: 2 },
+    { cat: "Salud", q: "¿Qué hábito ayuda a consolidar la memoria?", a: ["Dormir bien", "Saltarse comidas", "Evitar toda actividad", "Dormir menos"], correct: 0, explain: "El descanso favorece el aprendizaje.", diff: 1 },
+    { cat: "Salud", q: "¿Qué mineral es importante para los huesos?", a: ["Calcio", "Sodio", "Cloro", "Yodo"], correct: 0, explain: "También interviene la vitamina D.", diff: 1 },
+    { cat: "Astronomía", q: "¿Qué es una supernova?", a: ["Explosión de una estrella", "Planeta pequeño", "Luna artificial", "Cometa brillante"], correct: 0, explain: "Puede liberar enormes cantidades de energía.", diff: 2 },
+    { cat: "Astronomía", q: "¿Qué galaxia contiene nuestro Sistema Solar?", a: ["Vía Láctea", "Andrómeda", "Triángulo", "Sombrero"], correct: 0, explain: "Es una galaxia espiral.", diff: 1 },
+    { cat: "Sociedad", q: "¿Qué poder crea las leyes en una democracia?", a: ["Legislativo", "Judicial", "Ejecutivo", "Municipal"], correct: 0, explain: "El poder legislativo debate y aprueba leyes.", diff: 2 },
+    { cat: "Sociedad", q: "¿Qué documento establece derechos fundamentales?", a: ["Constitución", "Factura", "Calendario", "Receta"], correct: 0, explain: "Es la norma fundamental de un Estado.", diff: 1 },
+    { cat: "Gastronomía", q: "¿De qué país es originaria la paella?", a: ["España", "Italia", "México", "Grecia"], correct: 0, explain: "Es especialmente asociada con Valencia.", diff: 1 },
+    { cat: "Gastronomía", q: "¿Qué especia da color amarillo al curry y a la mostaza?", a: ["Cúrcuma", "Canela", "Pimienta", "Vainilla"], correct: 0, explain: "Contiene curcumina.", diff: 2 }
+
 ];
 
 // --- AUDIO SYSTEM ---
@@ -730,9 +772,9 @@ const Game = {
         const hard = QUESTIONS_DB.filter(q => q.diff === 3);
 
         const selected = [
-            ...this.shuffleArray(easy).slice(0, 4),
-            ...this.shuffleArray(med).slice(0, 4),
-            ...this.shuffleArray(hard).slice(0, 4)
+            ...this.shuffleArray(easy).slice(0, 5),
+            ...this.shuffleArray(med).slice(0, 5),
+            ...this.shuffleArray(hard).slice(0, 5)
         ];
         
         State.questions = selected.map(q => this.shuffleOptions(q));
@@ -740,7 +782,7 @@ const Game = {
 
     loadPracticeQuestions: function() {
         let pool = this.shuffleArray([...QUESTIONS_DB]);
-        State.questions = pool.slice(0, 20).map(q => this.shuffleOptions(q));
+        State.questions = pool.slice(0, 30).map(q => this.shuffleOptions(q));
     },
 
     loadDailyQuestions: function() {
@@ -751,24 +793,25 @@ const Game = {
         const dailyQs = [];
         const copy = JSON.parse(JSON.stringify(QUESTIONS_DB));
         
-        for(let i=0; i<10; i++) {
+        for(let i=0; i<12; i++) {
             if (copy.length === 0) break;
             const index = Math.abs(hash + i) % copy.length;
             dailyQs.push(copy[index]);
             copy.splice(index, 1);
         }
         State.questions = dailyQs.map(q => this.shuffleOptions(q));
+        // El reto diario prioriza variedad de categorías cuando hay opciones disponibles.
     },
 
     shuffleArray: function(array) {
-        return array.sort(() => 0.5 - Math.random());
+        for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } return array;
     },
 
     shuffleOptions: function(q) {
         let newQ = JSON.parse(JSON.stringify(q));
         const originalCorrectText = newQ.a[newQ.correct];
         let answers = newQ.a.map(ans => ({ text: ans, isCorrect: ans === originalCorrectText }));
-        answers.sort(() => Math.random() - 0.5);
+        for (let i = answers.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [answers[i], answers[j]] = [answers[j], answers[i]]; }
         newQ.a = answers.map(obj => obj.text);
         newQ.correct = answers.findIndex(obj => obj.isCorrect);
         return newQ;
